@@ -1,0 +1,450 @@
+kotlin version: 2.0.21
+error message: org.jetbrains.kotlin.backend.common.BackendException: Backend Internal error: Exception during IR lowering
+File being compiled: /Users/aleksandrkosarev/AndroidStudioProjects/ShareYourVoiceMapbox/app/src/main/java/com/example/shareyourvoicemapbox/MainActivity.kt
+The root cause java.lang.RuntimeException was thrown at: org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:47)
+	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException(CodegenUtil.kt:253)
+	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException$default(CodegenUtil.kt:236)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invokeSequential(performByIrFile.kt:65)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invoke(performByIrFile.kt:52)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invoke(performByIrFile.kt:38)
+	at org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase.phaseBody(CompilerPhase.kt:166)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:27)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:14)
+	at org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase.phaseBody(CompilerPhase.kt:166)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.CompilerPhaseKt.invokeToplevel(CompilerPhase.kt:62)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.invokeCodegen(JvmIrCodegenFactory.kt:371)
+	at org.jetbrains.kotlin.codegen.CodegenFactory.generateModule(CodegenFactory.kt:47)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.generateModuleInFrontendIRMode(JvmIrCodegenFactory.kt:433)
+	at org.jetbrains.kotlin.cli.jvm.compiler.pipeline.JvmCompilerPipelineKt.generateCodeFromIr(jvmCompilerPipeline.kt:246)
+	at org.jetbrains.kotlin.cli.jvm.compiler.pipeline.JvmCompilerPipelineKt.compileModulesUsingFrontendIrAndLightTree(jvmCompilerPipeline.kt:142)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:148)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:43)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:103)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:49)
+	at org.jetbrains.kotlin.cli.common.CLITool.exec(CLITool.kt:101)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunner.runCompiler(IncrementalJvmCompilerRunner.kt:464)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunner.runCompiler(IncrementalJvmCompilerRunner.kt:73)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.doCompile(IncrementalCompilerRunner.kt:506)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compileImpl(IncrementalCompilerRunner.kt:423)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.tryCompileIncrementally$lambda$9$compile(IncrementalCompilerRunner.kt:249)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.tryCompileIncrementally(IncrementalCompilerRunner.kt:267)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compile(IncrementalCompilerRunner.kt:120)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.execIncrementalCompiler(CompileServiceImpl.kt:675)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.access$execIncrementalCompiler(CompileServiceImpl.kt:92)
+	at org.jetbrains.kotlin.daemon.CompileServiceImpl.compile(CompileServiceImpl.kt:1660)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.base/java.lang.Thread.run(Unknown Source)
+Caused by: java.lang.RuntimeException: Exception while generating code for:
+FUN CLASS_STATIC_INITIALIZER name:<clinit> visibility:public/*package*/ modality:FINAL <> () returnType:kotlin.Unit
+  BLOCK_BODY
+    SET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt visibility:public [final,static] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt' type=kotlin.Unit origin=INITIALIZE_FIELD
+      value: CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt' type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt origin=null
+    SET_FIELD 'FIELD name:lambda-1 type:@[ExtensionFunctionType] kotlin.Function3<com.mapbox.maps.extension.compose.MapboxMapScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit> visibility:internal [static] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt' type=kotlin.Unit origin=INITIALIZE_FIELD
+      value: CALL 'public final fun composableLambdaInstance (key: kotlin.Int, tracked: kotlin.Boolean, block: kotlin.Any): androidx.compose.runtime.internal.ComposableLambda declared in androidx.compose.runtime.internal.ComposableLambdaKt' type=androidx.compose.runtime.internal.ComposableLambda origin=null
+        key: CONST Int type=kotlin.Int value=-1737211039
+        tracked: CONST Boolean type=kotlin.Boolean value=false
+        block: BLOCK type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> origin=null
+          CLASS LAMBDA_IMPL CLASS name:<no name provided> modality:FINAL visibility:public/*package*/ superTypes:[kotlin.Any; kotlin.Function3<com.mapbox.maps.extension.compose.MapboxMapScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>]
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>
+            CONSTRUCTOR GENERATED_MEMBER_IN_CALLABLE_REFERENCE visibility:public/*package*/ <> () returnType:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> [primary]
+              BLOCK_BODY
+                DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+                BLOCK type=kotlin.Unit origin=null
+            FUN name:invoke visibility:public modality:FINAL <> ($this:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>, $this$MapboxMap:com.mapbox.maps.extension.compose.MapboxMapScope, $composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
+              annotations:
+                Composable
+                ComposableTarget(applier = "com.mapbox.maps.extension.compose.MapboxMapComposable")
+              overridden:
+                public abstract fun invoke (p1: P1 of kotlin.Function3, p2: P2 of kotlin.Function3, p3: P3 of kotlin.Function3): R of kotlin.Function3 [operator] declared in kotlin.Function3
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>
+              VALUE_PARAMETER name:$this$MapboxMap index:0 type:com.mapbox.maps.extension.compose.MapboxMapScope
+              VALUE_PARAMETER name:$composer index:1 type:androidx.compose.runtime.Composer? [assignable]
+              VALUE_PARAMETER name:$changed index:2 type:kotlin.Int
+              BLOCK_BODY
+                CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
+                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                  sourceInformation: CONST String type=kotlin.String value="C32@1173L61,30@1101L210:MainActivity.kt#disv1c"
+                WHEN type=kotlin.Unit origin=IF
+                  BRANCH
+                    if: CALL 'public final fun OROR (arg0: kotlin.Boolean, arg1: kotlin.Boolean): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                      arg0: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                        $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                          arg0: CALL 'public final fun and (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
+                            $this: GET_VAR '$changed: kotlin.Int declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Int origin=null
+                            other: CONST Int type=kotlin.Int value=17
+                          arg1: CONST Int type=kotlin.Int value=16
+                      arg1: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                        $this: CALL 'public abstract fun <get-skipping> (): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
+                          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                    then: BLOCK type=kotlin.Unit origin=null
+                      WHEN type=kotlin.Unit origin=IF
+                        BRANCH
+                          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime.ComposerKt' type=kotlin.Boolean origin=null
+                          then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
+                            key: CONST Int type=kotlin.Int value=-1737211039
+                            dirty1: GET_VAR '$changed: kotlin.Int declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Int origin=null
+                            dirty2: CONST Int type=kotlin.Int value=-1
+                            info: CONST String type=kotlin.String value="com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.lambda-1.<anonymous> (MainActivity.kt:30)"
+                      BLOCK type=kotlin.Unit origin=ARGUMENTS_REORDERING_FOR_CALL
+                        VAR IR_TEMPORARY_VARIABLE name:tmp0_point type:com.mapbox.geojson.Point [val]
+                          BLOCK type=com.mapbox.geojson.Point origin=null
+                            VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Any? [val]
+                              CALL 'public open fun fromLngLat (p0: kotlin.Double, p1: kotlin.Double): @[FlexibleNullability] com.mapbox.geojson.Point? declared in com.mapbox.geojson.Point' type=@[FlexibleNullability] com.mapbox.geojson.Point? origin=null
+                                p0: CONST Double type=kotlin.Double value=-98.0
+                                p1: CONST Double type=kotlin.Double value=39.5
+                            CALL 'public final fun checkNotNullExpressionValue (value: kotlin.Any?, expression: kotlin.String): kotlin.Unit declared in kotlin.jvm.internal.Intrinsics' type=kotlin.Unit origin=null
+                              value: GET_VAR 'val tmp0: kotlin.Any? [val] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Any? origin=null
+                              expression: CONST String type=kotlin.String value="fromLngLat(...)"
+                            GET_VAR 'val tmp0: kotlin.Any? [val] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Any? origin=null
+                        CALL 'public final fun Marker-_2sGejQ (point: com.mapbox.geojson.Point, color: androidx.compose.ui.graphics.Color, innerColor: androidx.compose.ui.graphics.Color, stroke: androidx.compose.ui.graphics.Color?, text: kotlin.String?, onClick: kotlin.Function0<kotlin.Unit>?, $composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int, $default: kotlin.Int): kotlin.Unit declared in com.mapbox.maps.extension.compose.annotation.MarkerKt' type=kotlin.Unit origin=null
+                          point: GET_VAR 'val tmp0_point: com.mapbox.geojson.Point [val] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=com.mapbox.geojson.Point origin=null
+                          color: COMPOSITE type=androidx.compose.ui.graphics.Color origin=DEFAULT_VALUE
+                            CALL 'public final fun <unsafe-coerce> <T, R> (v: T of kotlin.jvm.internal.<unsafe-coerce>): R of kotlin.jvm.internal.<unsafe-coerce> declared in kotlin.jvm.internal' type=androidx.compose.ui.graphics.Color origin=null
+                              <T>: kotlin.Long
+                              <R>: androidx.compose.ui.graphics.Color
+                              v: CONST Long type=kotlin.Long value=0
+                          innerColor: COMPOSITE type=androidx.compose.ui.graphics.Color origin=DEFAULT_VALUE
+                            CALL 'public final fun <unsafe-coerce> <T, R> (v: T of kotlin.jvm.internal.<unsafe-coerce>): R of kotlin.jvm.internal.<unsafe-coerce> declared in kotlin.jvm.internal' type=androidx.compose.ui.graphics.Color origin=null
+                              <T>: kotlin.Long
+                              <R>: androidx.compose.ui.graphics.Color
+                              v: CONST Long type=kotlin.Long value=0
+                          stroke: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                            CONST Null type=kotlin.Nothing? value=null
+                          text: CONST String type=kotlin.String value="USA"
+                          onClick: BLOCK type=kotlin.Function0<kotlin.Unit> origin=null
+                            BLOCK type=kotlin.Unit origin=null
+                              CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                                key: CONST Int type=kotlin.Int value=-1696202173
+                              CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
+                                composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                                sourceInformation: CONST String type=kotlin.String value="CC(remember):MainActivity.kt#9igjgp"
+                            VAR IR_TEMPORARY_VARIABLE name:tmp0_group type:kotlin.Function0<kotlin.Unit> [val]
+                              CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposerKt.cache>): T of androidx.compose.runtime.ComposerKt.cache [inline] declared in androidx.compose.runtime.ComposerKt' type=kotlin.Function0<kotlin.Unit> origin=null
+                                <T>: kotlin.Function0<kotlin.Unit>
+                                $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                                invalid: CONST Boolean type=kotlin.Boolean value=false
+                                block: BLOCK type=kotlin.Function0<kotlin.Function0<kotlin.Unit>> origin=LAMBDA
+                                  COMPOSITE type=kotlin.Unit origin=null
+                                  FUNCTION_REFERENCE 'private final fun invoke$lambda$1 (): kotlin.Function0<kotlin.Unit> declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=kotlin.Function0<kotlin.Function0<kotlin.Unit>> origin=INLINE_LAMBDA reflectionTarget=null
+                            CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                              $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                            GET_VAR 'val tmp0_group: kotlin.Function0<kotlin.Unit> [val] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Function0<kotlin.Unit> origin=null
+                          $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                          $changed: CONST Int type=kotlin.Int value=221184
+                          $default: CONST Int type=kotlin.Int value=14
+                      WHEN type=kotlin.Unit origin=IF
+                        BRANCH
+                          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime.ComposerKt' type=kotlin.Boolean origin=null
+                          then: CALL 'public final fun traceEventEnd (): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
+                  BRANCH
+                    if: CONST Boolean type=kotlin.Boolean value=true
+                    then: CALL 'public abstract fun skipToGroupEnd (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+            FUN LOCAL_FUNCTION_FOR_LAMBDA name:invoke$lambda$1$lambda$0 visibility:private modality:FINAL <> () returnType:kotlin.Unit?
+              BLOCK_BODY
+                SET_FIELD 'FIELD IR_EXTERNAL_JAVA_DECLARATION_STUB name:DEBUG type:kotlin.Int visibility:public [final,static] declared in android.util.Log' type=kotlin.Unit superQualifierSymbol=android.util.Log origin=EQ
+                  value: CONST Int type=kotlin.Int value=1
+            FUN INLINE_LAMBDA name:invoke$lambda$1 visibility:private modality:FINAL <> () returnType:kotlin.Function0<kotlin.Unit>
+              BLOCK_BODY
+                VAR name:$i$a$-cache-ComposableSingletons$MainActivityKt$lambda-1$1$1 type:kotlin.Int [val]
+                  CONST Int type=kotlin.Int value=0
+                RETURN type=kotlin.Nothing from='private final fun invoke$lambda$1 (): kotlin.Function0<kotlin.Unit> declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>'
+                  BLOCK type=kotlin.Function0<kotlin.Unit> origin=LAMBDA
+                    COMPOSITE type=kotlin.Unit origin=null
+                    CALL 'public final fun <jvm-indy> <T> (dynamicCall: T of kotlin.jvm.internal.<jvm-indy>, bootstrapMethodHandle: kotlin.Any, vararg bootstrapMethodArguments: kotlin.Any): T of kotlin.jvm.internal.<jvm-indy> declared in kotlin.jvm.internal' type=kotlin.Function0<kotlin.Unit> origin=null
+                      <T>: kotlin.Function0<kotlin.Unit>
+                      dynamicCall: CALL 'public final fun invoke (): kotlin.Function0<kotlin.Unit> declared in kotlin.jvm.internal.invokeDynamic' type=kotlin.Function0<kotlin.Unit> origin=null
+                      bootstrapMethodHandle: CALL 'public final fun <jvm-method-handle> (tag: kotlin.Int, owner: kotlin.String, name: kotlin.String, descriptor: kotlin.String, isInterface: kotlin.Boolean): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                        tag: CONST Int type=kotlin.Int value=6
+                        owner: CONST String type=kotlin.String value="java/lang/invoke/LambdaMetafactory"
+                        name: CONST String type=kotlin.String value="metafactory"
+                        descriptor: CONST String type=kotlin.String value="(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+                        isInterface: CONST Boolean type=kotlin.Boolean value=false
+                      bootstrapMethodArguments: VARARG type=kotlin.Array<kotlin.Any> varargElementType=kotlin.Any
+                        CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                          method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (): R of kotlin.Function0 [operator] declared in kotlin.Function0' type=kotlin.Any
+                        RAW_FUNCTION_REFERENCE 'private final fun invoke$lambda$1$lambda$0 (): kotlin.Unit? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=kotlin.Any
+                        CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                          method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (): kotlin.Unit? [fake_override,operator] declared in kotlin.jvm.internal.invokeDynamic.<fake>' type=kotlin.Any
+            FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> visibility:public [final,static]
+            FUN CLASS_STATIC_INITIALIZER name:<clinit> visibility:public/*package*/ modality:FINAL <> () returnType:kotlin.Unit
+              BLOCK_BODY
+                SET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> visibility:public [final,static] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=kotlin.Unit origin=INITIALIZE_FIELD
+                  value: CONSTRUCTOR_CALL 'public/*package*/ constructor <init> () [primary] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> origin=null
+            FUN BRIDGE name:invoke visibility:public modality:OPEN <> ($this:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>, p1:kotlin.Any?, p2:kotlin.Any?, p3:kotlin.Any?) returnType:kotlin.Any?
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>
+              VALUE_PARAMETER BRIDGE name:p1 index:0 type:kotlin.Any?
+              VALUE_PARAMETER BRIDGE name:p2 index:1 type:kotlin.Any?
+              VALUE_PARAMETER BRIDGE name:p3 index:2 type:kotlin.Any?
+              EXPRESSION_BODY
+                RETURN type=kotlin.Nothing from='public open fun invoke (p1: kotlin.Any?, p2: kotlin.Any?, p3: kotlin.Any?): kotlin.Any? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>'
+                  CALL 'public final fun invoke ($this$MapboxMap: com.mapbox.maps.extension.compose.MapboxMapScope, $composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.Unit declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=kotlin.Unit origin=BRIDGE_DELEGATION
+                    $this: GET_VAR '<this>: com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> origin=null
+                    $this$MapboxMap: TYPE_OP type=com.mapbox.maps.extension.compose.MapboxMapScope origin=IMPLICIT_CAST typeOperand=com.mapbox.maps.extension.compose.MapboxMapScope
+                      GET_VAR 'p1: kotlin.Any? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Any? origin=null
+                    $composer: TYPE_OP type=androidx.compose.runtime.Composer origin=IMPLICIT_CAST typeOperand=androidx.compose.runtime.Composer
+                      GET_VAR 'p2: kotlin.Any? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Any? origin=null
+                    $changed: TYPE_OP type=kotlin.Int origin=IMPLICIT_CAST typeOperand=kotlin.Int
+                      GET_VAR 'p3: kotlin.Any? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Any? origin=null
+          GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> visibility:public [final,static] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> origin=null
+    SET_FIELD 'FIELD name:lambda-2 type:kotlin.Function2<androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit> visibility:internal [static] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt' type=kotlin.Unit origin=INITIALIZE_FIELD
+      value: CALL 'public final fun composableLambdaInstance (key: kotlin.Int, tracked: kotlin.Boolean, block: kotlin.Any): androidx.compose.runtime.internal.ComposableLambda declared in androidx.compose.runtime.internal.ComposableLambdaKt' type=androidx.compose.runtime.internal.ComposableLambda origin=null
+        key: CONST Int type=kotlin.Int value=1045251778
+        tracked: CONST Boolean type=kotlin.Boolean value=false
+        block: BLOCK type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> origin=null
+          CLASS LAMBDA_IMPL CLASS name:<no name provided> modality:FINAL visibility:public/*package*/ superTypes:[kotlin.Any; kotlin.Function2<androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>]
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>
+            CONSTRUCTOR GENERATED_MEMBER_IN_CALLABLE_REFERENCE visibility:public/*package*/ <> () returnType:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> [primary]
+              BLOCK_BODY
+                DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+                BLOCK type=kotlin.Unit origin=null
+            FUN name:invoke visibility:public modality:FINAL <> ($this:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>, $composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
+              annotations:
+                Composable
+                ComposableTarget(applier = "androidx.compose.ui.UiComposable")
+              overridden:
+                public abstract fun invoke (p1: P1 of kotlin.Function2, p2: P2 of kotlin.Function2): R of kotlin.Function2 [operator] declared in kotlin.Function2
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>
+              VALUE_PARAMETER name:$composer index:0 type:androidx.compose.runtime.Composer? [assignable]
+              VALUE_PARAMETER name:$changed index:1 type:kotlin.Int
+              BLOCK_BODY
+                CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
+                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                  sourceInformation: CONST String type=kotlin.String value="C21@794L273,19@708L617:MainActivity.kt#disv1c"
+                WHEN type=kotlin.Unit origin=IF
+                  BRANCH
+                    if: CALL 'public final fun OROR (arg0: kotlin.Boolean, arg1: kotlin.Boolean): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                      arg0: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                        $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                          arg0: CALL 'public final fun and (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
+                            $this: GET_VAR '$changed: kotlin.Int declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Int origin=null
+                            other: CONST Int type=kotlin.Int value=3
+                          arg1: CONST Int type=kotlin.Int value=2
+                      arg1: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                        $this: CALL 'public abstract fun <get-skipping> (): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
+                          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                    then: BLOCK type=kotlin.Unit origin=null
+                      WHEN type=kotlin.Unit origin=IF
+                        BRANCH
+                          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime.ComposerKt' type=kotlin.Boolean origin=null
+                          then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
+                            key: CONST Int type=kotlin.Int value=1045251778
+                            dirty1: GET_VAR '$changed: kotlin.Int declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Int origin=null
+                            dirty2: CONST Int type=kotlin.Int value=-1
+                            info: CONST String type=kotlin.String value="com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.lambda-2.<anonymous> (MainActivity.kt:19)"
+                      CALL 'public final fun MapboxMap (modifier: androidx.compose.ui.Modifier?, composeMapInitOptions: com.mapbox.maps.extension.compose.ComposeMapInitOptions?, compass: @[ExtensionFunctionType] kotlin.Function3<com.mapbox.maps.extension.compose.ornaments.compass.MapCompassScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>?, scaleBar: @[ExtensionFunctionType] kotlin.Function3<com.mapbox.maps.extension.compose.ornaments.scalebar.MapScaleBarScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>?, logo: @[ExtensionFunctionType] kotlin.Function3<com.mapbox.maps.extension.compose.ornaments.logo.MapLogoScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>?, attribution: @[ExtensionFunctionType] kotlin.Function3<com.mapbox.maps.extension.compose.ornaments.attribution.MapAttributionScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>?, mapViewportState: com.mapbox.maps.extension.compose.animation.viewport.MapViewportState?, mapState: com.mapbox.maps.extension.compose.MapState?, onMapClickListener: com.mapbox.maps.plugin.gestures.OnMapClickListener?, onMapLongClickListener: com.mapbox.maps.plugin.gestures.OnMapLongClickListener?, style: @[MapboxStyleComposable] kotlin.Function2<androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>?, content: @[MapboxMapComposable] @[ExtensionFunctionType] kotlin.Function3<com.mapbox.maps.extension.compose.MapboxMapScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>?, $composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int, $changed1: kotlin.Int, $default: kotlin.Int): kotlin.Unit declared in com.mapbox.maps.extension.compose.MapboxMapKt' type=kotlin.Unit origin=null
+                        modifier: CALL 'public final fun fillMaxSize$default (fraction: kotlin.Float, $mask0: kotlin.Int, $handler: kotlin.Any?): androidx.compose.ui.Modifier declared in androidx.compose.foundation.layout.SizeKt' type=androidx.compose.ui.Modifier origin=DEFAULT_DISPATCH_CALL
+                          $receiver: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:Companion type:androidx.compose.ui.Modifier.Companion visibility:public [final,static] declared in androidx.compose.ui.Modifier' type=androidx.compose.ui.Modifier.Companion origin=null
+                          fraction: COMPOSITE type=kotlin.Float origin=DEFAULT_VALUE
+                            CONST Float type=kotlin.Float value=0.0
+                          $mask0: CONST Int type=kotlin.Int value=1
+                          $handler: CONST Null type=kotlin.Any? value=null
+                        composeMapInitOptions: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        compass: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        scaleBar: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        logo: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        attribution: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        mapViewportState: CALL 'public final fun rememberMapViewportState (key: kotlin.String?, init: @[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.extension.compose.animation.viewport.MapViewportState, kotlin.Unit>?, $composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int, $default: kotlin.Int): com.mapbox.maps.extension.compose.animation.viewport.MapViewportState [inline] declared in com.mapbox.maps.extension.compose.animation.viewport.MapViewportStateKt' type=com.mapbox.maps.extension.compose.animation.viewport.MapViewportState origin=null
+                          key: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                            CONST Null type=kotlin.Nothing? value=null
+                          init: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.extension.compose.animation.viewport.MapViewportState, kotlin.Unit> origin=LAMBDA
+                            COMPOSITE type=kotlin.Unit origin=null
+                            CALL 'public final fun <jvm-indy> <T> (dynamicCall: T of kotlin.jvm.internal.<jvm-indy>, bootstrapMethodHandle: kotlin.Any, vararg bootstrapMethodArguments: kotlin.Any): T of kotlin.jvm.internal.<jvm-indy> declared in kotlin.jvm.internal' type=@[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.extension.compose.animation.viewport.MapViewportState, kotlin.Unit> origin=null
+                              <T>: @[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.extension.compose.animation.viewport.MapViewportState, kotlin.Unit>
+                              dynamicCall: CALL 'public final fun invoke (): @[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.extension.compose.animation.viewport.MapViewportState, kotlin.Unit> declared in kotlin.jvm.internal.invokeDynamic' type=@[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.extension.compose.animation.viewport.MapViewportState, kotlin.Unit> origin=null
+                              bootstrapMethodHandle: CALL 'public final fun <jvm-method-handle> (tag: kotlin.Int, owner: kotlin.String, name: kotlin.String, descriptor: kotlin.String, isInterface: kotlin.Boolean): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                                tag: CONST Int type=kotlin.Int value=6
+                                owner: CONST String type=kotlin.String value="java/lang/invoke/LambdaMetafactory"
+                                name: CONST String type=kotlin.String value="metafactory"
+                                descriptor: CONST String type=kotlin.String value="(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+                                isInterface: CONST Boolean type=kotlin.Boolean value=false
+                              bootstrapMethodArguments: VARARG type=kotlin.Array<kotlin.Any> varargElementType=kotlin.Any
+                                CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                                  method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: P1 of kotlin.Function1): R of kotlin.Function1 [operator] declared in kotlin.Function1' type=kotlin.Any
+                                RAW_FUNCTION_REFERENCE 'private final fun invoke$lambda$1 ($this$rememberMapViewportState: com.mapbox.maps.extension.compose.animation.viewport.MapViewportState): kotlin.Unit? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=kotlin.Any
+                                CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                                  method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: com.mapbox.maps.extension.compose.animation.viewport.MapViewportState): kotlin.Unit? [fake_override,operator] declared in kotlin.jvm.internal.invokeDynamic.<fake>' type=kotlin.Any
+                          $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                          $changed: CONST Int type=kotlin.Int value=0
+                          $default: CONST Int type=kotlin.Int value=1
+                        mapState: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        onMapClickListener: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        onMapLongClickListener: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        style: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
+                          CONST Null type=kotlin.Nothing? value=null
+                        content: CALL 'internal final fun <get-lambda-1> (): @[ExtensionFunctionType] kotlin.Function3<com.mapbox.maps.extension.compose.MapboxMapScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit> declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt' type=@[ExtensionFunctionType] kotlin.Function3<com.mapbox.maps.extension.compose.MapboxMapScope, androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit> origin=null
+                          $this: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt visibility:public [final,static] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt' type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt origin=null
+                        $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+                        $changed: CONST Int type=kotlin.Int value=6
+                        $changed1: CONST Int type=kotlin.Int value=48
+                        $default: CONST Int type=kotlin.Int value=1982
+                      WHEN type=kotlin.Unit origin=IF
+                        BRANCH
+                          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime.ComposerKt' type=kotlin.Boolean origin=null
+                          then: CALL 'public final fun traceEventEnd (): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
+                  BRANCH
+                    if: CONST Boolean type=kotlin.Boolean value=true
+                    then: CALL 'public abstract fun skipToGroupEnd (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=androidx.compose.runtime.Composer? origin=null
+            FUN LOCAL_FUNCTION_FOR_LAMBDA name:invoke$lambda$1$lambda$0 visibility:private modality:FINAL <> ($this$setCameraOptions:com.mapbox.maps.CameraOptions.Builder) returnType:kotlin.Unit?
+              VALUE_PARAMETER name:$this$setCameraOptions index:0 type:com.mapbox.maps.CameraOptions.Builder
+              BLOCK_BODY
+                COMPOSITE type=kotlin.Unit origin=null
+                  CALL 'public open fun zoom (p0: @[EnhancedNullability] kotlin.Double?): @[FlexibleNullability] com.mapbox.maps.CameraOptions.Builder? declared in com.mapbox.maps.CameraOptions.Builder' type=@[FlexibleNullability] com.mapbox.maps.CameraOptions.Builder? origin=null
+                    $this: GET_VAR '$this$setCameraOptions: com.mapbox.maps.CameraOptions.Builder declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke$lambda$1$lambda$0' type=com.mapbox.maps.CameraOptions.Builder origin=null
+                    p0: CONST Double type=kotlin.Double value=2.0
+                  COMPOSITE type=kotlin.Unit origin=null
+                COMPOSITE type=kotlin.Unit origin=null
+                  CALL 'public open fun center (p0: @[EnhancedNullability] com.mapbox.geojson.Point?): @[FlexibleNullability] com.mapbox.maps.CameraOptions.Builder? declared in com.mapbox.maps.CameraOptions.Builder' type=@[FlexibleNullability] com.mapbox.maps.CameraOptions.Builder? origin=null
+                    $this: GET_VAR '$this$setCameraOptions: com.mapbox.maps.CameraOptions.Builder declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke$lambda$1$lambda$0' type=com.mapbox.maps.CameraOptions.Builder origin=null
+                    p0: CALL 'public open fun fromLngLat (p0: kotlin.Double, p1: kotlin.Double): @[FlexibleNullability] com.mapbox.geojson.Point? declared in com.mapbox.geojson.Point' type=@[FlexibleNullability] com.mapbox.geojson.Point? origin=null
+                      p0: CONST Double type=kotlin.Double value=-98.0
+                      p1: CONST Double type=kotlin.Double value=39.5
+                  COMPOSITE type=kotlin.Unit origin=null
+                COMPOSITE type=kotlin.Unit origin=null
+                  CALL 'public open fun pitch (p0: @[EnhancedNullability] kotlin.Double?): @[FlexibleNullability] com.mapbox.maps.CameraOptions.Builder? declared in com.mapbox.maps.CameraOptions.Builder' type=@[FlexibleNullability] com.mapbox.maps.CameraOptions.Builder? origin=null
+                    $this: GET_VAR '$this$setCameraOptions: com.mapbox.maps.CameraOptions.Builder declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke$lambda$1$lambda$0' type=com.mapbox.maps.CameraOptions.Builder origin=null
+                    p0: CONST Double type=kotlin.Double value=0.0
+                  COMPOSITE type=kotlin.Unit origin=null
+                COMPOSITE type=kotlin.Unit origin=null
+                  CALL 'public open fun bearing (p0: @[EnhancedNullability] kotlin.Double?): @[FlexibleNullability] com.mapbox.maps.CameraOptions.Builder? declared in com.mapbox.maps.CameraOptions.Builder' type=@[FlexibleNullability] com.mapbox.maps.CameraOptions.Builder? origin=null
+                    $this: GET_VAR '$this$setCameraOptions: com.mapbox.maps.CameraOptions.Builder declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke$lambda$1$lambda$0' type=com.mapbox.maps.CameraOptions.Builder origin=null
+                    p0: CONST Double type=kotlin.Double value=0.0
+                  COMPOSITE type=kotlin.Unit origin=null
+            FUN LOCAL_FUNCTION_FOR_LAMBDA name:invoke$lambda$1 visibility:private modality:FINAL <> ($this$rememberMapViewportState:com.mapbox.maps.extension.compose.animation.viewport.MapViewportState) returnType:kotlin.Unit?
+              VALUE_PARAMETER name:$this$rememberMapViewportState index:0 type:com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
+              BLOCK_BODY
+                CALL 'public final fun setCameraOptions (block: @[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.CameraOptions.Builder, kotlin.Unit>): kotlin.Unit declared in com.mapbox.maps.extension.compose.animation.viewport.MapViewportState' type=kotlin.Unit origin=null
+                  $this: GET_VAR '$this$rememberMapViewportState: com.mapbox.maps.extension.compose.animation.viewport.MapViewportState declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke$lambda$1' type=com.mapbox.maps.extension.compose.animation.viewport.MapViewportState origin=null
+                  block: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.CameraOptions.Builder, kotlin.Unit> origin=LAMBDA
+                    COMPOSITE type=kotlin.Unit origin=null
+                    CALL 'public final fun <jvm-indy> <T> (dynamicCall: T of kotlin.jvm.internal.<jvm-indy>, bootstrapMethodHandle: kotlin.Any, vararg bootstrapMethodArguments: kotlin.Any): T of kotlin.jvm.internal.<jvm-indy> declared in kotlin.jvm.internal' type=@[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.CameraOptions.Builder, kotlin.Unit> origin=null
+                      <T>: @[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.CameraOptions.Builder, kotlin.Unit>
+                      dynamicCall: CALL 'public final fun invoke (): @[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.CameraOptions.Builder, kotlin.Unit> declared in kotlin.jvm.internal.invokeDynamic' type=@[ExtensionFunctionType] kotlin.Function1<com.mapbox.maps.CameraOptions.Builder, kotlin.Unit> origin=null
+                      bootstrapMethodHandle: CALL 'public final fun <jvm-method-handle> (tag: kotlin.Int, owner: kotlin.String, name: kotlin.String, descriptor: kotlin.String, isInterface: kotlin.Boolean): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                        tag: CONST Int type=kotlin.Int value=6
+                        owner: CONST String type=kotlin.String value="java/lang/invoke/LambdaMetafactory"
+                        name: CONST String type=kotlin.String value="metafactory"
+                        descriptor: CONST String type=kotlin.String value="(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+                        isInterface: CONST Boolean type=kotlin.Boolean value=false
+                      bootstrapMethodArguments: VARARG type=kotlin.Array<kotlin.Any> varargElementType=kotlin.Any
+                        CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                          method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: P1 of kotlin.Function1): R of kotlin.Function1 [operator] declared in kotlin.Function1' type=kotlin.Any
+                        RAW_FUNCTION_REFERENCE 'private final fun invoke$lambda$1$lambda$0 ($this$setCameraOptions: com.mapbox.maps.CameraOptions.Builder): kotlin.Unit? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=kotlin.Any
+                        CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
+                          method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: com.mapbox.maps.CameraOptions.Builder): kotlin.Unit? [fake_override,operator] declared in kotlin.jvm.internal.invokeDynamic.<fake>' type=kotlin.Any
+            FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> visibility:public [final,static]
+            FUN CLASS_STATIC_INITIALIZER name:<clinit> visibility:public/*package*/ modality:FINAL <> () returnType:kotlin.Unit
+              BLOCK_BODY
+                SET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> visibility:public [final,static] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=kotlin.Unit origin=INITIALIZE_FIELD
+                  value: CONSTRUCTOR_CALL 'public/*package*/ constructor <init> () [primary] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> origin=null
+            FUN BRIDGE name:invoke visibility:public modality:OPEN <> ($this:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>, p1:kotlin.Any?, p2:kotlin.Any?) returnType:kotlin.Any?
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>
+              VALUE_PARAMETER BRIDGE name:p1 index:0 type:kotlin.Any?
+              VALUE_PARAMETER BRIDGE name:p2 index:1 type:kotlin.Any?
+              EXPRESSION_BODY
+                RETURN type=kotlin.Nothing from='public open fun invoke (p1: kotlin.Any?, p2: kotlin.Any?): kotlin.Any? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>'
+                  CALL 'public final fun invoke ($composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.Unit declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=kotlin.Unit origin=BRIDGE_DELEGATION
+                    $this: GET_VAR '<this>: com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> origin=null
+                    $composer: TYPE_OP type=androidx.compose.runtime.Composer origin=IMPLICIT_CAST typeOperand=androidx.compose.runtime.Composer
+                      GET_VAR 'p1: kotlin.Any? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Any? origin=null
+                    $changed: TYPE_OP type=kotlin.Int origin=IMPLICIT_CAST typeOperand=kotlin.Int
+                      GET_VAR 'p2: kotlin.Any? declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>.invoke' type=kotlin.Any? origin=null
+          GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> visibility:public [final,static] declared in com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided>' type=com.example.shareyourvoicemapbox.ComposableSingletons$MainActivityKt.<clinit>.<no name provided> origin=null
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:47)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate$default(FunctionCodegen.kt:40)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethodNode(ClassCodegen.kt:406)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethod(ClassCodegen.kt:423)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generate(ClassCodegen.kt:172)
+	at org.jetbrains.kotlin.backend.jvm.FileCodegen.lower(JvmPhases.kt:39)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseFactoriesKt.createFilePhase$lambda$4(PhaseFactories.kt:71)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt$createSimpleNamedCompilerPhase$1.phaseBody(PhaseBuilders.kt:69)
+	at org.jetbrains.kotlin.backend.common.phaser.SimpleNamedCompilerPhase.phaseBody(CompilerPhase.kt:226)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invokeSequential(performByIrFile.kt:62)
+	... 44 more
+Caused by: java.lang.RuntimeException: Exception while generating code for:
+FUN LOCAL_FUNCTION_FOR_LAMBDA name:invoke$lambda$1$lambda$0 visibility:private modality:FINAL <> () returnType:kotlin.Unit?
+  BLOCK_BODY
+    SET_FIELD 'FIELD IR_EXTERNAL_JAVA_DECLARATION_STUB name:DEBUG type:kotlin.Int visibility:public [final,static] declared in android.util.Log' type=kotlin.Unit superQualifierSymbol=android.util.Log origin=EQ
+      value: CONST Int type=kotlin.Int value=1
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:47)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate$default(FunctionCodegen.kt:40)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethodNode(ClassCodegen.kt:406)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethod(ClassCodegen.kt:423)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generate(ClassCodegen.kt:168)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitClass(ExpressionCodegen.kt:1000)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitClass(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.declarations.IrClass.accept(IrClass.kt:72)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:579)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitContainerExpression(ExpressionCodegen.kt:593)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitContainerExpression(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitor$DefaultImpls.visitBlock(IrElementVisitor.kt:122)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlock(ExpressionCodegen.kt:413)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlock(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrBlock.accept(IrBlock.kt:18)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.gen(ExpressionCodegen.kt:217)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrCallGenerator.genValueAndPut(IrCallGenerator.kt:48)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall$handleParameter(ExpressionCodegen.kt:616)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:644)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrCall.accept(IrCall.kt:24)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitFieldAccess(ExpressionCodegen.kt:878)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitFieldAccess(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitor$DefaultImpls.visitSetField(IrElementVisitor.kt:206)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitSetField(ExpressionCodegen.kt:908)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitSetField(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrSetField.accept(IrSetField.kt:21)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:579)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:584)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrBlockBody.accept(IrBlockBody.kt:20)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.generate(ExpressionCodegen.kt:240)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.doGenerate(FunctionCodegen.kt:123)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:44)
+	... 54 more
+Caused by: java.lang.AssertionError: access of const val: SET_FIELD 'FIELD IR_EXTERNAL_JAVA_DECLARATION_STUB name:DEBUG type:kotlin.Int visibility:public [final,static] declared in android.util.Log' type=kotlin.Unit superQualifierSymbol=android.util.Log origin=EQ
+  value: CONST Int type=kotlin.Int value=1
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitFieldAccess(ExpressionCodegen.kt:861)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitFieldAccess(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitor$DefaultImpls.visitSetField(IrElementVisitor.kt:206)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitSetField(ExpressionCodegen.kt:908)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitSetField(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrSetField.accept(IrSetField.kt:21)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:579)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:584)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrBlockBody.accept(IrBlockBody.kt:20)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.generate(ExpressionCodegen.kt:240)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.doGenerate(FunctionCodegen.kt:123)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:44)
+	... 87 more
+
+
