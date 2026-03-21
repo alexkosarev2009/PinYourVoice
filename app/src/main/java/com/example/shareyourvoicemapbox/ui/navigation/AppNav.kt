@@ -23,18 +23,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.shareyourvoicemapbox.ui.screens.auth.AuthScreen
 import com.example.shareyourvoicemapbox.ui.screens.feed.FeedScreen
 import com.example.shareyourvoicemapbox.ui.screens.map.MapScreen
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileScreen
-import com.example.shareyourvoicemapbox.ui.screens.register.RegisterScreen
-import com.mapbox.maps.extension.compose.MapboxMap
-import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 
 @Composable
 fun AppNavHost(
@@ -94,7 +89,8 @@ fun NavigationBarExample(modifier: Modifier = Modifier) {
                         },
                         icon = {
                             Icon(
-                                route.icon,
+                                imageVector = if (selectedDestination == index) route.icon
+                                else route.iconOutlined,
                                 contentDescription = route.contentDescription
                             )
                         },
@@ -119,12 +115,6 @@ fun NavigationBarExample(modifier: Modifier = Modifier) {
 
         }
     ) { contentPadding ->
-//        MapboxMap(
-//            modifier = Modifier.padding(contentPadding),
-//            scaleBar = {}
-//        ) {
-//
-//        }
         AppNavHost(navController, startDestination, Modifier.padding(contentPadding))
     }
 }
