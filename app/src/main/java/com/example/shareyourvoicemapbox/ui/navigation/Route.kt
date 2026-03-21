@@ -27,3 +27,10 @@ enum class Route(
         Icons.Outlined.Person,
         "Profile")
 }
+
+enum class AuthRoute(
+    val route: String
+) {
+    AUTH("auth"),
+    REGISTER("register")
+}

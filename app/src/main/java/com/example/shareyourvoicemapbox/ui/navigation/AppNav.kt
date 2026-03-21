@@ -27,9 +27,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.shareyourvoicemapbox.ui.screens.auth.AuthScreen
 import com.example.shareyourvoicemapbox.ui.screens.feed.FeedScreen
 import com.example.shareyourvoicemapbox.ui.screens.map.MapScreen
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileScreen
+import com.example.shareyourvoicemapbox.ui.screens.register.RegisterScreen
 
 @Composable
 fun AppNavHost(
@@ -55,6 +57,14 @@ fun AppNavHost(
                     Route.MAP -> MapScreen(modifier)
                     Route.FEED -> FeedScreen(modifier)
                     Route.PROFILE -> ProfileScreen(modifier)
+                }
+            }
+        }
+        AuthRoute.entries.forEach { route ->
+            composable(route.route) {
+                when (route) {
+                    AuthRoute.AUTH -> AuthScreen()
+                    AuthRoute.REGISTER -> RegisterScreen()
                 }
             }
         }
