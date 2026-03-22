@@ -3,16 +3,9 @@ package com.example.shareyourvoicemapbox
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.shareyourvoicemapbox.ui.navigation.NavigationBarExample
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
-import com.mapbox.geojson.Point
-import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                NavigationBarExample(Modifier)
+                NavigationBarExample()
             }
         }
     }

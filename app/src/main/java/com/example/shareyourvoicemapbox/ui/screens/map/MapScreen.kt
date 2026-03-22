@@ -1,30 +1,25 @@
 package com.example.shareyourvoicemapbox.ui.screens.map
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.MapboxMap
-import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
-import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
+import kotlinx.coroutines.delay
 
 @Composable
 fun MapScreen(
@@ -32,6 +27,15 @@ fun MapScreen(
     viewModel: MapViewModel = viewModel<MapViewModel>()
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    var overlayVisible by remember { mutableStateOf(true) }
+
+
+    LaunchedEffect(Unit) {
+        delay(300)
+        overlayVisible = false
+    }
+
     when (state) {
         MapState.NoConnection -> {
 
@@ -42,16 +46,31 @@ fun MapScreen(
                 modifier = modifier,
                 contentAlignment = Alignment.BottomEnd
             ) {
-                MapboxMap(
-                    Modifier.fillMaxSize(),
-                    mapViewportState = state.mapViewportState,
-                    scaleBar = {
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(animationSpec = tween(1000))
+                ) {
+                    MapboxMap(
+                        Modifier.fillMaxSize(),
+                        mapViewportState = state.mapViewportState,
+                        scaleBar = {
 
-                    },
-                    logo = {
-                        Logo()
-                    }
-                )
+                        },
+                        logo = {
+                            Logo()
+                        }
+                    )
+                }
+                AnimatedVisibility(
+                    visible = overlayVisible,
+                    exit = fadeOut(animationSpec = tween(1000))
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(Color(0xFF051728))
+                    )
+                }
             }
         }
     }

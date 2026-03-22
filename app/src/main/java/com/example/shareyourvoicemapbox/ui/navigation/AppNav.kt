@@ -47,7 +47,7 @@ fun AppNavHost(
             fadeOut(animationSpec = tween(0))
         },
         enterTransition = {
-            fadeIn(animationSpec = tween(300))
+            fadeIn(animationSpec = tween(200))
         }
 
     ) {
