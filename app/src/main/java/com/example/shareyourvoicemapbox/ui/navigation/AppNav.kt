@@ -72,7 +72,7 @@ fun AppNavHost(
 }
 
 @Composable
-fun NavigationBarExample(modifier: Modifier = Modifier) {
+fun AppNavigationBar(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val startDestination = Route.MAP
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }

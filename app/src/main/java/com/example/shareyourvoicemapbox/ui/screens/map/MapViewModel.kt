@@ -25,10 +25,10 @@ class MapViewModel : ViewModel() {
         viewModelScope.launch {
             getMarkersUseCase().fold(
                 onSuccess = { data ->
-                    _uiState.emit(MapState.Content(data))
+                    _uiState.emit(MapState.Content(markers = data))
                 },
                 onFailure = { error ->
-                    _uiState.emit(MapState.Error(error.message.orEmpty()))
+                    _uiState.emit(MapState.Error(message = error.message.orEmpty()))
                 }
             )
         }

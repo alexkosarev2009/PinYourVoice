@@ -6,6 +6,7 @@ import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 sealed interface MapState {
     data object NoConnection: MapState
     data class Error(
+        val mapViewportState: MapViewportState = MapViewportState(),
         val message: String
     ) : MapState
     data class Content(
