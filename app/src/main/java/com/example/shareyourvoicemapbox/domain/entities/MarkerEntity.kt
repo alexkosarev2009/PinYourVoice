@@ -4,6 +4,9 @@ data class MarkerEntity(
     val title: String,
     val lat: Double,
     val lng: Double,
-    val imgUrl: String?,
+    val imageUrl: String?,
     val audioUrl: String,
+    val authorName: String,
+    val authorUsername: String,
+    val authorAvatarUrl: String,
 )

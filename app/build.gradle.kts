@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -46,13 +47,10 @@ dependencies {
     implementation(libs.android.ndk27)
     implementation(libs.maps.compose.ndk27)
 
-    // KTOR
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.client.logging)
+    // SERIALIZATION
 
+    // KTOR
+    implementation(libs.bundles.ktor)
     // FONTS
     implementation(libs.androidx.compose.ui.text.google.fonts)
 

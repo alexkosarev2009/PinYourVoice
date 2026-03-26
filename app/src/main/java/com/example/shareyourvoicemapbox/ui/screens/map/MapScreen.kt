@@ -1,5 +1,7 @@
 package com.example.shareyourvoicemapbox.ui.screens.map
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -7,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,8 +20,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shareyourvoicemapbox.R
+import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.MapboxMap
+import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
+import com.mapbox.maps.extension.compose.annotation.Marker
+import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
+import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import kotlinx.coroutines.delay
 
 @Composable
@@ -37,11 +48,18 @@ fun MapScreen(
     }
 
     when (state) {
-        MapState.NoConnection -> {
-
+        is MapState.NoConnection -> {
+            Text("No connection")
         }
 
-        else -> {
+        is MapState.Error -> {
+            Text((state as MapState.Error).message)
+        }
+
+        is MapState.Content -> {
+            val contentState = state as MapState.Content
+            val context = LocalContext.current
+
             Box(
                 modifier = modifier,
                 contentAlignment = Alignment.BottomEnd
@@ -52,14 +70,25 @@ fun MapScreen(
                 ) {
                     MapboxMap(
                         Modifier.fillMaxSize(),
-                        mapViewportState = state.mapViewportState,
-                        scaleBar = {
-
-                        },
-                        logo = {
-                            Logo()
+                        mapViewportState = contentState.mapViewportState,
+                        scaleBar = {}
+                    ) {
+                        val markerIcon = rememberIconImage(key = "red-marker", painter =
+                            painterResource(id = R.drawable.red_marker))
+                        contentState.markers.forEach { marker ->
+                            PointAnnotation(
+                                point = Point.fromLngLat(marker.lng, marker.lat)
+                            ) {
+                                iconImage = markerIcon
+                                interactionsState.onClicked {
+                                    Toast.makeText(context,
+                                        marker.title,
+                                        Toast.LENGTH_SHORT).show()
+                                    true
+                                }
+                            }
                         }
-                    )
+                    }
                 }
                 AnimatedVisibility(
                     visible = overlayVisible,

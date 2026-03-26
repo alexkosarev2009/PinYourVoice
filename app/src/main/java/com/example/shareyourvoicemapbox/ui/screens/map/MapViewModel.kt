@@ -15,7 +15,7 @@ class MapViewModel : ViewModel() {
         markerRepository = MarkerRepository(MarkerDataSource())
     )
     private val _uiState: MutableStateFlow<MapState> = MutableStateFlow(MapState.Content())
-    val uiState: StateFlow<MapState> = _uiState.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     init {
         getData()

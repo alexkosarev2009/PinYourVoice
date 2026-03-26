@@ -7,6 +7,6 @@ class GetMarkersUseCase(
     val markerRepository: MarkerRepository
 ) {
     suspend operator fun invoke(): Result<List<MarkerEntity>> {
-        return markerRepository.getUsers()
+        return markerRepository.getMarkers()
     }
 }
