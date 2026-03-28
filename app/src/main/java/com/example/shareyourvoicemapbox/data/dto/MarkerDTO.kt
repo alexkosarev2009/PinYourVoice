@@ -5,9 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MarkerDTO(
-    @SerialName("id")
-    val id: Long?,
-
     @SerialName("title")
     val title: String?,
 

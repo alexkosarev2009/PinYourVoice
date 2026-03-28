@@ -14,10 +14,7 @@ class MarkerDataSource {
 
     suspend fun getMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
-            val response = client.get("${Network.HOST}/api/marker")
-            Log.d("KTOR", response.status.toString())
-            Log.d("KTOR", response.bodyAsText())
-
+            val response = client.get("${Network.HOST}/api/markers")
             if (response.status != HttpStatusCode.OK) {
                 error("Error: ${response.status}")
             }
