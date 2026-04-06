@@ -3,15 +3,19 @@ package com.example.shareyourvoicemapbox.ui.screens.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.data.MarkerRepository
+import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.data.source.MarkerDataSource
+import com.example.shareyourvoicemapbox.domain.CreateMarkerUseCase
 import com.example.shareyourvoicemapbox.domain.GetMarkersUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MapViewModel : ViewModel() {
     private val getMarkersUseCase = GetMarkersUseCase(
+        markerRepository = MarkerRepository(MarkerDataSource())
+    )
+    private val createMarkerUseCase = CreateMarkerUseCase(
         markerRepository = MarkerRepository(MarkerDataSource())
     )
     private val _uiState: MutableStateFlow<MapState> = MutableStateFlow(MapState.Content())
@@ -29,6 +33,18 @@ class MapViewModel : ViewModel() {
                 },
                 onFailure = { error ->
                     _uiState.emit(MapState.Error(message = error.message.orEmpty()))
+                }
+            )
+        }
+    }
+    fun createMarker(dto: CreateMarkerDTO) {
+        viewModelScope.launch {
+            createMarkerUseCase(dto).fold(
+                onSuccess = {
+                    getData()
+                },
+                onFailure = {
+
                 }
             )
         }

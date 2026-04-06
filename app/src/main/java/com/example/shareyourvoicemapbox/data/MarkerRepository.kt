@@ -1,5 +1,6 @@
 package com.example.shareyourvoicemapbox.data
 
+import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.data.source.MarkerDataSource
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 
@@ -20,6 +21,20 @@ class MarkerRepository(
                     authorAvatarUrl = markerDTO.authorAvatarUrl ?: return@mapNotNull null,
                 )
             }
+        }
+    }
+    suspend fun createMarker(dto: CreateMarkerDTO): Result<MarkerEntity> {
+        return markerDataSource.postMarker(dto).map { markerDTO ->
+            MarkerEntity(
+                title = markerDTO.title ?: error("Invalid MarkerDTO from server"),
+                lat = markerDTO.lat ?: error("Invalid MarkerDTO from server"),
+                lng = markerDTO.lng ?: error("Invalid MarkerDTO from server"),
+                imageUrl = markerDTO.imageUrl,
+                audioUrl = markerDTO.audioUrl ?: error("Invalid MarkerDTO from server"),
+                authorName = markerDTO.authorName ?: error("Invalid MarkerDTO from server"),
+                authorUsername = markerDTO.authorUsername ?: error("Invalid MarkerDTO from server"),
+                authorAvatarUrl = markerDTO.authorAvatarUrl ?: error("Invalid MarkerDTO from server"),
+            )
         }
     }
 }

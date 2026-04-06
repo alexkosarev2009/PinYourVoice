@@ -57,6 +57,9 @@ dependencies {
     // ICONS
     implementation(libs.androidx.compose.material.icons.extended.android)
 
+    // PERMISSIONS
+    implementation(libs.accompanist.permissions)
+
     implementation("androidx.navigation:navigation-compose:2.9.7")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

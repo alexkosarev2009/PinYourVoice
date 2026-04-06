@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -17,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +46,6 @@ fun MapScreen(
 
     var overlayVisible by remember { mutableStateOf(true) }
 
-
     LaunchedEffect(Unit) {
         delay(300)
         overlayVisible = false
@@ -57,6 +58,7 @@ fun MapScreen(
 
         is MapState.Error -> {
             MapError(
+                modifier = modifier,
                 state = currentState,
                 overlayVisible = overlayVisible
             )
@@ -64,8 +66,12 @@ fun MapScreen(
 
         is MapState.Content -> {
             MapContent(
+                modifier = modifier,
                 state = currentState,
                 overlayVisible = overlayVisible,
+                onMarkerClick = {
+
+                }
             )
         }
     }
@@ -76,7 +82,8 @@ fun MapContent(
     modifier: Modifier = Modifier,
     state: MapState.Content,
     overlayVisible: Boolean,
-    onMarkerClick: (MarkerEntity) -> Unit = {}
+    onMarkerClick: (MarkerEntity) -> Unit,
+    showBottomSheet: Boolean = false,
 ) {
     val context = LocalContext.current
     val overlayVisible = overlayVisible
@@ -92,7 +99,10 @@ fun MapContent(
             MapboxMap(
                 Modifier.fillMaxSize(),
                 mapViewportState = state.mapViewportState,
-                scaleBar = {}
+                scaleBar = {},
+                logo = {
+                    Logo()
+                }
             ) {
                 val markerIcon = rememberIconImage(key = "red-marker", painter =
                     painterResource(id = R.drawable.red_marker))
@@ -102,9 +112,7 @@ fun MapContent(
                     ) {
                         iconImage = markerIcon
                         interactionsState.onClicked {
-                            Toast.makeText(context,
-                                marker.title,
-                                Toast.LENGTH_SHORT).show()
+                            onMarkerClick(marker)
                             true
                         }
                     }
@@ -121,6 +129,7 @@ fun MapContent(
                     .background(Color(0xFF051728))
             )
         }
+
     }
 }
 
