@@ -1,4 +1,4 @@
-package com.example.shareyourvoicemapbox.domain
+package com.example.shareyourvoicemapbox.domain.markers
 
 import com.example.shareyourvoicemapbox.data.MarkerRepository
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO

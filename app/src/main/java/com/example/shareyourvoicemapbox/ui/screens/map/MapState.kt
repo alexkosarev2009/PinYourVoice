@@ -5,12 +5,12 @@ import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 
 sealed interface MapState {
     data object NoConnection: MapState
-    data class Error(
-        val mapViewportState: MapViewportState = MapViewportState(),
-        val message: String
-    ) : MapState
     data class Content(
         val markers: List<MarkerEntity> = emptyList(),
-        val mapViewportState: MapViewportState = MapViewportState()
+        val mapViewportState: MapViewportState = MapViewportState(),
+        val isRecording: Boolean = false,
+        val showAddMarkerDialog: Boolean = false,
+        val showMicPermissionDialog: Boolean = false,
+        val error: String = ""
     ) : MapState
 }
