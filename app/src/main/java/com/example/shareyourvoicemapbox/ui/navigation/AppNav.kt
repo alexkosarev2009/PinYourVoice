@@ -140,7 +140,7 @@ fun AppNav(
 
         AppNavHost(
             navHostController = navController,
-            startDestination = AuthRoute.AUTH.route,
+            startDestination = Route.MAP.route,
             modifier = Modifier.padding(padding),
             viewModel = viewModel,
         )

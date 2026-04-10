@@ -6,6 +6,8 @@ import android.os.Build
 import android.util.Log
 import com.example.shareyourvoicemapbox.domain.recorder.AudioRecorder
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class AudioRecorderImpl(
     private val context: Context
@@ -58,7 +60,14 @@ class AudioRecorderImpl(
     }
 
     override fun createFile(): String {
-        val file = File(context.cacheDir, "audio_${System.currentTimeMillis()}.m4a")
+        var simpleDateFormat = SimpleDateFormat("yyyy.MM.D_hh.mm.ss")
+        var date = simpleDateFormat.format(Date())
+        val file = File(context.cacheDir, "audio_${date}.m4a")
+        // ЗАГЛУШКА ДЛЯ ТЕСТИРОВАНИЯ
+        context.cacheDir.listFiles()
+            ?.filter { it.name.endsWith(".m4a") }
+            ?.forEach { it.delete() }
+
         return file.absolutePath
     }
 }

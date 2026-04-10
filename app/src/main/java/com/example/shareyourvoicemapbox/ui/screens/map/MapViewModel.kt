@@ -3,10 +3,11 @@ package com.example.shareyourvoicemapbox.ui.screens.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
-import com.example.shareyourvoicemapbox.domain.recorder.StartRecordingUseCase
-import com.example.shareyourvoicemapbox.domain.recorder.StopRecordingUseCase
 import com.example.shareyourvoicemapbox.domain.markers.CreateMarkerUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
+import com.example.shareyourvoicemapbox.domain.recorder.StartRecordingUseCase
+import com.example.shareyourvoicemapbox.domain.recorder.StopRecordingUseCase
+import com.mapbox.geojson.Point
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,10 +20,10 @@ class MapViewModel(
     private val stopRecordingUseCase: StopRecordingUseCase
 ) : ViewModel() {
 
-
-
     private val _uiState: MutableStateFlow<MapState> = MutableStateFlow(MapState.Content())
     val uiState = _uiState.asStateFlow()
+    private val _systemState = MutableStateFlow(MapSystemState())
+    val systemState = _systemState.asStateFlow()
 
     init {
         getData()
@@ -52,6 +53,12 @@ class MapViewModel(
         }
     }
 
+    fun setLocationPermission(granted: Boolean) {
+        _systemState.update {
+            it.copy(hasLocationPermission = granted)
+        }
+    }
+
     fun createMarker(dto: CreateMarkerDTO) {
         viewModelScope.launch {
             createMarkerUseCase(dto).fold(
@@ -66,21 +73,32 @@ class MapViewModel(
     }
     fun startRecording() {
         startRecordingUseCase()
-        val current = _uiState.value
-        if (current is MapState.Content) {
-            _uiState.value = current.copy(
-                isRecording = true
-            )
+        _systemState.update {
+            it.copy(isRecording = true)
         }
     }
 
-    fun stopRecording() {
+    fun stopRecording(): String {
         val path = stopRecordingUseCase()
-        val current = _uiState.value
-        if (current is MapState.Content) {
-            _uiState.value = current.copy(
-                isRecording = false
+        _systemState.update {
+            it.copy(
+                isRecording = false,
+                currentAudioPath = path
             )
+        }
+        return path
+    }
+
+    fun onRecordClick() {
+
+        if (_systemState.value.isRecording) {
+            stopRecording()
+        }
+        else startRecording()
+    }
+    fun onRecordRelease() {
+        if (_systemState.value.isRecording) {
+            stopRecording()
         }
     }
 
@@ -118,6 +136,12 @@ class MapViewModel(
             _uiState.value = currentState.copy(
                 showMicPermissionDialog = false
             )
+        }
+    }
+
+    fun updateUserLocation(point: Point) {
+        _systemState.update {
+            it.copy(userLocation = point)
         }
     }
 
