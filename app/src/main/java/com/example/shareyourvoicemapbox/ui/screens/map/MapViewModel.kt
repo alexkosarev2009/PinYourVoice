@@ -6,18 +6,22 @@ import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.domain.markers.CreateMarkerUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
+import com.example.shareyourvoicemapbox.domain.network.NetworkMonitor
 import com.example.shareyourvoicemapbox.domain.recorder.ReleaseRecorderUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StartRecordingUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StopRecordingUseCase
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.mapbox.geojson.Point
+import com.mapbox.maps.dsl.cameraOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -31,6 +35,7 @@ class MapViewModel @Inject constructor(
     private val stopRecordingUseCase: StopRecordingUseCase,
     private val releaseRecorderUseCase: ReleaseRecorderUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<MapState> = MutableStateFlow(MapState.Content())
@@ -40,6 +45,13 @@ class MapViewModel @Inject constructor(
 
     private val _actionFlow = MutableSharedFlow<MapAction>()
     val actionFlow = _actionFlow.asSharedFlow()
+
+    val isConnected = networkMonitor.observe()
+        .stateIn(viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            networkMonitor.isCurrentlyConnected())
+
+    private var hasCenteredUser = false
 
     private var timerJob: Job? = null
     val minDuration = 3_000L
@@ -214,6 +226,12 @@ class MapViewModel @Inject constructor(
         _systemState.update {
             it.copy(userLocation = point)
         }
+        if (!hasCenteredUser) {
+            hasCenteredUser = true
+            _systemState.update {
+                it.copy(hasCenteredUser = true)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -228,10 +246,10 @@ class MapViewModel @Inject constructor(
     fun onDeleteRecordingClick() {
         _systemState.update {
             it.copy(
-                currentAudioPath = null
+                currentAudioPath = null,
+                recordTimeMs = 0L
             )
         }
         savedStateHandle["audioPath"] = null
     }
-
 }

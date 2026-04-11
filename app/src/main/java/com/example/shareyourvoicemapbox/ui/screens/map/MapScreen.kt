@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -30,10 +29,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocationAlt
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardVoice
@@ -42,6 +45,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,9 +66,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -84,14 +91,15 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
+import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 import com.mapbox.maps.extension.compose.annotation.IconImage
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
+import com.mapbox.maps.extension.compose.ornaments.compass.MapCompassScope
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.viewport.data.FollowPuckViewportStateOptions
 import kotlinx.coroutines.delay
-import kotlin.math.min
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
@@ -103,6 +111,8 @@ fun MapScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val systemState by viewModel.systemState.collectAsState()
+    val isConnected by viewModel.isConnected.collectAsState()
+
     val minDuration = viewModel.minDuration
     val maxDuration = viewModel.maxDuration
     val progress = (systemState.recordTimeMs / maxDuration.toFloat())
@@ -154,6 +164,18 @@ fun MapScreen(
             }
         }
     }
+    LaunchedEffect(Unit) {
+        val point = systemState.userLocation ?: return@LaunchedEffect
+
+        if (systemState.hasCenteredUser) {
+            systemState.mapViewportState.flyTo(
+                cameraOptions {
+                    center(point)
+                    zoom(14.0)
+                }
+            )
+        }
+    }
 
     LaunchedEffect(Unit) {
         val granted = ContextCompat.checkSelfPermission(
@@ -173,156 +195,202 @@ fun MapScreen(
         overlayVisible = false
     }
 
-    when (val currentState = state) {
-        is MapState.NoConnection -> {
-            Text("No connection")
-        }
-
-
+    when(val currentState = state) {
         is MapState.Content -> {
-            Scaffold(
-                modifier = modifier,
-                floatingActionButton = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+            if (!isConnected) {
+                Column(
+                    modifier.fillMaxSize().statusBarsPadding(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+
+                ) {
+                    Box(
+                        contentAlignment = Alignment.BottomEnd
                     ) {
-                        FloatingActionButton(
-                            modifier = Modifier.size(48.dp),
-                            onClick = {
-                                when {
-                                    fineLocationPermissionState.status.isGranted -> {
-                                        currentState.mapViewportState.transitionToFollowPuckState(
-                                            followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder().pitch(0.0).build()
-                                        )
-                                    }
-                                    fineLocationPermissionState.status.shouldShowRationale -> {
-                                        viewModel.openFineLocationPermissionDialog()
-                                    }
-                                    else -> {
-                                        val isPermanentlyDenied =
-                                            !fineLocationPermissionState.status.shouldShowRationale
+                        Icon(
+                            modifier = Modifier,
+                            imageVector = ImageVector.vectorResource(R.drawable.no_connection_icon),
+                            contentDescription = "Connection status",
+                            tint = Color.Gray
+                        )
+                        Icon(modifier = Modifier
+                            .padding(8.dp, 8.dp)
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.background),
+                            tint = MaterialTheme.colorScheme.error,
+                            imageVector = Icons.Default.Cancel,
+                            contentDescription = "No connection")
+                    }
+                    Spacer(Modifier.height(8.dp))
 
-                                        if (isPermanentlyDenied) {
-                                            viewModel.openFineLocationPermissionDialog()
-                                        } else {
-                                            launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                                        }
-                                    }
-                                }
-                            },
-                            shape = CircleShape
+                    Text(text = "No internet connection",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(4.dp))
+
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        modifier = Modifier.width(350.dp),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(text = "Offline maps not supported")
+                }
+
+            }
+            else {
+                Scaffold(
+                    modifier = modifier,
+                    floatingActionButton = {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.NearMe,
-                                contentDescription = "My location",
-                                modifier = Modifier.size(28.dp),
-                            )
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        FloatingActionButton(
-                            onClick = {
-                                val audioGranted = audioPermissionState.status.isGranted
-                                val locationGranted = fineLocationPermissionState.status.isGranted
-
-                                when {
-                                    audioGranted && locationGranted -> {
-                                        viewModel.openAddMarkerDialog()
-                                    }
-
-                                    !audioGranted -> {
-                                        when {
-                                            audioPermissionState.status.shouldShowRationale -> {
-                                                viewModel.openMicPermissionDialog()
-                                            }
-                                            else -> {
-                                                launcher.launch(Manifest.permission.RECORD_AUDIO)
-                                            }
+                            FloatingActionButton(
+                                modifier = Modifier.size(48.dp),
+                                onClick = {
+                                    when {
+                                        fineLocationPermissionState.status.isGranted -> {
+                                            systemState.mapViewportState.transitionToFollowPuckState(
+                                                followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
+                                                    .pitch(0.0).build()
+                                            )
                                         }
-                                    }
-                                    !locationGranted -> {
-                                        when {
-                                            fineLocationPermissionState.status.shouldShowRationale -> {
-                                                viewModel.openFineLocationPermissionDialog()
-                                            }
 
-                                            else -> {
+                                        fineLocationPermissionState.status.shouldShowRationale -> {
+                                            viewModel.openFineLocationPermissionDialog()
+                                        }
+
+                                        else -> {
+                                            val isPermanentlyDenied =
+                                                !fineLocationPermissionState.status.shouldShowRationale
+
+                                            if (isPermanentlyDenied) {
+                                                viewModel.openFineLocationPermissionDialog()
+                                            } else {
                                                 launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                                             }
                                         }
                                     }
+                                },
+                                shape = CircleShape
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.NearMe,
+                                    contentDescription = "My location",
+                                    modifier = Modifier.size(28.dp),
+                                )
+                            }
+                            Spacer(Modifier.height(8.dp))
+                            FloatingActionButton(
+                                onClick = {
+                                    val audioGranted = audioPermissionState.status.isGranted
+                                    val locationGranted =
+                                        fineLocationPermissionState.status.isGranted
+
+                                    when {
+                                        audioGranted && locationGranted -> {
+                                            viewModel.openAddMarkerDialog()
+                                        }
+
+                                        !audioGranted -> {
+                                            when {
+                                                audioPermissionState.status.shouldShowRationale -> {
+                                                    viewModel.openMicPermissionDialog()
+                                                }
+
+                                                else -> {
+                                                    launcher.launch(Manifest.permission.RECORD_AUDIO)
+                                                }
+                                            }
+                                        }
+
+                                        !locationGranted -> {
+                                            when {
+                                                fineLocationPermissionState.status.shouldShowRationale -> {
+                                                    viewModel.openFineLocationPermissionDialog()
+                                                }
+
+                                                else -> {
+                                                    launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                shape = CircleShape,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AddLocationAlt,
+                                    contentDescription = "Add marker",
+                                    modifier = Modifier.size(30.dp),
+                                )
+                            }
+                        }
+
+                    },
+                ) {
+                    MapContent(
+                        state = currentState,
+                        overlayVisible = overlayVisible,
+                        onMarkerClick = {
+
+                        },
+                        onAddMarkerDismiss = {
+                            if (!systemState.isRecording) {
+                                viewModel.closeAddMarkerDialog()
+                            } else {
+                                viewModel.onRecordRelease()
+                                viewModel.closeAddMarkerDialog()
+                            }
+                        },
+                        onConfirmPermissionSettingsDialog = {
+                            val intent =
+                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", context.packageName, null)
                                 }
-                            },
-                            shape = CircleShape,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.AddLocationAlt,
-                                contentDescription = "Add marker",
-                                modifier = Modifier.size(30.dp),
-                            )
-                        }
-                    }
-
-                },
-            ) {
-                MapContent(
-                    state = currentState,
-                    overlayVisible = overlayVisible,
-                    onMarkerClick = {
-
-                    },
-                    onAddMarkerDismiss = {
-                        if (!systemState.isRecording) {
-                            viewModel.closeAddMarkerDialog()
-                        }
-                        else {
+                            context.startActivity(intent)
+                            viewModel.closeMicPermissionDialog()
+                        },
+                        onDismissPermissionSettingsDialog = {
+                            viewModel.closeMicPermissionDialog()
+                        },
+                        onRecordClick = {
+                            viewModel.onRecordClick()
+                        },
+                        onRecordRelease = {
                             viewModel.onRecordRelease()
-                            viewModel.closeAddMarkerDialog()
-                        }
-                    },
-                    onConfirmPermissionSettingsDialog = {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", context.packageName, null)
-                        }
-                        context.startActivity(intent)
-                        viewModel.closeMicPermissionDialog()
-                    },
-                    onDismissPermissionSettingsDialog = {
-                        viewModel.closeMicPermissionDialog()
-                    },
-                    onRecordClick = {
-                        viewModel.onRecordClick()
-                    },
-                    onRecordRelease = {
-                        viewModel.onRecordRelease()
-                    },
-                    animatedScale = animatedScale,
-                    markerIcon = markerIcon,
-                    onLocationChange = { point ->
-                        viewModel.updateUserLocation(point)
-                    },
-                    onConfirmFineLoactionDialog = {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", context.packageName, null)
-                        }
-                        context.startActivity(intent)
-                        viewModel.closeFineLocationPermissionDialog()
-                    },
-                    onDismissFineLocationDialog = {
-                        viewModel.closeFineLocationPermissionDialog()
-                    },
-                    offset = offset,
-                    systemState = systemState,
-                    onSaveRecordingClick = {
-                        viewModel.onRecordRelease()
-                        viewModel.onSaveRecordingClick()
-                    },
-                    onDeleteRecordingClick = {
-                        viewModel.onRecordRelease()
-                        viewModel.onDeleteRecordingClick()
-                    },
-                    progress = progress,
-                    minDuration = minDuration
-                )
+                        },
+                        animatedScale = animatedScale,
+                        markerIcon = markerIcon,
+                        onLocationChange = { point ->
+                            viewModel.updateUserLocation(point)
+                        },
+                        onConfirmFineLoactionDialog = {
+                            val intent =
+                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", context.packageName, null)
+                                }
+                            context.startActivity(intent)
+                            viewModel.closeFineLocationPermissionDialog()
+                        },
+                        onDismissFineLocationDialog = {
+                            viewModel.closeFineLocationPermissionDialog()
+                        },
+                        offset = offset,
+                        systemState = systemState,
+                        onSaveRecordingClick = {
+                            viewModel.onRecordRelease()
+                            viewModel.onSaveRecordingClick()
+                        },
+                        onDeleteRecordingClick = {
+                            viewModel.onRecordRelease()
+                            viewModel.onDeleteRecordingClick()
+                        },
+                        progress = progress,
+                        minDuration = minDuration
+                    )
+                }
             }
         }
     }
@@ -361,8 +429,11 @@ fun MapContent(
         ) {
             MapboxMap(
                 Modifier.fillMaxSize(),
-                mapViewportState = state.mapViewportState,
+                mapViewportState = systemState.mapViewportState,
                 scaleBar = {},
+                compass = {
+                    Compass(modifier = Modifier.statusBarsPadding())
+                },
                 logo = {
                     Logo()
                 },
@@ -372,10 +443,13 @@ fun MapContent(
                         locationPuck = createDefault2DPuck(withBearing = true)
                         enabled = true
                     }
-                    state.mapViewportState.transitionToFollowPuckState(
-                        followPuckViewportStateOptions = FollowPuckViewportStateOptions
-                            .Builder().pitch(0.0).build()
-                    )
+                    if (!systemState.hasCenteredUser) {
+                        systemState.mapViewportState.transitionToFollowPuckState(
+                            followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
+                                .pitch(0.0).build()
+                        )
+                    }
+
                     mapView.location.addOnIndicatorPositionChangedListener { point ->
                         onLocationChange(point)
                     }
@@ -387,7 +461,7 @@ fun MapContent(
                     ) {
                         iconImage = markerIcon
                         interactionsState.onClicked {
-                            state.mapViewportState.flyTo(
+                            systemState.mapViewportState.flyTo(
                                 cameraOptions {
                                     center(point)
 
@@ -483,7 +557,7 @@ fun AddMarkerDialog(
                 IconButton(
                     onClick = onDeleteRecordingClick,
                     modifier.offset(x = -(offset.plus(4.dp))),
-                    enabled = systemState.isRecording || systemState.currentAudioPath != null
+                    enabled = systemState.recordTimeMs > 0
                 ) {
                     Icon(imageVector = Icons.Default.Delete,
                         contentDescription = "Delete recording",
@@ -535,16 +609,6 @@ fun AddMarkerDialog(
 
                             )
                     }
-                    Spacer(Modifier.height(8.dp))
-                    Text(modifier = Modifier.offset(y = offset / 2),
-                        text = formatTime(systemState.recordTimeMs),
-                        fontSize = 20.sp,
-                        color = if (systemState.recordTimeMs < minDuration && systemState.isRecording) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        }
-                    )
                 }
 
                 IconButton(
@@ -560,6 +624,16 @@ fun AddMarkerDialog(
                 }
 
             }
+            Spacer(Modifier.height(8.dp))
+            Text(modifier = Modifier.offset(y = offset / 2),
+                text = formatTime(systemState.recordTimeMs),
+                fontSize = 20.sp,
+                color = if (systemState.recordTimeMs != 0L && systemState.recordTimeMs < minDuration) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                }
+            )
             Spacer(Modifier.height(42.dp))
         }
     }
