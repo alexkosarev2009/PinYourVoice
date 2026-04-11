@@ -23,7 +23,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.shareyourvoicemapbox.ui.navigation.AuthRoute
+import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.example.shareyourvoicemapbox.ui.navigation.Route
 
 @Composable
@@ -37,7 +37,7 @@ fun AuthScreen(
         viewModel.actionFlow.collect { action ->
             when (action) {
                 is AuthAction.OpenScreen -> navHostController.navigate(Route.MAP.route) {
-                    popUpTo(AuthRoute.AUTH.route) {
+                    popUpTo(SecondaryRoute.AUTH.route) {
                         inclusive = true
                     }
                 }

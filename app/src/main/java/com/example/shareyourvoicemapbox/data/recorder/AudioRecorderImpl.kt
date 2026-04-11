@@ -8,6 +8,7 @@ import com.example.shareyourvoicemapbox.domain.recorder.AudioRecorder
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 class AudioRecorderImpl(
     private val context: Context
@@ -36,8 +37,9 @@ class AudioRecorderImpl(
             try {
                 prepare()
                 start()
+                Log.d("RECORDER", "Start recording called")
             } catch (e: Exception) {
-                Log.e("AudioRecorder", "Start recording failed", e)
+                Log.e("RECORDER", "Start recording failed", e)
                 release()
                 recorder = null
             }
@@ -60,8 +62,8 @@ class AudioRecorderImpl(
     }
 
     override fun createFile(): String {
-        var simpleDateFormat = SimpleDateFormat("yyyy.MM.D_hh.mm.ss")
-        var date = simpleDateFormat.format(Date())
+        val simpleDateFormat = SimpleDateFormat("yyyy.MM.dd_hh.mm.ss", Locale.US)
+        val date = simpleDateFormat.format(Date())
         val file = File(context.cacheDir, "audio_${date}.m4a")
         // ЗАГЛУШКА ДЛЯ ТЕСТИРОВАНИЯ
         context.cacheDir.listFiles()
@@ -69,5 +71,10 @@ class AudioRecorderImpl(
             ?.forEach { it.delete() }
 
         return file.absolutePath
+    }
+
+    override fun release() {
+        recorder?.release()
+        recorder = null
     }
 }

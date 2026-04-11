@@ -3,13 +3,14 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.example.shareyourvoicemapbox"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
+
 
     defaultConfig {
         applicationId = "com.example.shareyourvoicemapbox"
@@ -47,8 +48,10 @@ dependencies {
     implementation(libs.android.ndk27)
     implementation(libs.maps.compose.ndk27)
 
-    // SERIALIZATION
-
+    // HILT
+    implementation("com.google.dagger:hilt-android:2.57.1")
+    ksp("com.google.dagger:hilt-compiler:2.57.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     // KTOR
     implementation(libs.bundles.ktor)
     // FONTS

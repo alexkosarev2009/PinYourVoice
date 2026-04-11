@@ -10,6 +10,7 @@ sealed interface MapState {
         val mapViewportState: MapViewportState = MapViewportState(),
         val showAddMarkerDialog: Boolean = false,
         val showMicPermissionDialog: Boolean = false,
+        val showFineLocationPermissionDialog: Boolean = false,
         val error: String = ""
     ) : MapState
 }

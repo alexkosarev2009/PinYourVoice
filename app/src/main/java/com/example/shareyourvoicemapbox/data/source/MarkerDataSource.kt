@@ -2,6 +2,7 @@ package com.example.shareyourvoicemapbox.data.source
 
 import com.example.shareyourvoicemapbox.data.dto.MarkerDTO
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -11,9 +12,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class MarkerDataSource {
-    val client = Network.client
+class MarkerDataSource @Inject constructor(
+    private val client: HttpClient
+) {
 
     suspend fun getMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {

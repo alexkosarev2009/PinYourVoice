@@ -3,9 +3,10 @@ package com.example.shareyourvoicemapbox.data
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.data.source.MarkerDataSource
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
+import javax.inject.Inject
 
-class MarkerRepository(
-    val markerDataSource: MarkerDataSource
+class MarkerRepository @Inject constructor(
+    private val markerDataSource: MarkerDataSource
 ) {
     suspend fun getMarkers(): Result<List<MarkerEntity>> {
         return markerDataSource.getMarkers().map { markerDTOS ->

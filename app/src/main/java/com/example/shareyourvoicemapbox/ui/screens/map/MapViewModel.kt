@@ -1,29 +1,50 @@
 package com.example.shareyourvoicemapbox.ui.screens.map
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.domain.markers.CreateMarkerUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
+import com.example.shareyourvoicemapbox.domain.recorder.ReleaseRecorderUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StartRecordingUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StopRecordingUseCase
+import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.mapbox.geojson.Point
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MapViewModel(
+@HiltViewModel
+class MapViewModel @Inject constructor(
     private val getMarkersUseCase: GetMarkersUseCase,
     private val createMarkerUseCase: CreateMarkerUseCase,
     private val startRecordingUseCase: StartRecordingUseCase,
-    private val stopRecordingUseCase: StopRecordingUseCase
+    private val stopRecordingUseCase: StopRecordingUseCase,
+    private val releaseRecorderUseCase: ReleaseRecorderUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<MapState> = MutableStateFlow(MapState.Content())
     val uiState = _uiState.asStateFlow()
     private val _systemState = MutableStateFlow(MapSystemState())
     val systemState = _systemState.asStateFlow()
+
+    private val _actionFlow = MutableSharedFlow<MapAction>()
+    val actionFlow = _actionFlow.asSharedFlow()
+
+    private var timerJob: Job? = null
+    val minDuration = 3_000L
+    val maxDuration = 30_000L
+
 
     init {
         getData()
@@ -71,22 +92,56 @@ class MapViewModel(
             )
         }
     }
+
+    private fun startTimer() {
+        timerJob?.cancel()
+
+        timerJob = viewModelScope.launch {
+            val startTime = System.currentTimeMillis()
+
+            while (isActive) {
+                val time = System.currentTimeMillis() - startTime
+
+                _systemState.update {
+                    it.copy(recordTimeMs = time)
+                }
+
+                if (time >= maxDuration) {
+                    stopRecording()
+                    break
+                }
+
+                delay(50)
+            }
+        }
+    }
     fun startRecording() {
         startRecordingUseCase()
         _systemState.update {
-            it.copy(isRecording = true)
+            it.copy(isRecording = true,
+                recordTimeMs = 0L)
         }
+        startTimer()
     }
 
-    fun stopRecording(): String {
+    fun stopRecording() {
+        timerJob?.cancel()
+        timerJob = null
+
+        val duration = _systemState.value.recordTimeMs
         val path = stopRecordingUseCase()
+        val isValid = duration >= minDuration
+
         _systemState.update {
             it.copy(
                 isRecording = false,
-                currentAudioPath = path
+                currentAudioPath = if (isValid) path else null,
+                recordTimeMs = duration
             )
         }
-        return path
+        if (isValid) {
+            savedStateHandle["audioPath"] = path
+        }
     }
 
     fun onRecordClick() {
@@ -103,39 +158,55 @@ class MapViewModel(
     }
 
     fun openAddMarkerDialog() {
-        val currentState = _uiState.value
-
-        if (currentState is MapState.Content) {
-            _uiState.value = currentState.copy(
-                showAddMarkerDialog = true
-            )
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(showAddMarkerDialog = true)
+            }
+            else state
         }
     }
     fun closeAddMarkerDialog() {
-        val currentState = _uiState.value
-
-        if (currentState is MapState.Content) {
-            _uiState.value = currentState.copy(
-                showAddMarkerDialog = false
-            )
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(showAddMarkerDialog = false,)
+            }
+            else state
+        }
+        _systemState.update { state ->
+            state.copy(currentAudioPath = null)
         }
     }
-    fun openPermissionSettingsDialog() {
-        val currentState = _uiState.value
-
-        if (currentState is MapState.Content) {
-            _uiState.value = currentState.copy(
-                showMicPermissionDialog = true
-            )
+    fun openMicPermissionDialog() {
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(showMicPermissionDialog = true)
+            }
+            else state
         }
     }
-    fun closePermissionSettingsDialog() {
-        val currentState = _uiState.value
+    fun closeMicPermissionDialog() {
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(showMicPermissionDialog = false)
+            }
+            else state
+        }
+    }
 
-        if (currentState is MapState.Content) {
-            _uiState.value = currentState.copy(
-                showMicPermissionDialog = false
-            )
+    fun openFineLocationPermissionDialog() {
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(showFineLocationPermissionDialog = true)
+            }
+            else state
+        }
+    }
+    fun closeFineLocationPermissionDialog() {
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(showFineLocationPermissionDialog = false)
+            }
+            else state
         }
     }
 
@@ -143,6 +214,24 @@ class MapViewModel(
         _systemState.update {
             it.copy(userLocation = point)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        releaseRecorderUseCase()
+    }
+    fun onSaveRecordingClick() {
+        viewModelScope.launch {
+            _actionFlow.emit(MapAction.OpenScreen(SecondaryRoute.EDIT.route))
+        }
+    }
+    fun onDeleteRecordingClick() {
+        _systemState.update {
+            it.copy(
+                currentAudioPath = null
+            )
+        }
+        savedStateHandle["audioPath"] = null
     }
 
 }

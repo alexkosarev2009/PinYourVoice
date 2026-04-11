@@ -14,39 +14,18 @@ import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
 import com.example.shareyourvoicemapbox.ui.navigation.AppNav
 import com.example.shareyourvoicemapbox.ui.screens.map.AddMarkerDialog
 import com.example.shareyourvoicemapbox.ui.screens.map.MapViewModel
-import com.example.shareyourvoicemapbox.ui.screens.map.MapViewModelFactory
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val recorder = AudioRecorderImpl(applicationContext)
 
-        val startRecordingUseCase = StartRecordingUseCase(recorder)
-        val stopRecordingUseCase = StopRecordingUseCase(recorder)
-
-        val markerRepository = MarkerRepository(MarkerDataSource())
-
-        val getMarkersUseCase = GetMarkersUseCase(
-            markerRepository = markerRepository
-        )
-
-        val createMarkerUseCase = CreateMarkerUseCase(
-            markerRepository = markerRepository
-        )
-
-        val factory = MapViewModelFactory(
-            getMarkersUseCase,
-            createMarkerUseCase,
-            startRecordingUseCase,
-            stopRecordingUseCase
-        )
-
-        val mapViewModel = ViewModelProvider(this, factory)[MapViewModel::class.java]
         setContent {
             AppTheme {
-                AppNav(viewModel = mapViewModel)
+                AppNav()
             }
         }
     }

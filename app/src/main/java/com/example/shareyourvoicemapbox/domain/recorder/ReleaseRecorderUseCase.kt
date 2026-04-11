@@ -2,10 +2,10 @@ package com.example.shareyourvoicemapbox.domain.recorder
 
 import javax.inject.Inject
 
-class StopRecordingUseCase @Inject constructor(
+class ReleaseRecorderUseCase @Inject constructor(
     private val recorder: AudioRecorder
 ) {
-    operator fun invoke(): String {
-        return recorder.stopRecording()
+    operator fun invoke() {
+        recorder.release()
     }
 }

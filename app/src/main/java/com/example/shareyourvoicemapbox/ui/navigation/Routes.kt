@@ -4,21 +4,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PinDrop
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.outlined.AddLocationAlt
 import androidx.compose.material.icons.outlined.Explore
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.PinDrop
-import androidx.compose.material.icons.outlined.Place
 import androidx.compose.ui.graphics.vector.ImageVector
-
-sealed interface c
 
 enum class Route(
     val route: String,
@@ -39,9 +28,10 @@ enum class Route(
         "Profile")
 }
 
-enum class AuthRoute(
+enum class SecondaryRoute(
     val route: String
 ) {
     AUTH("auth"),
-    REGISTER("register")
+    REGISTER("register"),
+    EDIT("edit_marker")
 }
