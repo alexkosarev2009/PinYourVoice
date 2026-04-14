@@ -20,10 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.shareyourvoicemapbox.ui.screens.auth.AuthScreen
 import com.example.shareyourvoicemapbox.ui.screens.edit.EditScreen
 import com.example.shareyourvoicemapbox.ui.screens.feed.FeedScreen
@@ -58,7 +60,7 @@ fun AppNavHost(
                 }
             }
         }
-        composable(SecondaryRoute.EDIT.route,
+        composable("${SecondaryRoute.EDIT.route}/{audioPath}",
             enterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { it },
@@ -82,9 +84,10 @@ fun AppNavHost(
                     targetOffsetX = { it },
                     animationSpec = tween(500)
                 )
-            }
+            },
+            arguments = listOf(navArgument("audioPath") {type = NavType.StringType})
         ) {
-            EditScreen(navHostController = navHostController)
+            EditScreen(navHostController = navHostController, modifier = modifier)
         }
     }
 }

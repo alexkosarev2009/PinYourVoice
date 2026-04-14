@@ -12,7 +12,6 @@ import com.example.shareyourvoicemapbox.domain.recorder.StartRecordingUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StopRecordingUseCase
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.mapbox.geojson.Point
-import com.mapbox.maps.dsl.cameraOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

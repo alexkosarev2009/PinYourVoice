@@ -4,6 +4,7 @@ package com.example.shareyourvoicemapbox.ui.screens.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -33,7 +34,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocationAlt
 import androidx.compose.material.icons.filled.Cancel
@@ -51,38 +54,47 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
-import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -91,15 +103,15 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
-import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 import com.mapbox.maps.extension.compose.annotation.IconImage
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
-import com.mapbox.maps.extension.compose.ornaments.compass.MapCompassScope
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.viewport.data.FollowPuckViewportStateOptions
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.net.URLEncoder
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
@@ -107,7 +119,7 @@ import kotlinx.coroutines.delay
 fun MapScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    viewModel: MapViewModel = hiltViewModel<MapViewModel>()
+    viewModel: MapViewModel = hiltViewModel<MapViewModel>(),
 ) {
     val state by viewModel.uiState.collectAsState()
     val systemState by viewModel.systemState.collectAsState()
@@ -115,31 +127,47 @@ fun MapScreen(
 
     val minDuration = viewModel.minDuration
     val maxDuration = viewModel.maxDuration
-    val progress = (systemState.recordTimeMs / maxDuration.toFloat())
-        .coerceIn(0f, 1f)
-
-
+    val progress by remember {
+        derivedStateOf {
+            (systemState.recordTimeMs / maxDuration.toFloat()).coerceIn(0f, 1f)
+        }
+    }
     var overlayVisible by remember { mutableStateOf(true) }
 
     val animatedScale by animateFloatAsState(
         targetValue = if (systemState.isRecording) 1.3f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
+            stiffness = Spring.StiffnessLow,
         ),
-        label = "record_scale"
+        label = "record_scale",
     )
+    val view = LocalView.current
+
+    DisposableEffect(Unit) {
+        val window = (view.context as Activity).window
+
+
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+        onDispose {
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+
+        }
+    }
     val offset by animateDpAsState(
         targetValue = if (systemState.isRecording) 40.dp else 0.dp,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
+            stiffness = Spring.StiffnessLow,
         ),
-        label = "buttons_offset"
+        label = "buttons_offset",
     )
 
-    val markerIcon = rememberIconImage(key = "red-marker", painter =
-        painterResource(id = R.drawable.red_marker))
+    val markerIcon = rememberIconImage(
+        key = "red-marker",
+        painter =
+            painterResource(id = R.drawable.red_marker),
+    )
 
     val context = LocalContext.current
 
@@ -149,16 +177,20 @@ fun MapScreen(
         viewModel.setLocationPermission(granted)
     }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
-    val fineLocationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+    val fineLocationPermissionState =
+        rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.actionFlow.collect { action ->
             when (action) {
                 is MapAction.OpenScreen -> {
-                    navHostController.currentBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("audioPath", systemState.currentAudioPath)
-                    navHostController.navigate(SecondaryRoute.EDIT.route)
+                    val encodedPath = URLEncoder.encode(systemState.currentAudioPath, "UTF-8")
+                    navHostController.navigate("${SecondaryRoute.EDIT.route}/${encodedPath}") {
+                        launchSingleTop = true
+                    }
 
                 }
             }
@@ -172,7 +204,7 @@ fun MapScreen(
                 cameraOptions {
                     center(point)
                     zoom(14.0)
-                }
+                },
             )
         }
     }
@@ -180,7 +212,7 @@ fun MapScreen(
     LaunchedEffect(Unit) {
         val granted = ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION,
         ) == PackageManager.PERMISSION_GRANTED
 
         if (granted) {
@@ -195,56 +227,73 @@ fun MapScreen(
         overlayVisible = false
     }
 
-    when(val currentState = state) {
+    when (val currentState = state) {
         is MapState.Content -> {
             if (!isConnected) {
                 Column(
-                    modifier.fillMaxSize().statusBarsPadding(),
+                    modifier
+                        .fillMaxSize()
+                        .statusBarsPadding(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
 
-                ) {
+                    ) {
                     Box(
-                        contentAlignment = Alignment.BottomEnd
+                        contentAlignment = Alignment.BottomEnd,
                     ) {
                         Icon(
                             modifier = Modifier,
                             imageVector = ImageVector.vectorResource(R.drawable.no_connection_icon),
                             contentDescription = "Connection status",
-                            tint = Color.Gray
+                            tint = Color.Gray,
                         )
-                        Icon(modifier = Modifier
-                            .padding(8.dp, 8.dp)
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.background),
+                        Icon(
+                            modifier = Modifier
+                                .padding(8.dp, 8.dp)
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.background),
                             tint = MaterialTheme.colorScheme.error,
                             imageVector = Icons.Default.Cancel,
-                            contentDescription = "No connection")
+                            contentDescription = "No connection",
+                        )
                     }
                     Spacer(Modifier.height(8.dp))
 
-                    Text(text = "No internet connection",
+                    Text(
+                        text = "No internet connection",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold)
+                        fontWeight = FontWeight.Bold,
+                    )
                     Spacer(Modifier.height(4.dp))
 
                     HorizontalDivider(
                         thickness = 1.dp,
                         modifier = Modifier.width(350.dp),
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(text = "Offline maps not supported")
                 }
 
-            }
-            else {
+            } else {
                 Scaffold(
                     modifier = modifier,
+                    snackbarHost = {
+                        SnackbarHost(snackbarHostState) { data ->
+                            Snackbar(
+                                snackbarData = data,
+                                shape = RoundedCornerShape(32.dp),
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError,
+                                modifier = Modifier.widthIn(max = 280.dp)
+                            )
+                        }
+
+                    },
                     floatingActionButton = {
                         Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             FloatingActionButton(
                                 modifier = Modifier.size(48.dp),
@@ -253,7 +302,7 @@ fun MapScreen(
                                         fineLocationPermissionState.status.isGranted -> {
                                             systemState.mapViewportState.transitionToFollowPuckState(
                                                 followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
-                                                    .pitch(0.0).build()
+                                                    .pitch(0.0).build(),
                                             )
                                         }
 
@@ -273,7 +322,7 @@ fun MapScreen(
                                         }
                                     }
                                 },
-                                shape = CircleShape
+                                shape = CircleShape,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.NearMe,
@@ -291,6 +340,10 @@ fun MapScreen(
                                     when {
                                         audioGranted && locationGranted -> {
                                             viewModel.openAddMarkerDialog()
+                                            systemState.mapViewportState.transitionToFollowPuckState(
+                                                followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
+                                                    .pitch(0.0).build(),
+                                            )
                                         }
 
                                         !audioGranted -> {
@@ -327,7 +380,15 @@ fun MapScreen(
                                 )
                             }
                         }
-
+                        LaunchedEffect(currentState.error) {
+                            if (currentState.error != "") {
+                                snackbarHostState.showSnackbar(
+                                    message = currentState.error,
+                                    duration = SnackbarDuration.Short,
+                                    withDismissAction = true
+                                )
+                            }
+                        }
                     },
                 ) {
                     MapContent(
@@ -338,9 +399,11 @@ fun MapScreen(
                         },
                         onAddMarkerDismiss = {
                             if (!systemState.isRecording) {
+                                viewModel.onDeleteRecordingClick()
                                 viewModel.closeAddMarkerDialog()
                             } else {
                                 viewModel.onRecordRelease()
+                                viewModel.onDeleteRecordingClick()
                                 viewModel.closeAddMarkerDialog()
                             }
                         },
@@ -388,7 +451,7 @@ fun MapScreen(
                             viewModel.onDeleteRecordingClick()
                         },
                         progress = progress,
-                        minDuration = minDuration
+                        minDuration = minDuration,
                     )
                 }
             }
@@ -421,18 +484,18 @@ fun MapContent(
 ) {
     Box(
         modifier = modifier,
-        contentAlignment = Alignment.BottomEnd
+        contentAlignment = Alignment.TopCenter,
     ) {
         AnimatedVisibility(
             visible = true,
-            enter = fadeIn(animationSpec = tween(1000))
+            enter = fadeIn(animationSpec = tween(1000)),
         ) {
             MapboxMap(
                 Modifier.fillMaxSize(),
                 mapViewportState = systemState.mapViewportState,
                 scaleBar = {},
                 compass = {
-                    Compass(modifier = Modifier.statusBarsPadding())
+                    Compass(modifier = Modifier.padding(0.dp, 120.dp))
                 },
                 logo = {
                     Logo()
@@ -446,7 +509,7 @@ fun MapContent(
                     if (!systemState.hasCenteredUser) {
                         systemState.mapViewportState.transitionToFollowPuckState(
                             followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
-                                .pitch(0.0).build()
+                                .pitch(0.0).build(),
                         )
                     }
 
@@ -457,7 +520,7 @@ fun MapContent(
                 state.markers.forEach { marker ->
                     val point = Point.fromLngLat(marker.lng, marker.lat)
                     PointAnnotation(
-                        point = point
+                        point = point,
                     ) {
                         iconImage = markerIcon
                         interactionsState.onClicked {
@@ -465,7 +528,7 @@ fun MapContent(
                                 cameraOptions {
                                     center(point)
 
-                                }
+                                },
                             )
                             onMarkerClick(marker)
                             true
@@ -476,7 +539,7 @@ fun MapContent(
         }
         AnimatedVisibility(
             visible = overlayVisible,
-            exit = fadeOut(animationSpec = tween(1000))
+            exit = fadeOut(animationSpec = tween(1000)),
         ) {
             Box(
                 Modifier
@@ -486,10 +549,10 @@ fun MapContent(
                             colors = listOf(
                                 Color(0xFF0B1E3A),
                                 Color(0xFF051728),
-                                Color(0xFF020A14)
-                            )
-                        )
-                    )
+                                Color(0xFF020A14),
+                            ),
+                        ),
+                    ),
             )
         }
         if (state.showAddMarkerDialog) {
@@ -503,7 +566,7 @@ fun MapContent(
                 onSaveRecordingClick = onSaveRecordingClick,
                 onDeleteRecordingClick = onDeleteRecordingClick,
                 progress = progress,
-                minDuration = minDuration
+                minDuration = minDuration,
             )
         }
         if (state.showMicPermissionDialog) {
@@ -511,7 +574,7 @@ fun MapContent(
                 onConfirm = onConfirmPermissionSettingsDialog,
                 onDismiss = onDismissPermissionSettingsDialog,
                 title = "Couldn't record audio",
-                text = "Please allow microphone access in App Settings."
+                text = "Please allow microphone access in App Settings.",
             )
         }
         if (state.showFineLocationPermissionDialog) {
@@ -519,7 +582,7 @@ fun MapContent(
                 onConfirm = onConfirmFineLoactionDialog,
                 onDismiss = onDismissFineLocationDialog,
                 title = "Couldn't fetch your current location",
-                text = "Please allow location access in App Settings."
+                text = "Please allow location access in App Settings.",
             )
         }
 
@@ -538,7 +601,7 @@ fun AddMarkerDialog(
     onSaveRecordingClick: () -> Unit,
     onDeleteRecordingClick: () -> Unit,
     progress: Float,
-    minDuration: Long
+    minDuration: Long,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -547,32 +610,39 @@ fun AddMarkerDialog(
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Row(
                 modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
             ) {
                 IconButton(
                     onClick = onDeleteRecordingClick,
-                    modifier.offset(x = -(offset.plus(4.dp))),
-                    enabled = systemState.recordTimeMs > 0
+                    modifier = Modifier
+                        .graphicsLayer {
+                            translationX = -(offset.plus(4.dp)).toPx()
+                        },
+                    enabled = systemState.recordTimeMs > 0,
                 ) {
-                    Icon(imageVector = Icons.Default.Delete,
+                    Icon(
+                        imageVector = Icons.Default.Delete,
                         contentDescription = "Delete recording",
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
                     )
                 }
                 Column(
                     modifier,
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Box(
                         modifier = Modifier
                             .size(60.dp)
-                            .scale(animatedScale)
+                            .graphicsLayer {
+                                scaleX = animatedScale
+                                scaleY = animatedScale
+                            }
                             .pointerInput(Unit) {
                                 detectTapGestures(
                                     onPress = {
@@ -586,18 +656,18 @@ fun AddMarkerDialog(
                                                 onRecordRelease()
                                             }
                                         }
-                                    }
+                                    },
                                 )
                             }
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             modifier = Modifier.size(28.dp),
                             imageVector = Icons.Default.KeyboardVoice,
                             contentDescription = "Record",
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                         CircularProgressIndicator(
                             progress = {
@@ -613,50 +683,37 @@ fun AddMarkerDialog(
 
                 IconButton(
                     onClick = onSaveRecordingClick,
-                    modifier = Modifier.offset(x = offset.plus(4.dp)),
-                    enabled = systemState.isRecording || systemState.currentAudioPath != null
+                    modifier = Modifier
+                        .graphicsLayer {
+                            translationX = (offset.plus(4.dp)).toPx()
+                        },
+                    enabled = systemState.recordTimeMs > minDuration,
 
-                ) {
-                    Icon(imageVector = Icons.Default.Check,
+                    ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
                         contentDescription = "Save recording",
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
                     )
                 }
 
             }
             Spacer(Modifier.height(8.dp))
-            Text(modifier = Modifier.offset(y = offset / 2),
+            Text(
+                modifier = Modifier.offset(y = offset / 2),
                 text = formatTime(systemState.recordTimeMs),
                 fontSize = 20.sp,
                 color = if (systemState.recordTimeMs != 0L && systemState.recordTimeMs < minDuration) {
                     MaterialTheme.colorScheme.error
                 } else {
                     MaterialTheme.colorScheme.onSurface
-                }
+                },
             )
             Spacer(Modifier.height(42.dp))
         }
     }
 }
 
-@Composable
-@Preview
-fun AddMarkerDialogPreview(modifier: Modifier = Modifier) {
-    AppTheme {
-        AddMarkerDialog(
-            onDismiss = {},
-            onRecordClick = {},
-            animatedScale = 1f,
-            onRecordRelease = {},
-            offset = 0.dp,
-            systemState = MapSystemState(),
-            onSaveRecordingClick = {},
-            onDeleteRecordingClick = {},
-            progress = 0f,
-            minDuration = 1
-        )
-    }
-}
 
 
 @Composable
@@ -666,7 +723,7 @@ fun PermissionSettingsDialog(
     title: String,
     text: String,
 
-) {
+    ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -684,7 +741,7 @@ fun PermissionSettingsDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cancel")
             }
-        }
+        },
     )
 }
 

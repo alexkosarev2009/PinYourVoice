@@ -44,6 +44,10 @@ android {
 }
 
 dependencies {
+    // WAVEFORM
+    implementation("com.github.lincollincol:compose-audiowaveform:1.1.1")
+    implementation("com.github.lincollincol:amplituda:2.3.1")
+
     // MAPBOX
     implementation(libs.android.ndk27)
     implementation(libs.maps.compose.ndk27)

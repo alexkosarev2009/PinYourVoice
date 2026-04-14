@@ -2,7 +2,6 @@ package com.example.shareyourvoicemapbox.data.recorder
 
 import android.content.Context
 import android.media.MediaRecorder
-import android.os.Build
 import android.util.Log
 import com.example.shareyourvoicemapbox.domain.recorder.AudioRecorder
 import java.io.File
@@ -21,18 +20,16 @@ class AudioRecorderImpl(
 
         currentFilePath = filePath
 
-
-        val mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            MediaRecorder(context)
-        } else {
-            MediaRecorder()
-        }
+        val mediaRecorder = MediaRecorder()
 
         recorder = mediaRecorder.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setOutputFile(filePath)
             setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setAudioChannels(1)
+            setAudioSamplingRate(48000)
+            setAudioEncodingBitRate(192000)
 
             try {
                 prepare()
@@ -64,9 +61,9 @@ class AudioRecorderImpl(
     override fun createFile(): String {
         val simpleDateFormat = SimpleDateFormat("yyyy.MM.dd_hh.mm.ss", Locale.US)
         val date = simpleDateFormat.format(Date())
-        val file = File(context.cacheDir, "audio_${date}.m4a")
+        val file = File(context.externalCacheDir, "audio_${date}.m4a")
         // ЗАГЛУШКА ДЛЯ ТЕСТИРОВАНИЯ
-        context.cacheDir.listFiles()
+        context.externalCacheDir?.listFiles()
             ?.filter { it.name.endsWith(".m4a") }
             ?.forEach { it.delete() }
 
