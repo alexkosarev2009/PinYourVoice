@@ -280,16 +280,6 @@ fun MapScreen(
                 Scaffold(
                     modifier = modifier,
                     snackbarHost = {
-                        SnackbarHost(snackbarHostState) { data ->
-                            Snackbar(
-                                snackbarData = data,
-                                shape = RoundedCornerShape(32.dp),
-                                containerColor = MaterialTheme.colorScheme.error,
-                                contentColor = MaterialTheme.colorScheme.onError,
-                                modifier = Modifier.widthIn(max = 280.dp)
-                            )
-                        }
-
                     },
                     floatingActionButton = {
                         Column(
@@ -383,7 +373,7 @@ fun MapScreen(
                         LaunchedEffect(currentState.error) {
                             if (currentState.error != "") {
                                 snackbarHostState.showSnackbar(
-                                    message = currentState.error,
+                                    message = "Couldn't load markers",
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = true
                                 )
@@ -453,6 +443,20 @@ fun MapScreen(
                         progress = progress,
                         minDuration = minDuration,
                     )
+                }
+                Box(
+                    modifier = Modifier.fillMaxSize().statusBarsPadding().padding(0.dp, 8.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    SnackbarHost(snackbarHostState) { data ->
+                        Snackbar(
+                            snackbarData = data,
+                            shape = RoundedCornerShape(32.dp),
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError,
+                            modifier = Modifier.widthIn(max = 280.dp)
+                        )
+                    }
                 }
             }
         }

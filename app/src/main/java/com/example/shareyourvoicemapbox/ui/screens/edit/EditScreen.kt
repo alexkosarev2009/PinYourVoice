@@ -1,6 +1,7 @@
 package com.example.shareyourvoicemapbox.ui.screens.edit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,8 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +39,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,12 +69,19 @@ fun EditScreen(
     viewModel: EditViewModel = hiltViewModel<EditViewModel>(),
 ) {
     val state by viewModel.state.collectAsState()
+    val playerState by viewModel.playerState.collectAsState()
 
-    var waveformProgress by remember { mutableStateOf(0f) }
+    val waveformProgress by remember {
+        derivedStateOf {
+            (playerState.currentPosition / playerState.maxDuration.toFloat())
+                .coerceIn(0f, 1f)
+        }
+    }
 
     LaunchedEffect(Unit) {
         if (state.audioPath == "") return@LaunchedEffect
         viewModel.processAudio()
+        viewModel.getAudioDurationMs(state.audioPath)
     }
 
     Scaffold(
@@ -91,10 +104,11 @@ fun EditScreen(
         EditContent(
             modifier = modifier.padding(innerPadding),
             state = state,
+            platerState = playerState,
             waveformProgress = waveformProgress,
             amplitudes = state.amplitudes,
-            onWaveformProgressChange = {
-
+            onWaveformProgressChange = { progress ->
+                viewModel.onWaveformProgressChange(progress)
             },
             onImagePickClick = {
 
@@ -103,7 +117,12 @@ fun EditScreen(
                 viewModel.onTitleChange(title)
             },
             onPlayClick = {
-
+                if (!playerState.isPlaying) {
+                    viewModel.playAudio()
+                }
+                else {
+                    viewModel.pauseAudio()
+                }
             },
             titleState = state.title,
             onPostClick = {
@@ -118,6 +137,7 @@ fun EditScreen(
 fun EditContent(
     modifier: Modifier = Modifier,
     state: EditState,
+    platerState: EditPlayerState,
     waveformProgress: Float,
     amplitudes: List<Int>,
     onWaveformProgressChange: (Float) -> Unit,
@@ -188,50 +208,59 @@ fun EditContent(
         }
         HorizontalDivider()
         Spacer(Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(8.dp, 12.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+        ElevatedCard(
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
         ) {
-            Box(
-                modifier = Modifier.size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.onPrimaryContainer)
-                    .clickable(
-                        onClick = onPlayClick
-                    ),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(8.dp, 12.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Play audio",
-                    tint = MaterialTheme.colorScheme.primaryContainer,
-                    modifier = Modifier.size(32.dp))
-            }
-            Spacer(Modifier.width(16.dp))
-            AudioWaveform(
-                modifier = Modifier,
-                progressBrush = Brush.horizontalGradient(
-                    listOf(
-                        MaterialTheme.colorScheme.onPrimaryContainer,
-                        MaterialTheme.colorScheme.secondary
-                    )
-                ),
-                waveformBrush = SolidColor(MaterialTheme.colorScheme.surfaceContainerLowest),
-                amplitudes = amplitudes,
-                progress = waveformProgress,
-                onProgressChange = onWaveformProgressChange,
-                spikeWidth = 4.dp,
-                spikeRadius = 32.dp,
-                waveformAlignment = WaveformAlignment.Center
+                Box(
+                    modifier = Modifier.size(48.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.onPrimaryContainer)
+                        .clickable(
+                            onClick = onPlayClick
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val imageVector = if (platerState.isPlaying)
+                        Icons.Default.Pause else Icons.Default.PlayArrow
+                    Icon(imageVector = imageVector,
+                        contentDescription = "Play audio",
+                        tint = MaterialTheme.colorScheme.background,
+                        modifier = Modifier.size(32.dp))
+                }
+                Spacer(Modifier.width(16.dp))
+                AudioWaveform(
+                    modifier = Modifier,
+                    progressBrush = Brush.horizontalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.onPrimaryContainer,
+                            MaterialTheme.colorScheme.secondary
+                        )
+                    ),
+                    waveformBrush = SolidColor(MaterialTheme.colorScheme.surfaceContainerLowest),
+                    amplitudes = amplitudes.map { it ->
+                        if (it == 0) it + 1 else it
+                    },
+                    progress = waveformProgress,
+                    onProgressChange = onWaveformProgressChange,
+                    spikeWidth = 4.dp,
+                    spikeRadius = 32.dp,
+                    waveformAlignment = WaveformAlignment.Center
                 )
+            }
         }
+
         Box(
-            modifier = Modifier.fillMaxSize().padding(0.dp, 16.dp),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
         ) {
             Button(
@@ -248,7 +277,7 @@ fun EditContent(
 @Preview(showSystemUi = true)
 fun EditScreenPreview(modifier: Modifier = Modifier) {
     AppTheme(
-        darkTheme = true
+        darkTheme = false
     ) {
         Scaffold(
             modifier = Modifier.statusBarsPadding(),
@@ -271,7 +300,8 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
             EditContent(
                 modifier = modifier.padding(innerPadding),
                 state = EditState(),
-                waveformProgress = 0.5f,
+                platerState = EditPlayerState(),
+                waveformProgress = 1f,
                 amplitudes = listOf(
                     2, 3, 2, 4, 3, 2, 3, 2,
                     20, 35, 50, 65, 80, 75, 70, 85, 90, 78, 60, 55, 40, 30,

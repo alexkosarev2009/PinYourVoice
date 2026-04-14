@@ -8,34 +8,40 @@ class AudioPlayerImpl: AudioPlayer{
     private var player: MediaPlayer? = null
 
     override fun play(filePath: String) {
-        if (player != null) return
-
-        val mediaPlayer = MediaPlayer()
-        player = mediaPlayer.apply {
-            setDataSource(filePath)
-            try {
-                prepare()
-                start()
-                Log.d("PLAYER", "play called")
-            } catch (e: Exception) {
-                Log.e("PLAYER", "play failed", e)
-                release()
-                player = null
+        try {
+            if (player == null) {
+                player = MediaPlayer().apply {
+                    setDataSource(filePath)
+                    prepare()
+                }
             }
+            player?.start()
+        } catch (e: Exception) {
+            Log.e("PLAYER", "Play failed", e)
+            player?.release()
+            player = null
         }
+    }
+
+    override fun resume() {
+        player?.start()
     }
 
     override fun pause() {
-        player?.apply {
-            try {
-                stop()
-            } catch (e: Exception) {
-                Log.e("PLAYER", "Stop failed", e)
-            }
-            finally {
-                release()
-            }
-        }
-        player = null
+        player?.pause()
     }
+
+    override fun release() {
+        player?.release()
+    }
+
+    override fun seekTo(ms: Long) {
+        player?.apply {
+            seekTo(ms.toInt())
+        }
+    }
+    override fun getCurrentPosition(): Int {
+        return player?.currentPosition ?: 0
+    }
+
 }
