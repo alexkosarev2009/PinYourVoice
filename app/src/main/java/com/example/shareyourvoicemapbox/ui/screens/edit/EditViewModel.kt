@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import javax.inject.Inject
 
+const val MAX_TITLE_LEN = 30
+
 @HiltViewModel
 class EditViewModel @Inject constructor(
     private val playAudioUseCase: PlayAudioUseCase,
@@ -40,6 +42,14 @@ class EditViewModel @Inject constructor(
                     }
                 }
             )
+        }
+    }
+
+    fun onTitleChange(newTitle: String) {
+        if (newTitle.length <= MAX_TITLE_LEN) {
+            _state.update {
+                it.copy(title = newTitle)
+            }
         }
     }
 

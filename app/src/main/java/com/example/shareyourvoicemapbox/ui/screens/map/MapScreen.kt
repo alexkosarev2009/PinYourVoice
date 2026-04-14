@@ -181,7 +181,6 @@ fun MapScreen(
         rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.actionFlow.collect { action ->
@@ -190,6 +189,7 @@ fun MapScreen(
                     val encodedPath = URLEncoder.encode(systemState.currentAudioPath, "UTF-8")
                     navHostController.navigate("${SecondaryRoute.EDIT.route}/${encodedPath}") {
                         launchSingleTop = true
+                        restoreState = true
                     }
 
                 }
