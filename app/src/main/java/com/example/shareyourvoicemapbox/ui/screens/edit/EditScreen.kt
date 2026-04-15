@@ -1,8 +1,16 @@
 package com.example.shareyourvoicemapbox.ui.screens.edit
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -19,14 +28,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,25 +53,38 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
+import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
+import kotlinx.coroutines.launch
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -78,12 +103,34 @@ fun EditScreen(
         }
     }
 
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            viewModel.onImagePicked(uri)
+        }
+    }
+
+    val density = LocalDensity.current
+    val maxDragPx = with(density) { 250.dp.toPx() }
+
+    val offsetX = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    val imageScale = remember { Animatable(1f) }
+    val shouldEnlarge = offsetX.value >= maxDragPx * 0.9f
+
+    LaunchedEffect(shouldEnlarge) {
+        imageScale.animateTo(
+            targetValue = if (shouldEnlarge) 1.2f else 1f,
+            animationSpec = tween(300)
+        )
+    }
+
     LaunchedEffect(Unit) {
         if (state.audioPath == "") return@LaunchedEffect
         viewModel.processAudio()
         viewModel.getAudioDurationMs(state.audioPath)
     }
-
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
         topBar = {
@@ -111,7 +158,13 @@ fun EditScreen(
                 viewModel.onWaveformProgressChange(progress)
             },
             onImagePickClick = {
-
+                if (state.imageUri == null) {
+                    imagePicker.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                }
             },
             onTitleChange = { title ->
                 viewModel.onTitleChange(title)
@@ -127,7 +180,30 @@ fun EditScreen(
             titleState = state.title,
             onPostClick = {
 
-            }
+            },
+            isPinYourVoiceEnabled = viewModel.isPinYourVoiceEnabled,
+            offsetX = offsetX,
+            maxDragPx = maxDragPx,
+            onDrag = { change, dragAmount ->
+                if (maxDragPx >= offsetX.value + dragAmount.x && dragAmount.x + offsetX.value >= 0f) {
+                    change.consume()
+                    scope.launch {
+                        offsetX.snapTo(offsetX.value + dragAmount.x)
+                    }
+                }
+            },
+            onDragEnd = {
+                scope.launch {
+                    if (offsetX.value > maxDragPx - 80) {
+                        viewModel.onDeleteImage()
+                    }
+                    offsetX.animateTo(
+                        targetValue = 0f,
+                        animationSpec = tween(800)
+                    )
+                }
+            },
+            imageScale = imageScale
         )
     }
 
@@ -145,7 +221,13 @@ fun EditContent(
     onTitleChange: (String) -> Unit,
     onPlayClick: () -> Unit,
     titleState: String,
-    onPostClick: () -> Unit
+    onPostClick: () -> Unit,
+    isPinYourVoiceEnabled: Boolean,
+    offsetX: Animatable<Float, AnimationVector1D>,
+    maxDragPx: Float,
+    onDrag: (PointerInputChange, Offset) -> Unit,
+    onDragEnd: () -> Unit,
+    imageScale: Animatable<Float, AnimationVector1D>
 ) {
     Column(
         modifier
@@ -153,29 +235,98 @@ fun EditContent(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(0.dp, 4.dp),
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Box(
-                Modifier.size(100.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                    .clickable(
-                        onClick = onImagePickClick,
-                    ),
-                contentAlignment = Alignment.Center
+
+            HorizontalDivider(
+                modifier = Modifier.padding(16.dp, 0.dp)
+                    .zIndex(-1f),
+                color = MaterialTheme.colorScheme.surfaceContainerHighest
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add picture",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(32.dp),
+                Box(
+                    modifier = if (state.imageUri != null) Modifier
+                        .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDrag = onDrag,
+                                onDragEnd = onDragEnd
+                            )
+                        }
+                        .graphicsLayer {
+                            scaleY = imageScale.value
+                            scaleX = imageScale.value
+                        }
+                        .zIndex(1f)
+                    else Modifier
+                        .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                        .graphicsLayer {
+                            scaleY = imageScale.value
+                            scaleX = imageScale.value
+                        }
+                        .zIndex(10f)
+
+                ) {
+                    Box(
+                        Modifier.size(100.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                            .clickable(
+                                onClick = onImagePickClick,
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (state.imageUri == null) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add picture",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(32.dp),
+                            )
+                        } else {
+                            AsyncImage(
+                                model = state.imageUri,
+                                contentDescription = "Preview photo",
+                                contentScale = ContentScale.Crop,
+                            )
+                        }
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .padding(40.dp, 0.dp)
+                        .graphicsLayer {
+                            alpha = (offsetX.value / maxDragPx).coerceIn(0.25f, 1f)
+                            scaleX = (1 / (offsetX.value / maxDragPx)).coerceIn(1f, 1.3f)
+                            scaleY = (1 / (offsetX.value / maxDragPx)).coerceIn(1f, 1.3f)
+                        }
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.error)
+
+                ) {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        tint = MaterialTheme.colorScheme.onError,
+                        imageVector = Icons.Default.DeleteForever,
+                        contentDescription = "Delete image"
                     )
+                }
+
             }
+            HorizontalDivider(
+                modifier = Modifier.padding(16.dp, 0.dp)
+                    .zIndex(-1f),
+                color = MaterialTheme.colorScheme.surfaceContainerHighest
+            )
 
         }
+        Spacer(Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -199,8 +350,10 @@ fun EditContent(
                     ),
                 textStyle = TextStyle(fontWeight = FontWeight.Bold,
                     fontSize = 16.sp),
-
-
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                )
 
             )
             Text(text = "${titleState.length}/${MAX_TITLE_LEN}",
@@ -216,7 +369,10 @@ fun EditContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(Brush.horizontalGradient(colors = listOf(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.secondaryContainer
+                    )))
                     .padding(8.dp, 12.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
@@ -247,8 +403,8 @@ fun EditContent(
                         )
                     ),
                     waveformBrush = SolidColor(MaterialTheme.colorScheme.surfaceContainerLowest),
-                    amplitudes = amplitudes.map { it ->
-                        if (it == 0) it + 1 else it
+                    amplitudes = amplitudes.map {
+                        it + 3
                     },
                     progress = waveformProgress,
                     onProgressChange = onWaveformProgressChange,
@@ -266,8 +422,19 @@ fun EditContent(
             Button(
                 onClick = onPostClick,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
+                enabled = isPinYourVoiceEnabled
             ) {
-                Text("Post marker", fontSize = 20.sp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PinDrop,
+                        contentDescription = "Pin drop",
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Pin your voice", fontSize = 20.sp)
+                }
             }
         }
     }
@@ -317,8 +484,14 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                 onImagePickClick = {},
                 onTitleChange = {},
                 onPlayClick = {},
-                onPostClick = {},
                 titleState = "",
+                onPostClick = {},
+                isPinYourVoiceEnabled = true,
+                offsetX = Animatable(0f),
+                onDrag = {change, dragAmount -> },
+                onDragEnd = {},
+                maxDragPx = 250f,
+                imageScale = Animatable(1f)
             )
         }
     }

@@ -44,6 +44,10 @@ android {
 }
 
 dependencies {
+    // COIL
+    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc01")
+
     // WAVEFORM
     implementation("com.github.lincollincol:compose-audiowaveform:1.1.1")
     implementation("com.github.lincollincol:amplituda:2.3.1")

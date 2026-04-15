@@ -1,6 +1,7 @@
 package com.example.shareyourvoicemapbox.ui.screens.edit
 
 import android.media.MediaMetadataRetriever
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +33,9 @@ class EditViewModel @Inject constructor(
     private val getCurrentPositionUseCase: GetCurrentPositionUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    val isPinYourVoiceEnabled: Boolean
+        get() = _state.value.title.trim().length > 3  && _state.value.imageUri != null
+
     private val _state = MutableStateFlow(EditState(
         audioPath = URLDecoder.decode(savedStateHandle["audioPath"], "UTF-8"),
     ))
@@ -62,8 +66,8 @@ class EditViewModel @Inject constructor(
 
     fun onTitleChange(newTitle: String) {
         if (newTitle.length <= MAX_TITLE_LEN) {
-            _state.update {
-                it.copy(title = newTitle)
+            _state.update { state ->
+                state.copy(title = newTitle.filter { it.isLetterOrDigit() })
             }
         }
     }
@@ -145,6 +149,18 @@ class EditViewModel @Inject constructor(
 
         } finally {
             retriever.release()
+        }
+    }
+
+    fun onImagePicked(uri: Uri) {
+        _state.update {
+            it.copy(imageUri = uri)
+        }
+    }
+
+    fun onDeleteImage() {
+        _state.update {
+            it.copy(imageUri = null)
         }
     }
 }
