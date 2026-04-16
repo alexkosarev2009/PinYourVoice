@@ -60,7 +60,7 @@ fun AppNavHost(
                 }
             }
         }
-        composable("${SecondaryRoute.EDIT.route}/{audioPath}",
+        composable("${SecondaryRoute.EDIT.route}/{audioPath}?lat={lat}&lng={lng}",
             enterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { it },
@@ -85,7 +85,17 @@ fun AppNavHost(
                     animationSpec = tween(500)
                 )
             },
-            arguments = listOf(navArgument("audioPath") {type = NavType.StringType})
+            arguments = listOf(
+                navArgument("audioPath") {type = NavType.StringType},
+                navArgument("lat") {
+                    type = NavType.StringType
+                    defaultValue = "0.0"
+                },
+                navArgument("lng") {
+                    type = NavType.StringType
+                    defaultValue = "0.0"
+                }
+            )
         ) {
             EditScreen(navHostController = navHostController, modifier = modifier)
         }

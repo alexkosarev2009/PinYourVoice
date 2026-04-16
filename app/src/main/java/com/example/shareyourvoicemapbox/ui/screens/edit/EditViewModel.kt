@@ -1,11 +1,16 @@
 package com.example.shareyourvoicemapbox.ui.screens.edit
 
+import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
+import com.example.shareyourvoicemapbox.domain.UploadFileUseCase
 import com.example.shareyourvoicemapbox.domain.amplituda.ProcessAudioUseCase
+import com.example.shareyourvoicemapbox.domain.markers.CreateMarkerUseCase
 import com.example.shareyourvoicemapbox.domain.player.GetCurrentPositionUseCase
 import com.example.shareyourvoicemapbox.domain.player.PauseAudioUseCase
 import com.example.shareyourvoicemapbox.domain.player.PlayAudioUseCase
@@ -19,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.io.File
 import java.net.URLDecoder
 import javax.inject.Inject
 
@@ -31,14 +37,20 @@ class EditViewModel @Inject constructor(
     private val seekToUseCase: SeekToUseCase,
     private val processAudioUseCase: ProcessAudioUseCase,
     private val getCurrentPositionUseCase: GetCurrentPositionUseCase,
+    private val uploadFileUseCase: UploadFileUseCase,
+    private val createMarkerUseCase: CreateMarkerUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     val isPinYourVoiceEnabled: Boolean
         get() = _state.value.title.trim().length > 3  && _state.value.imageUri != null
 
-    private val _state = MutableStateFlow(EditState(
-        audioPath = URLDecoder.decode(savedStateHandle["audioPath"], "UTF-8"),
-    ))
+    private val _state = MutableStateFlow(
+        EditState(
+            audioPath = URLDecoder.decode(savedStateHandle["audioPath"] ?: "", "UTF-8"),
+            lat = savedStateHandle.get<String>("lat")?.toDoubleOrNull() ?: 0.0,
+            lng = savedStateHandle.get<String>("lng")?.toDoubleOrNull() ?: 0.0
+        )
+    )
     val state: StateFlow<EditState> = _state.asStateFlow()
 
     private val _playerState = MutableStateFlow(EditPlayerState())
@@ -161,6 +173,72 @@ class EditViewModel @Inject constructor(
     fun onDeleteImage() {
         _state.update {
             it.copy(imageUri = null)
+        }
+    }
+
+    fun onPostClick() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+
+            val audioResult = uploadFileUseCase(
+                fileName = "audio.mp3",
+                contentType = "audio/mpeg",
+                filePath = _state.value.audioPath
+            )
+
+            val imageResult = uploadFileUseCase(
+                fileName = "image.jpg",
+                contentType = "image/jpeg",
+                filePath = _state.value.imagePath
+            )
+
+            val audioKey = audioResult.getOrNull()
+            val imageKey = imageResult.getOrNull()
+
+            if (audioKey == null || imageKey == null) {
+                Log.d("UPLOAD", "Missing keys: audio=$audioKey image=$imageKey")
+                return@launch
+            }
+
+            createMarkerUseCase(
+                CreateMarkerDTO(
+                    title = _state.value.title,
+                    lat = _state.value.lat,
+                    lng = _state.value.lng,
+                    imageUrl = imageKey,
+                    audioUrl = audioKey,
+                    authorId = 1
+                )
+            ).fold(
+                onSuccess = {
+                    _state.update {
+                        it.copy(isLoading = false)
+                    }
+                },
+                onFailure = { error ->
+                    _state.update {
+                        it.copy(isLoading = false,
+                            error = error.message ?: "")
+                    }
+                }
+            )
+        }
+    }
+
+    fun getFileFromUri(context: Context, uri: Uri) {
+        val inputStream = context.contentResolver.openInputStream(uri)
+            ?: throw IllegalStateException("Cannot open input stream")
+
+        val file = File.createTempFile("upload_", ".tmp", context.cacheDir)
+
+        inputStream.use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        _state.update {
+            it.copy(imagePath = file.absolutePath)
         }
     }
 }

@@ -2,9 +2,9 @@ package com.example.shareyourvoicemapbox.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shareyourvoicemapbox.data.AuthRepository
-import com.example.shareyourvoicemapbox.data.source.AuthLocalDataSource
-import com.example.shareyourvoicemapbox.data.source.AuthNetworkDataSource
+import com.example.shareyourvoicemapbox.data.repo.AuthRepository
+import com.example.shareyourvoicemapbox.data.source.auth.AuthLocalDataSource
+import com.example.shareyourvoicemapbox.data.source.auth.AuthNetworkDataSource
 import com.example.shareyourvoicemapbox.domain.auth.CheckAndSaveAuthUseCase
 import com.example.shareyourvoicemapbox.domain.auth.CheckAuthFormatUseCase
 import com.example.shareyourvoicemapbox.ui.navigation.Route

@@ -1,7 +1,7 @@
-package com.example.shareyourvoicemapbox.data
+package com.example.shareyourvoicemapbox.data.repo
 
-import com.example.shareyourvoicemapbox.data.source.AuthLocalDataSource
-import com.example.shareyourvoicemapbox.data.source.AuthNetworkDataSource
+import com.example.shareyourvoicemapbox.data.source.auth.AuthLocalDataSource
+import com.example.shareyourvoicemapbox.data.source.auth.AuthNetworkDataSource
 
 class AuthRepository(
     private val networkDataSource: AuthNetworkDataSource,

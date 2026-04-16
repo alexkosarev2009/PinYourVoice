@@ -1,13 +1,12 @@
 package com.example.shareyourvoicemapbox.ui.screens.edit
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -28,7 +27,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -39,12 +37,18 @@ import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -65,6 +69,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -76,14 +81,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
-import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
 import kotlinx.coroutines.launch
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 
@@ -95,6 +99,7 @@ fun EditScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val playerState by viewModel.playerState.collectAsState()
+    val context = LocalContext.current
 
     val waveformProgress by remember {
         derivedStateOf {
@@ -102,14 +107,20 @@ fun EditScreen(
                 .coerceIn(0f, 1f)
         }
     }
+    LaunchedEffect(Unit) {
+        Log.d("LAT", state.lat.toString())
+        Log.d("LNG", state.lng.toString())
+    }
 
     val imagePicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
             viewModel.onImagePicked(uri)
+            viewModel.getFileFromUri(context, uri)
         }
     }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val density = LocalDensity.current
     val maxDragPx = with(density) { 250.dp.toPx() }
@@ -179,7 +190,7 @@ fun EditScreen(
             },
             titleState = state.title,
             onPostClick = {
-
+                viewModel.onPostClick()
             },
             isPinYourVoiceEnabled = viewModel.isPinYourVoiceEnabled,
             offsetX = offsetX,
@@ -205,6 +216,20 @@ fun EditScreen(
             },
             imageScale = imageScale
         )
+    }
+    LaunchedEffect(state.error) {
+        if (state.error != "") {
+            snackbarHostState.showSnackbar(
+                message = state.error,
+                duration = SnackbarDuration.Short,
+                withDismissAction = true
+            )
+        }
+    }
+    SnackbarHost(
+        hostState = snackbarHostState
+    ) { data ->
+        Snackbar(data)
     }
 
 }
@@ -434,6 +459,13 @@ fun EditContent(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text("Pin your voice", fontSize = 20.sp)
+                    if (state.isLoading) {
+                        Spacer(Modifier.width(8.dp))
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = ProgressIndicatorDefaults.circularColor
+                        )
+                    }
                 }
             }
         }
@@ -466,7 +498,7 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
         ) { innerPadding ->
             EditContent(
                 modifier = modifier.padding(innerPadding),
-                state = EditState(),
+                state = EditState(isLoading = true),
                 platerState = EditPlayerState(),
                 waveformProgress = 1f,
                 amplitudes = listOf(
@@ -487,11 +519,11 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                 titleState = "",
                 onPostClick = {},
                 isPinYourVoiceEnabled = true,
-                offsetX = Animatable(0f),
+                offsetX = remember { Animatable(0f) },
                 onDrag = {change, dragAmount -> },
                 onDragEnd = {},
                 maxDragPx = 250f,
-                imageScale = Animatable(1f)
+                imageScale = remember { Animatable(1f) }
             )
         }
     }

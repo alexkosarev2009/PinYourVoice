@@ -29,7 +29,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getMarkersUseCase: GetMarkersUseCase,
-    private val createMarkerUseCase: CreateMarkerUseCase,
     private val startRecordingUseCase: StartRecordingUseCase,
     private val stopRecordingUseCase: StopRecordingUseCase,
     private val releaseRecorderUseCase: ReleaseRecorderUseCase,
@@ -56,10 +55,6 @@ class MapViewModel @Inject constructor(
     val minDuration = 3_000L
     val maxDuration = 30_000L
 
-
-    init {
-        getData()
-    }
 
     fun getData() {
         viewModelScope.launch {
@@ -91,18 +86,6 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun createMarker(dto: CreateMarkerDTO) {
-        viewModelScope.launch {
-            createMarkerUseCase(dto).fold(
-                onSuccess = {
-                    getData()
-                },
-                onFailure = {
-
-                }
-            )
-        }
-    }
 
     private fun startTimer() {
         timerJob?.cancel()

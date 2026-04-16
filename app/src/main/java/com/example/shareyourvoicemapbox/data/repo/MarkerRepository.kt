@@ -1,7 +1,7 @@
-package com.example.shareyourvoicemapbox.data
+package com.example.shareyourvoicemapbox.data.repo
 
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
-import com.example.shareyourvoicemapbox.data.source.MarkerDataSource
+import com.example.shareyourvoicemapbox.data.source.marker.MarkerDataSource
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import javax.inject.Inject
 

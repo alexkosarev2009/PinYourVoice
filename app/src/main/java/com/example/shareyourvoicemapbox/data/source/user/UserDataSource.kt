@@ -1,7 +1,7 @@
-package com.example.shareyourvoicemapbox.data.source
+package com.example.shareyourvoicemapbox.data.source.user
 
 import com.example.shareyourvoicemapbox.data.dto.UserDTO
-import com.example.shareyourvoicemapbox.domain.entities.UserEntity
+import com.example.shareyourvoicemapbox.data.source.Network
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -15,7 +15,7 @@ class UserDataSource {
     suspend fun getUsers(): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val result = Network.client.get("${Network.HOST}/api/users")
-            if (result.status != HttpStatusCode.OK) {
+            if (result.status != HttpStatusCode.Companion.OK) {
                 error("Status: ${result.status}")
             }
             result.body()
@@ -24,7 +24,7 @@ class UserDataSource {
     suspend fun getUserById(id: Long): Result<UserDTO> = withContext(Dispatchers.IO) {
         runCatching {
             val result = Network.client.get("${Network.HOST}/api/users/{$id}")
-            if (result.status != HttpStatusCode.OK) {
+            if (result.status != HttpStatusCode.Companion.OK) {
                 error("Status: ${result.status}")
             }
             result.body()
@@ -35,7 +35,7 @@ class UserDataSource {
             val result = Network.client.get("${Network.HOST}/api/users/by-username") {
                 parameter("username", username)
             }
-            if (result.status != HttpStatusCode.OK) {
+            if (result.status != HttpStatusCode.Companion.OK) {
                 error("Status: ${result.status}")
             }
             result.body()

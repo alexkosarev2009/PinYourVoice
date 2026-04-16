@@ -1,6 +1,6 @@
 package com.example.shareyourvoicemapbox.domain.auth
 
-import com.example.shareyourvoicemapbox.data.AuthRepository
+import com.example.shareyourvoicemapbox.data.repo.AuthRepository
 
 class CheckAndSaveAuthUseCase(
     private val authRepository: AuthRepository,

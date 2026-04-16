@@ -1,6 +1,6 @@
 package com.example.shareyourvoicemapbox.domain.markers
 
-import com.example.shareyourvoicemapbox.data.MarkerRepository
+import com.example.shareyourvoicemapbox.data.repo.MarkerRepository
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import javax.inject.Inject
 

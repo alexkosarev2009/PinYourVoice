@@ -1,6 +1,6 @@
-package com.example.shareyourvoicemapbox.domain
+package com.example.shareyourvoicemapbox.domain.users
 
-import com.example.shareyourvoicemapbox.data.UserRepository
+import com.example.shareyourvoicemapbox.data.repo.UserRepository
 import com.example.shareyourvoicemapbox.domain.entities.UserEntity
 
 class GetUsersUseCase(

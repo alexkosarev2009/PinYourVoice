@@ -1,7 +1,8 @@
-package com.example.shareyourvoicemapbox.data.source
+package com.example.shareyourvoicemapbox.data.source.marker
 
-import com.example.shareyourvoicemapbox.data.dto.MarkerDTO
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
+import com.example.shareyourvoicemapbox.data.dto.MarkerDTO
+import com.example.shareyourvoicemapbox.data.source.Network
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -21,7 +22,7 @@ class MarkerDataSource @Inject constructor(
     suspend fun getMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${Network.HOST}/api/markers")
-            if (response.status != HttpStatusCode.OK) {
+            if (response.status != HttpStatusCode.Companion.OK) {
                 error("Error: ${response.status}")
             }
             response.body<List<MarkerDTO>>()
@@ -33,7 +34,7 @@ class MarkerDataSource @Inject constructor(
                 contentType(ContentType.Application.Json)
                 setBody(dto)
             }
-            if (response.status != HttpStatusCode.Created) {
+            if (response.status != HttpStatusCode.Companion.Created) {
                 error("Error: ${response.status}")
             }
             response.body<MarkerDTO>()

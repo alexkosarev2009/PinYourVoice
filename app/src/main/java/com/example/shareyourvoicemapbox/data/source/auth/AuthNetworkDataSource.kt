@@ -1,5 +1,6 @@
-package com.example.shareyourvoicemapbox.data.source
+package com.example.shareyourvoicemapbox.data.source.auth
 
+import com.example.shareyourvoicemapbox.data.source.Network
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders

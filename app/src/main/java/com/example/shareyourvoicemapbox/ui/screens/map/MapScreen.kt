@@ -183,11 +183,16 @@ fun MapScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
+        viewModel.getData()
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.actionFlow.collect { action ->
             when (action) {
                 is MapAction.OpenScreen -> {
                     val encodedPath = URLEncoder.encode(systemState.currentAudioPath, "UTF-8")
-                    navHostController.navigate("${SecondaryRoute.EDIT.route}/${encodedPath}") {
+
+                    navHostController.navigate("${SecondaryRoute.EDIT.route}/${encodedPath}?lat=${systemState.userLocation?.latitude()}&lng=${systemState.userLocation?.longitude()}") {
                         launchSingleTop = true
                         restoreState = true
                     }

@@ -1,7 +1,7 @@
-package com.example.shareyourvoicemapbox.data
+package com.example.shareyourvoicemapbox.data.repo
 
 import com.example.shareyourvoicemapbox.data.exceptions.AppException
-import com.example.shareyourvoicemapbox.data.source.UserDataSource
+import com.example.shareyourvoicemapbox.data.source.user.UserDataSource
 import com.example.shareyourvoicemapbox.domain.entities.UserEntity
 
 class UserRepository(
