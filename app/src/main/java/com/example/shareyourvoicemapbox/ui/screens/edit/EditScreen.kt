@@ -229,12 +229,14 @@ fun EditScreen(
                 duration = SnackbarDuration.Short,
                 withDismissAction = true,
             )
+            viewModel.clearError()
         }
     }
     SnackbarHost(
         hostState = snackbarHostState,
     ) { data ->
-        Snackbar(data)
+        Snackbar(data,
+            modifier = Modifier.statusBarsPadding())
     }
 
 }

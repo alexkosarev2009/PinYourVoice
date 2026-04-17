@@ -461,7 +461,7 @@ fun MapScreen(
                             shape = RoundedCornerShape(32.dp),
                             containerColor = MaterialTheme.colorScheme.error,
                             contentColor = MaterialTheme.colorScheme.onError,
-                            modifier = Modifier.widthIn(max = 280.dp)
+                            modifier = Modifier.widthIn(max = 280.dp).statusBarsPadding()
                         )
                     }
                 }

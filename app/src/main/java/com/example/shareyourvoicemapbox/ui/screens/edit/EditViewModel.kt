@@ -139,6 +139,7 @@ class EditViewModel @Inject constructor(
 
                 if (duration in 1..current) {
                     pauseAudio()
+                    seekTo(0)
                     break
                 }
 
@@ -252,6 +253,11 @@ class EditViewModel @Inject constructor(
 
         _state.update {
             it.copy(imagePath = file.absolutePath)
+        }
+    }
+    fun clearError() {
+        _state.update {
+            it.copy(error = "")
         }
     }
 }
