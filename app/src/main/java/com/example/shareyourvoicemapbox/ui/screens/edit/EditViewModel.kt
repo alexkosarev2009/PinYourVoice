@@ -179,24 +179,36 @@ class EditViewModel @Inject constructor(
     fun onPostClick() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
+            delay(1000)
 
             val audioResult = uploadFileUseCase(
                 fileName = "audio.mp3",
                 contentType = "audio/mpeg",
                 filePath = _state.value.audioPath
-            )
+            ).onFailure {
+                _state.update {
+                    it.copy(isLoading = false,
+                        error = "Failed to upload audio")
+                }
+                return@launch
+            }
 
             val imageResult = uploadFileUseCase(
                 fileName = "image.jpg",
                 contentType = "image/jpeg",
                 filePath = _state.value.imagePath
-            )
+            ).onFailure {
+                _state.update {
+                    it.copy(isLoading = false,
+                        error = "Failed to upload image")
+                }
+                return@launch
+            }
 
             val audioKey = audioResult.getOrNull()
             val imageKey = imageResult.getOrNull()
 
             if (audioKey == null || imageKey == null) {
-                Log.d("UPLOAD", "Missing keys: audio=$audioKey image=$imageKey")
                 return@launch
             }
 
@@ -212,7 +224,8 @@ class EditViewModel @Inject constructor(
             ).fold(
                 onSuccess = {
                     _state.update {
-                        it.copy(isLoading = false)
+                        it.copy(isLoading = false,
+                             isDone = true)
                     }
                 },
                 onFailure = { error ->

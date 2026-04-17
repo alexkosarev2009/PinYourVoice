@@ -8,6 +8,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -84,6 +85,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.example.shareyourvoicemapbox.ui.navigation.Route
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
@@ -107,13 +109,15 @@ fun EditScreen(
                 .coerceIn(0f, 1f)
         }
     }
-    LaunchedEffect(Unit) {
-        Log.d("LAT", state.lat.toString())
-        Log.d("LNG", state.lng.toString())
+
+    LaunchedEffect(state.isDone) {
+        if (state.isDone) {
+            navHostController.popBackStack()
+        }
     }
 
     val imagePicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickVisualMedia()
+        ActivityResultContracts.PickVisualMedia(),
     ) { uri ->
         if (uri != null) {
             viewModel.onImagePicked(uri)
@@ -133,7 +137,7 @@ fun EditScreen(
     LaunchedEffect(shouldEnlarge) {
         imageScale.animateTo(
             targetValue = if (shouldEnlarge) 1.2f else 1f,
-            animationSpec = tween(300)
+            animationSpec = tween(300),
         )
     }
 
@@ -146,18 +150,20 @@ fun EditScreen(
         modifier = Modifier.statusBarsPadding(),
         topBar = {
             Row(
-                Modifier.fillMaxWidth()
+                Modifier.fillMaxWidth(),
             ) {
                 IconButton(
                     onClick = {
                         navHostController.popBackStack()
-                    }
+                    },
                 ) {
-                    Icon(imageVector = Icons.Default.ArrowBackIosNew,
-                        contentDescription = "Go back")
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = "Go back",
+                    )
                 }
             }
-        }
+        },
     ) { innerPadding ->
         EditContent(
             modifier = modifier.padding(innerPadding),
@@ -172,8 +178,8 @@ fun EditScreen(
                 if (state.imageUri == null) {
                     imagePicker.launch(
                         PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.ImageOnly
-                        )
+                            ActivityResultContracts.PickVisualMedia.ImageOnly,
+                        ),
                     )
                 }
             },
@@ -183,8 +189,7 @@ fun EditScreen(
             onPlayClick = {
                 if (!playerState.isPlaying) {
                     viewModel.playAudio()
-                }
-                else {
+                } else {
                     viewModel.pauseAudio()
                 }
             },
@@ -210,11 +215,11 @@ fun EditScreen(
                     }
                     offsetX.animateTo(
                         targetValue = 0f,
-                        animationSpec = tween(800)
+                        animationSpec = tween(800),
                     )
                 }
             },
-            imageScale = imageScale
+            imageScale = imageScale,
         )
     }
     LaunchedEffect(state.error) {
@@ -222,12 +227,12 @@ fun EditScreen(
             snackbarHostState.showSnackbar(
                 message = state.error,
                 duration = SnackbarDuration.Short,
-                withDismissAction = true
+                withDismissAction = true,
             )
         }
     }
     SnackbarHost(
-        hostState = snackbarHostState
+        hostState = snackbarHostState,
     ) { data ->
         Snackbar(data)
     }
@@ -252,60 +257,58 @@ fun EditContent(
     maxDragPx: Float,
     onDrag: (PointerInputChange, Offset) -> Unit,
     onDragEnd: () -> Unit,
-    imageScale: Animatable<Float, AnimationVector1D>
+    imageScale: Animatable<Float, AnimationVector1D>,
 ) {
     Column(
         modifier
-            .fillMaxSize().padding(16.dp, 0.dp),
+            .fillMaxSize()
+            .padding(16.dp, 0.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
 
             HorizontalDivider(
-                modifier = Modifier.padding(16.dp, 0.dp)
+                modifier = Modifier
+                    .padding(16.dp, 0.dp)
                     .zIndex(-1f),
-                color = MaterialTheme.colorScheme.surfaceContainerHighest
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
             )
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                val mod = Modifier
+                    .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                    .graphicsLayer {
+                        scaleY = imageScale.value
+                        scaleX = imageScale.value
+                    }
+                    .zIndex(10f)
                 Box(
-                    modifier = if (state.imageUri != null) Modifier
-                        .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                    modifier = if (state.imageUri != null) mod
                         .pointerInput(Unit) {
                             detectDragGestures(
                                 onDrag = onDrag,
-                                onDragEnd = onDragEnd
+                                onDragEnd = onDragEnd,
                             )
                         }
-                        .graphicsLayer {
-                            scaleY = imageScale.value
-                            scaleX = imageScale.value
-                        }
-                        .zIndex(1f)
-                    else Modifier
-                        .offset { IntOffset(offsetX.value.roundToInt(), 0) }
-                        .graphicsLayer {
-                            scaleY = imageScale.value
-                            scaleX = imageScale.value
-                        }
-                        .zIndex(10f)
+                    else mod,
 
-                ) {
+                    ) {
                     Box(
-                        Modifier.size(100.dp)
+                        Modifier
+                            .size(100.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                             .clickable(
                                 onClick = onImagePickClick,
                             ),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         if (state.imageUri == null) {
                             Icon(
@@ -332,22 +335,23 @@ fun EditContent(
                             scaleY = (1 / (offsetX.value / maxDragPx)).coerceIn(1f, 1.3f)
                         }
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.error)
+                        .background(MaterialTheme.colorScheme.error),
 
-                ) {
+                    ) {
                     Icon(
                         modifier = Modifier.size(32.dp),
                         tint = MaterialTheme.colorScheme.onError,
                         imageVector = Icons.Default.DeleteForever,
-                        contentDescription = "Delete image"
+                        contentDescription = "Delete image",
                     )
                 }
 
             }
             HorizontalDivider(
-                modifier = Modifier.padding(16.dp, 0.dp)
+                modifier = Modifier
+                    .padding(16.dp, 0.dp)
                     .zIndex(-1f),
-                color = MaterialTheme.colorScheme.surfaceContainerHighest
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
             )
 
         }
@@ -355,68 +359,83 @@ fun EditContent(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             TextField(
-                modifier = Modifier.heightIn(min = 52.dp).widthIn(max = 320.dp),
+                modifier = Modifier
+                    .heightIn(min = 52.dp)
+                    .widthIn(max = 320.dp),
                 singleLine = false,
                 value = titleState,
                 onValueChange = onTitleChange,
                 placeholder = {
-                    Text("Add a title",
-                        fontSize = 16.sp)
+                    Text(
+                        "Add a title",
+                        fontSize = 16.sp,
+                    )
                 },
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.background,
                     focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedIndicatorColor =  MaterialTheme.colorScheme.background,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
                     focusedIndicatorColor = MaterialTheme.colorScheme.background,
 
                     ),
-                textStyle = TextStyle(fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp),
+                textStyle = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                )
+                    imeAction = ImeAction.Done,
+                ),
 
+                )
+            Text(
+                text = "${titleState.length}/${MAX_TITLE_LEN}",
+                fontWeight = FontWeight.Light,
             )
-            Text(text = "${titleState.length}/${MAX_TITLE_LEN}",
-                fontWeight = FontWeight.Light)
         }
         HorizontalDivider()
         Spacer(Modifier.height(24.dp))
         ElevatedCard(
             shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Brush.horizontalGradient(colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.secondaryContainer
-                    )))
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.secondaryContainer,
+                            ),
+                        ),
+                    )
                     .padding(8.dp, 12.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.onPrimaryContainer)
                         .clickable(
-                            onClick = onPlayClick
+                            onClick = onPlayClick,
                         ),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     val imageVector = if (platerState.isPlaying)
                         Icons.Default.Pause else Icons.Default.PlayArrow
-                    Icon(imageVector = imageVector,
+                    Icon(
+                        imageVector = imageVector,
                         contentDescription = "Play audio",
                         tint = MaterialTheme.colorScheme.background,
-                        modifier = Modifier.size(32.dp))
+                        modifier = Modifier.size(32.dp),
+                    )
                 }
                 Spacer(Modifier.width(16.dp))
                 AudioWaveform(
@@ -424,8 +443,8 @@ fun EditContent(
                     progressBrush = Brush.horizontalGradient(
                         listOf(
                             MaterialTheme.colorScheme.onPrimaryContainer,
-                            MaterialTheme.colorScheme.secondary
-                        )
+                            MaterialTheme.colorScheme.secondary,
+                        ),
                     ),
                     waveformBrush = SolidColor(MaterialTheme.colorScheme.surfaceContainerLowest),
                     amplitudes = amplitudes.map {
@@ -435,35 +454,37 @@ fun EditContent(
                     onProgressChange = onWaveformProgressChange,
                     spikeWidth = 4.dp,
                     spikeRadius = 32.dp,
-                    waveformAlignment = WaveformAlignment.Center
+                    waveformAlignment = WaveformAlignment.Center,
                 )
             }
         }
 
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
+            contentAlignment = Alignment.BottomCenter,
         ) {
             Button(
                 onClick = onPostClick,
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                enabled = isPinYourVoiceEnabled
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                enabled = isPinYourVoiceEnabled,
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.PinDrop,
-                        contentDescription = "Pin drop",
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text("Pin your voice", fontSize = 20.sp)
-                    if (state.isLoading) {
+                    if (!state.isLoading) {
+                        Icon(
+                            imageVector = Icons.Default.PinDrop,
+                            contentDescription = "Pin drop",
+                        )
                         Spacer(Modifier.width(8.dp))
+                        Text("Pin your voice", fontSize = 20.sp)
+                    } else {
                         CircularProgressIndicator(
+                            trackColor = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(20.dp),
-                            color = ProgressIndicatorDefaults.circularColor
                         )
                     }
                 }
@@ -476,25 +497,25 @@ fun EditContent(
 @Preview(showSystemUi = true)
 fun EditScreenPreview(modifier: Modifier = Modifier) {
     AppTheme(
-        darkTheme = false
+        darkTheme = false,
     ) {
         Scaffold(
             modifier = Modifier.statusBarsPadding(),
             topBar = {
                 Row(
-                    Modifier.fillMaxWidth()
+                    Modifier.fillMaxWidth(),
                 ) {
                     IconButton(
                         onClick = {
-                        }
+                        },
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Go back"
+                            contentDescription = "Go back",
                         )
                     }
                 }
-            }
+            },
         ) { innerPadding ->
             EditContent(
                 modifier = modifier.padding(innerPadding),
@@ -511,7 +532,8 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                     30, 20, 10, 6, 4, 3, 2,
                     25, 45, 70, 95, 130, 160, 140, 155, 120, 100, 80, 60,
                     3, 2, 2, 3, 2, 2,
-                    50, 100),
+                    50, 100,
+                ),
                 onWaveformProgressChange = {},
                 onImagePickClick = {},
                 onTitleChange = {},
@@ -520,10 +542,10 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                 onPostClick = {},
                 isPinYourVoiceEnabled = true,
                 offsetX = remember { Animatable(0f) },
-                onDrag = {change, dragAmount -> },
+                onDrag = { change, dragAmount -> },
                 onDragEnd = {},
                 maxDragPx = 250f,
-                imageScale = remember { Animatable(1f) }
+                imageScale = remember { Animatable(1f) },
             )
         }
     }

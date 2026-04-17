@@ -12,4 +12,5 @@ data class EditState(
     val isLoading: Boolean = false,
     val lng: Double = 0.0,
     val lat: Double = 0.0,
+    val isDone: Boolean = false,
 )

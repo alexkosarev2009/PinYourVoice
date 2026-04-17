@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -63,13 +64,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,7 +86,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -106,12 +104,15 @@ import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.annotation.IconImage
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
+import com.mapbox.maps.extension.compose.style.standard.LightPresetValue
+import com.mapbox.maps.extension.compose.style.standard.MapboxStandardStyle
+import com.mapbox.maps.extension.compose.style.standard.StandardStyleConfigurationState
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.viewport.data.FollowPuckViewportStateOptions
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.net.URLEncoder
+import java.time.LocalTime
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
@@ -151,7 +152,8 @@ fun MapScreen(
         WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         onDispose {
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
-
+            viewModel.closeAddMarkerDialog()
+            viewModel.onDeleteRecordingClick()
         }
     }
     val offset by animateDpAsState(
@@ -509,6 +511,21 @@ fun MapContent(
                 logo = {
                     Logo()
                 },
+                style = {
+                    val hour = rememberHour()
+                    MapboxStandardStyle(
+                        standardStyleConfigurationState = remember {
+                            StandardStyleConfigurationState().apply {
+                                lightPreset = when (hour) {
+                                    in 6..11 -> LightPresetValue.DAWN
+                                    in 12..17 -> LightPresetValue.DAY
+                                    in 18..20 -> LightPresetValue.DUSK
+                                    else -> LightPresetValue.NIGHT
+                                }
+                            }
+                        }
+                    )
+                }
             ) {
                 MapEffect(Unit) { mapView ->
                     mapView.location.updateSettings {
@@ -528,6 +545,7 @@ fun MapContent(
                 }
                 state.markers.forEach { marker ->
                     val point = Point.fromLngLat(marker.lng, marker.lat)
+
                     PointAnnotation(
                         point = point,
                     ) {
@@ -760,4 +778,19 @@ fun formatTime(ms: Long): String {
     val seconds = totalSeconds % 60
 
     return "%02d:%02d".format(minutes, seconds)
+}
+
+@Composable
+fun rememberHour(): Int {
+    var hour by remember { mutableStateOf(LocalTime.now().hour) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            hour = LocalTime.now().hour
+            Log.d("HOUR", hour.toString())
+            delay(60_000)
+        }
+    }
+
+    return hour
 }
