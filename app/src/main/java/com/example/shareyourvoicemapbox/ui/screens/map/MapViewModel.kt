@@ -1,9 +1,11 @@
 package com.example.shareyourvoicemapbox.ui.screens.map
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
+import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.domain.markers.CreateMarkerUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.network.NetworkMonitor
@@ -50,6 +52,9 @@ class MapViewModel @Inject constructor(
             networkMonitor.isCurrentlyConnected())
 
     private var hasCenteredUser = false
+
+    private val _currentMarker = MutableStateFlow<MarkerEntity?>(null)
+    val currentMarker = _currentMarker.asStateFlow()
 
     private var timerJob: Job? = null
     val minDuration = 3_000L
@@ -234,4 +239,33 @@ class MapViewModel @Inject constructor(
         }
         savedStateHandle["audioPath"] = null
     }
+
+    fun openViewMarkerDialog(marker: MarkerEntity) {
+        viewModelScope.launch {
+            _currentMarker.emit(marker)
+        }
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(
+                    showViewMarkerDialog = true,
+                )
+            }
+            else state
+        }
+    }
+
+    fun closeViewMarkerDialog() {
+        viewModelScope.launch {
+            _currentMarker.emit(null)
+        }
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(
+                    showViewMarkerDialog = false,
+                )
+            }
+            else state
+        }
+    }
+
 }

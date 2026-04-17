@@ -78,6 +78,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -90,6 +91,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
@@ -125,6 +127,7 @@ fun MapScreen(
     val state by viewModel.uiState.collectAsState()
     val systemState by viewModel.systemState.collectAsState()
     val isConnected by viewModel.isConnected.collectAsState()
+    val currentMarker by viewModel.currentMarker.collectAsState()
 
     val minDuration = viewModel.minDuration
     val maxDuration = viewModel.maxDuration
@@ -391,8 +394,8 @@ fun MapScreen(
                     MapContent(
                         state = currentState,
                         overlayVisible = overlayVisible,
-                        onMarkerClick = {
-
+                        onMarkerClick = { marker ->
+                            viewModel.openViewMarkerDialog(marker)
                         },
                         onAddMarkerDismiss = {
                             if (!systemState.isRecording) {
@@ -449,10 +452,17 @@ fun MapScreen(
                         },
                         progress = progress,
                         minDuration = minDuration,
+                        currentMarker = currentMarker,
+                        onViewMarkerDismiss = {
+                            viewModel.closeViewMarkerDialog()
+                        },
                     )
                 }
                 Box(
-                    modifier = Modifier.fillMaxSize().statusBarsPadding().padding(0.dp, 8.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .statusBarsPadding()
+                        .padding(0.dp, 8.dp),
                     contentAlignment = Alignment.TopCenter
                 ) {
                     SnackbarHost(snackbarHostState) { data ->
@@ -461,7 +471,9 @@ fun MapScreen(
                             shape = RoundedCornerShape(32.dp),
                             containerColor = MaterialTheme.colorScheme.error,
                             contentColor = MaterialTheme.colorScheme.onError,
-                            modifier = Modifier.widthIn(max = 280.dp).statusBarsPadding()
+                            modifier = Modifier
+                                .widthIn(max = 280.dp)
+                                .statusBarsPadding()
                         )
                     }
                 }
@@ -492,6 +504,8 @@ fun MapContent(
     onDeleteRecordingClick: () -> Unit,
     progress: Float,
     minDuration: Long,
+    onViewMarkerDismiss: () -> Unit,
+    currentMarker: MarkerEntity?
 ) {
     Box(
         modifier = modifier,
@@ -545,7 +559,6 @@ fun MapContent(
                 }
                 state.markers.forEach { marker ->
                     val point = Point.fromLngLat(marker.lng, marker.lat)
-
                     PointAnnotation(
                         point = point,
                     ) {
@@ -595,6 +608,14 @@ fun MapContent(
                 progress = progress,
                 minDuration = minDuration,
             )
+        }
+        if (state.showViewMarkerDialog) {
+            if (currentMarker != null) {
+                ViewMarkerDialog(
+                    onDismiss = onViewMarkerDismiss,
+                    marker = currentMarker
+                )
+            }
         }
         if (state.showMicPermissionDialog) {
             PermissionSettingsDialog(
@@ -738,6 +759,25 @@ fun AddMarkerDialog(
             )
             Spacer(Modifier.height(42.dp))
         }
+    }
+}
+
+@Composable
+fun ViewMarkerDialog(
+    marker: MarkerEntity,
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        scrimColor = Color.Transparent,
+        ) {
+        AsyncImage(
+            model = "https://storage.yandexcloud.net/pin-your-voice/${marker.imageUrl}",
+            contentDescription = "Image",
+            modifier = Modifier.height(100.dp),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 

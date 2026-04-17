@@ -7,6 +7,7 @@ sealed interface MapState {
     data class Content(
         val markers: List<MarkerEntity> = emptyList(),
         val showAddMarkerDialog: Boolean = false,
+        val showViewMarkerDialog: Boolean = false,
         val showMicPermissionDialog: Boolean = false,
         val showFineLocationPermissionDialog: Boolean = false,
         val error: String = "",
