@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
@@ -29,7 +30,7 @@ import com.example.shareyourvoicemapbox.ui.navigation.Route
 @Composable
 fun AuthScreen(
     navHostController: NavHostController,
-    viewModel: AuthViewModel = viewModel<AuthViewModel>()
+    viewModel: AuthViewModel = hiltViewModel<AuthViewModel>()
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -51,10 +52,10 @@ fun AuthScreen(
             viewModel.onChangeInput(login, state.password)
         },
         onPasswordChange = { password ->
-            viewModel.onChangeInput(state.login, password)
+            viewModel.onChangeInput(state.username, password)
         },
         onLoginClick = {
-            viewModel.onLoginClick(state.login, state.password)
+            viewModel.onLoginClick(state.username, state.password)
         }
     )
 }
@@ -77,7 +78,7 @@ fun AuthContent(
     ) {
 
         OutlinedTextField(
-            value = state.login,
+            value = state.username,
             onValueChange = onLoginChange,
             label = {
                 Text("Login")

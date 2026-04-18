@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -88,7 +89,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
@@ -152,9 +152,9 @@ fun MapScreen(
         val window = (view.context as Activity).window
 
 
-        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+//        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         onDispose {
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+//            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
             viewModel.closeAddMarkerDialog()
             viewModel.onDeleteRecordingClick()
         }
@@ -661,7 +661,7 @@ fun AddMarkerDialog(
             verticalArrangement = Arrangement.Center,
         ) {
             Row(
-                modifier.fillMaxWidth(),
+                Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
@@ -680,7 +680,6 @@ fun AddMarkerDialog(
                     )
                 }
                 Column(
-                    modifier,
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -765,7 +764,6 @@ fun AddMarkerDialog(
 @Composable
 fun ViewMarkerDialog(
     marker: MarkerEntity,
-    modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
 ) {
     ModalBottomSheet(
@@ -775,7 +773,7 @@ fun ViewMarkerDialog(
         AsyncImage(
             model = "https://storage.yandexcloud.net/pin-your-voice/${marker.imageUrl}",
             contentDescription = "Image",
-            modifier = Modifier.height(100.dp),
+            modifier = Modifier.heightIn(min = 150.dp, max = 250.dp),
             contentScale = ContentScale.Fit
         )
     }

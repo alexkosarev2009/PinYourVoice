@@ -1,23 +1,20 @@
 package com.example.shareyourvoicemapbox.data.repo
 
-import com.example.shareyourvoicemapbox.data.source.auth.AuthLocalDataSource
-import com.example.shareyourvoicemapbox.data.source.auth.AuthNetworkDataSource
+import com.example.shareyourvoicemapbox.data.dto.AuthResponseDTO
+import com.example.shareyourvoicemapbox.data.dto.UserLoginDTO
+import com.example.shareyourvoicemapbox.data.source.auth.basic.AuthLocalDataSource
+import com.example.shareyourvoicemapbox.data.source.auth.basic.AuthNetworkDataSource
+import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
+import javax.inject.Inject
 
-class AuthRepository(
+class AuthRepository @Inject constructor(
     private val networkDataSource: AuthNetworkDataSource,
-    private val localDataSource: AuthLocalDataSource
 ) {
-    suspend fun checkAndAuth(
-        login: String,
-        password: String,
-    ): Result<Boolean> {
-        localDataSource.setToken(login, password)
-        return networkDataSource.checkAuth(
-            localDataSource.token ?: error("No token")
-        ).onFailure {
-            localDataSource.clearToken()
-        }.onSuccess { loginCompleted ->
-            if (!loginCompleted) localDataSource.clearToken()
-        }
+    suspend fun login(dto: UserLoginDTO): Result<Boolean> {
+        return networkDataSource.login(dto)
+    }
+
+    fun logOut() {
+        networkDataSource.logOut()
     }
 }

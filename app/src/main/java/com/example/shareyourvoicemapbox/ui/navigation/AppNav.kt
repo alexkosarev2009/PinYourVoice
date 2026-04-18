@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -60,7 +61,7 @@ fun AppNavHost(
                 when (route) {
                     Route.MAP -> MapScreen(modifier, navHostController)
                     Route.FEED -> FeedScreen(modifier)
-                    Route.PROFILE -> ProfileScreen(modifier)
+                    Route.PROFILE -> ProfileScreen(modifier, navHostController)
                 }
             }
         }
@@ -103,12 +104,21 @@ fun AppNavHost(
         ) {
             EditScreen(navHostController = navHostController, modifier = modifier)
         }
+        composable(SecondaryRoute.AUTH.route) {
+            AuthScreen(navHostController = navHostController)
+        }
+        composable(SecondaryRoute.REGISTER.route) {
+            RegisterScreen()
+        }
     }
 }
 @Composable
 fun AppNav(
     modifier: Modifier = Modifier,
+    viewModel: AppViewModel = hiltViewModel<AppViewModel>()
 ) {
+    val startDestination = viewModel.startDestination
+
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -161,7 +171,7 @@ fun AppNav(
 
         AppNavHost(
             navHostController = navController,
-            startDestination = Route.MAP.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(padding),
         )
     }

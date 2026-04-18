@@ -2,30 +2,25 @@ package com.example.shareyourvoicemapbox.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shareyourvoicemapbox.data.repo.AuthRepository
-import com.example.shareyourvoicemapbox.data.source.auth.AuthLocalDataSource
-import com.example.shareyourvoicemapbox.data.source.auth.AuthNetworkDataSource
+import com.example.shareyourvoicemapbox.data.dto.UserLoginDTO
 import com.example.shareyourvoicemapbox.domain.auth.CheckAndSaveAuthUseCase
 import com.example.shareyourvoicemapbox.domain.auth.CheckAuthFormatUseCase
 import com.example.shareyourvoicemapbox.ui.navigation.Route
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AuthViewModel: ViewModel() {
-    private val checkAndSaveAuthUseCase by lazy {
-        CheckAndSaveAuthUseCase(
-            AuthRepository(
-                networkDataSource = AuthNetworkDataSource(),
-                localDataSource = AuthLocalDataSource
-            )
-        )
-    }
-    private val checkAuthFormatUseCase by lazy {
-        CheckAuthFormatUseCase()
-    }
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val checkAndSaveAuthUseCase: CheckAndSaveAuthUseCase,
+) : ViewModel() {
+
+    private val checkAuthFormatUseCase: CheckAuthFormatUseCase = CheckAuthFormatUseCase()
+
 
     private val _uiState = MutableStateFlow(AuthState.Content())
     val uiState = _uiState.asStateFlow()
@@ -39,7 +34,7 @@ class AuthViewModel: ViewModel() {
     ) {
         viewModelScope.launch {
             _uiState.emit(AuthState.Content(
-                login = login,
+                username = login,
                 password = password,
                 error = "",
                 isEnableLogin = checkAuthFormatUseCase.invoke(login, password)
@@ -48,14 +43,17 @@ class AuthViewModel: ViewModel() {
         }
     }
     fun onLoginClick(
-        login: String,
+        username: String,
         password: String
     ) {
         viewModelScope.launch {
-            checkAndSaveAuthUseCase.invoke(login, password).fold(
+            checkAndSaveAuthUseCase.invoke(UserLoginDTO(
+                username = username,
+                password = password
+            )).fold(
                 onFailure = { error ->
                     _uiState.emit(AuthState.Content(
-                        login = login,
+                        username = username,
                         error = error.message ?: ""
                     ))
                 },
