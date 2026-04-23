@@ -118,7 +118,7 @@ fun ProfileScreen(
             }
             items(state.markers) { marker ->
                 MarkerCard(
-                    modifier = Modifier.padding(20.dp, 0.dp),
+                    modifier = Modifier.padding(24.dp, 0.dp),
                     title = marker.title,
                     location = marker.location,
                     username = marker.authorUsername,
@@ -253,7 +253,8 @@ fun ProfileContent(
         ) {
             Text("Bio", fontWeight = FontWeight.Bold)
             Text(state.bio, fontStyle = FontStyle.Italic,
-                fontSize = 16.sp)
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Light)
             Spacer(Modifier.height(16.dp))
             Text(
                 "Markers",
