@@ -1,8 +1,8 @@
 package com.example.shareyourvoicemapbox.data.source.presign
 
 import android.net.Uri
+import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.PresignResponseDTO
-import com.example.shareyourvoicemapbox.data.source.Network
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -29,7 +29,7 @@ class PresignDataSource @Inject constructor(
         contentType: String,
     ): Result<PresignResponseDTO> = withContext(Dispatchers.IO) {
         runCatching {
-            val response = client.get("${Network.HOST}/api/s3/presign") {
+            val response = client.get("${HOST}/api/s3/presign") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
                 parameter("fileName", fileName)
                 parameter("contentType", contentType)

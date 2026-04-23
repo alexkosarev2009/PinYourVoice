@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
-import com.example.shareyourvoicemapbox.domain.markers.CreateMarkerUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.network.NetworkMonitor
 import com.example.shareyourvoicemapbox.domain.recorder.ReleaseRecorderUseCase

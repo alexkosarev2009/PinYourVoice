@@ -20,6 +20,4 @@ data class CreateMarkerDTO(
     @SerialName("audioUrl")
     val audioUrl: String?,
 
-    @SerialName("authorId")
-    val authorId: Long?,
 )

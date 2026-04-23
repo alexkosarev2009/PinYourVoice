@@ -6,5 +6,7 @@ sealed interface AuthState {
         val password: String = "",
         val error: String = "",
         val isEnableLogin: Boolean = false,
+        val isSignInSelected: Boolean = true,
+        val isSignUpSelected: Boolean = false,
         )
 }

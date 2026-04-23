@@ -220,7 +220,6 @@ class EditViewModel @Inject constructor(
                     lng = _state.value.lng,
                     imageUrl = imageKey,
                     audioUrl = audioKey,
-                    authorId = 1
                 )
             ).fold(
                 onSuccess = {

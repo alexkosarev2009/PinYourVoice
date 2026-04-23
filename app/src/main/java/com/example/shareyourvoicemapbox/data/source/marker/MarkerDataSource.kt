@@ -1,8 +1,8 @@
 package com.example.shareyourvoicemapbox.data.source.marker
 
+import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.data.dto.MarkerDTO
-import com.example.shareyourvoicemapbox.data.source.Network
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -25,7 +25,7 @@ class MarkerDataSource @Inject constructor(
 
     suspend fun getMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
-            val response = client.get("${Network.HOST}/api/markers") {
+            val response = client.get("${HOST}/api/markers") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
             }
             if (response.status != HttpStatusCode.OK) {
@@ -36,7 +36,7 @@ class MarkerDataSource @Inject constructor(
     }
     suspend fun postMarker(dto: CreateMarkerDTO): Result<MarkerDTO> = withContext(Dispatchers.IO) {
         runCatching {
-            val response = client.post("${Network.HOST}/api/markers") {
+            val response = client.post("${HOST}/api/markers") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
                 contentType(ContentType.Application.Json)
                 setBody(dto)

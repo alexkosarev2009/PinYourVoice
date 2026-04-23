@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,10 +19,8 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val checkAndSaveAuthUseCase: CheckAndSaveAuthUseCase,
 ) : ViewModel() {
-
-    private val checkAuthFormatUseCase: CheckAuthFormatUseCase = CheckAuthFormatUseCase()
-
-
+    private val checkAuthFormatUseCase: CheckAuthFormatUseCase =
+        CheckAuthFormatUseCase()
     private val _uiState = MutableStateFlow(AuthState.Content())
     val uiState = _uiState.asStateFlow()
 
@@ -32,13 +31,12 @@ class AuthViewModel @Inject constructor(
         login: String,
         password: String
     ) {
-        viewModelScope.launch {
-            _uiState.emit(AuthState.Content(
+        _uiState.update {
+            it.copy(
                 username = login,
                 password = password,
                 error = "",
-                isEnableLogin = checkAuthFormatUseCase.invoke(login, password)
-                )
+                isEnableLogin = checkAuthFormatUseCase(login, password)
             )
         }
     }
@@ -61,6 +59,23 @@ class AuthViewModel @Inject constructor(
                     _actionFlow.emit(AuthAction.OpenScreen(Route.MAP.route))
                 }
             )
+        }
+    }
+
+    fun onSignInClick() {
+        if (!_uiState.value.isSignInSelected) {
+            _uiState.update {
+                it.copy(isSignInSelected = true,
+                    isSignUpSelected = false)
+            }
+        }
+    }
+    fun onSignUpClick() {
+        if (!_uiState.value.isSignUpSelected) {
+            _uiState.update {
+                it.copy(isSignUpSelected = true,
+                    isSignInSelected = false)
+            }
         }
     }
 }

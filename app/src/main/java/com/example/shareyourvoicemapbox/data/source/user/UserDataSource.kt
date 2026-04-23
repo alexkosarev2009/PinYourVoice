@@ -1,7 +1,7 @@
 package com.example.shareyourvoicemapbox.data.source.user
 
+import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.UserDTO
-import com.example.shareyourvoicemapbox.data.source.Network
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -20,7 +20,7 @@ class UserDataSource @Inject constructor(
 ) {
     suspend fun getUsers(): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
         runCatching {
-            val result = Network.client.get("${Network.HOST}/api/users") {
+            val result = client.get("${HOST}/api/users") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
             }
             if (result.status != HttpStatusCode.Companion.OK) {
@@ -31,7 +31,7 @@ class UserDataSource @Inject constructor(
     }
     suspend fun getUserById(id: Long): Result<UserDTO> = withContext(Dispatchers.IO) {
         runCatching {
-            val result = Network.client.get("${Network.HOST}/api/users/{$id}") {
+            val result = client.get("${HOST}/api/users/{$id}") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
             }
             if (result.status != HttpStatusCode.Companion.OK) {
@@ -42,7 +42,7 @@ class UserDataSource @Inject constructor(
     }
     suspend fun getUserByUsername(username: String): Result<UserDTO> = withContext(Dispatchers.IO) {
         runCatching {
-            val result = Network.client.get("${Network.HOST}/api/users/by-username") {
+            val result = client.get("${HOST}/api/users/by-username") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
                 parameter("username", username)
             }
