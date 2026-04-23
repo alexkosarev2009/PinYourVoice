@@ -118,21 +118,28 @@ fun AuthContent(
                     onClick = onSignInClick
                 )
             ) {
-                Text("Sign in")
+                Text("Sign in",
+                    color = if (state.isSignInSelected) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(8.dp))
             }
             Tab(
                 selected = state.isSignUpSelected,
                 onClick = onSignUpClick
             ) {
-                Text("Sign up")
+                Text("Sign up",
+                    color = if (state.isSignUpSelected) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(8.dp))
             }
         }
         Spacer(Modifier.height(32.dp))
 
         Box {
-            Column() {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 AnimatedVisibility(
                     visible = state.isSignInSelected,
                     enter = fadeIn(
@@ -146,7 +153,6 @@ fun AuthContent(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         OutlinedTextField(
-                            modifier = Modifier.fillMaxWidth(),
                             value = state.username,
                             onValueChange = onLoginChange,
                             label = {
@@ -160,7 +166,6 @@ fun AuthContent(
                         Spacer(Modifier.height(8.dp))
 
                         OutlinedTextField(
-                            modifier = Modifier.fillMaxWidth(),
                             value = state.password,
                             onValueChange = onPasswordChange,
                             label = {
@@ -181,7 +186,7 @@ fun AuthContent(
                         )
                         Spacer(Modifier.height(8.dp))
                         Button(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier,
                             onClick = onLoginClick,
                             enabled = state.isEnableLogin
                         ) {
@@ -190,7 +195,10 @@ fun AuthContent(
                     }
                 }
             }
-            Column {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 AnimatedVisibility(
                     visible = state.isSignUpSelected,
                     enter = fadeIn(

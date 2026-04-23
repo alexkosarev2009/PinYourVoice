@@ -61,7 +61,7 @@ fun AppNavHost(
                 when (route) {
                     Route.MAP -> MapScreen(modifier, navHostController)
                     Route.FEED -> FeedScreen(modifier)
-                    Route.PROFILE -> ProfileScreen(modifier, navHostController)
+                    Route.PROFILE -> ProfileScreen(modifier, navHostController = navHostController)
                 }
             }
         }

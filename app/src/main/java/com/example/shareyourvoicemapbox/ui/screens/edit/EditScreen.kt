@@ -1,6 +1,5 @@
 package com.example.shareyourvoicemapbox.ui.screens.edit
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -8,7 +7,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +42,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -82,10 +79,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import com.example.shareyourvoicemapbox.ui.navigation.Route
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
@@ -168,7 +163,7 @@ fun EditScreen(
         EditContent(
             modifier = modifier.padding(innerPadding),
             state = state,
-            platerState = playerState,
+            playerState = playerState,
             waveformProgress = waveformProgress,
             amplitudes = state.amplitudes,
             onWaveformProgressChange = { progress ->
@@ -245,7 +240,7 @@ fun EditScreen(
 fun EditContent(
     modifier: Modifier = Modifier,
     state: EditState,
-    platerState: EditPlayerState,
+    playerState: PlayerState,
     waveformProgress: Float,
     amplitudes: List<Int>,
     onWaveformProgressChange: (Float) -> Unit,
@@ -430,7 +425,7 @@ fun EditContent(
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    val imageVector = if (platerState.isPlaying)
+                    val imageVector = if (playerState.isPlaying)
                         Icons.Default.Pause else Icons.Default.PlayArrow
                     Icon(
                         imageVector = imageVector,
@@ -522,7 +517,7 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
             EditContent(
                 modifier = modifier.padding(innerPadding),
                 state = EditState(isLoading = true),
-                platerState = EditPlayerState(),
+                playerState = PlayerState(),
                 waveformProgress = 1f,
                 amplitudes = listOf(
                     2, 3, 2, 4, 3, 2, 3, 2,

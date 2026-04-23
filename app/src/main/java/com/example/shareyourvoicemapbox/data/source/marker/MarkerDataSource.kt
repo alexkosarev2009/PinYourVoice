@@ -8,6 +8,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -34,6 +35,19 @@ class MarkerDataSource @Inject constructor(
             response.body<List<MarkerDTO>>()
         }
     }
+    suspend fun getMarkersByAuthorId(authorId: Long): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val result = client.get("${HOST}/api/markers/by-author-id") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                parameter("authorId", authorId)
+            }
+            if (result.status != HttpStatusCode.OK) {
+                error("Status: ${result.status}")
+            }
+            result.body()
+        }
+    }
+
     suspend fun postMarker(dto: CreateMarkerDTO): Result<MarkerDTO> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.post("${HOST}/api/markers") {

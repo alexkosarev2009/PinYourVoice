@@ -567,7 +567,7 @@ fun MapContent(
                             systemState.mapViewportState.flyTo(
                                 cameraOptions {
                                     center(point)
-
+                                    bearing(0.0)
                                 },
                             )
                             onMarkerClick(marker)

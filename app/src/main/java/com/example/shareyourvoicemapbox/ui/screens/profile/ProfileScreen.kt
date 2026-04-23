@@ -1,7 +1,11 @@
 package com.example.shareyourvoicemapbox.ui.screens.profile
 
+import android.content.Context
+import android.location.Geocoder
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,11 +13,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Menu
@@ -28,12 +38,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,29 +57,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
+import com.example.shareyourvoicemapbox.ui.components.MarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
+import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.Locale
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     navHostController: NavHostController,
     viewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>()
     ) {
 
     val state by viewModel.uiState.collectAsState()
 
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             Row(
-                modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(24.dp, 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .statusBarsPadding()
+                    .padding(24.dp, 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Profile",
+                Text(
+                    "Profile",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
+                    fontSize = 24.sp,
                 )
                 Icon(
                     imageVector = Icons.Default.Menu,
@@ -78,12 +107,32 @@ fun ProfileScreen(
                     )
                 )
             }
-        }
+        },
     ) { innerPadding ->
-        ProfileContent(
-            state = state,
-            modifier = Modifier.padding(innerPadding)
-        )
+        LazyColumn {
+            item {
+                ProfileContent(
+                    state = state,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
+            items(state.markers) { marker ->
+                MarkerCard(
+                    title = marker.title,
+                    location = marker.location,
+                    username = marker.authorUsername,
+                    avatarUrl = marker.authorAvatarUrl,
+                    imageUrl = marker.imageUrl ?: "",
+                    onPlayClick = {  },
+                    onOpenMap = {  },
+                    amplitudes = emptyList(),
+                    waveformProgress = 0f,
+                    onWaveformProgressChange = {},
+                    playerState = PlayerState(),
+                    name = marker.authorName
+                )
+            }
+        }
     }
 }
 
@@ -93,10 +142,46 @@ fun ProfileContent(
     state: ProfileState
     ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
     ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Icon(imageVector = Icons.Default.Person,
+                    contentDescription = "default avatar",
+                    modifier = Modifier.size(68.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (state.avatarUrl != "") {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape),
+                        model = state.avatarUrl,
+                        contentDescription = "user avatar",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(state.fullName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text("@${state.userName}", fontSize = 16.sp)
+        }
+        Spacer(Modifier.height(16.dp))
         Row(
-            modifier = Modifier.padding(24.dp, 0.dp)
+            modifier = Modifier
+                .padding(24.dp, 0.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
         ) {
             ElevatedCard(
                 elevation = CardDefaults.elevatedCardElevation(8.dp),
@@ -107,7 +192,9 @@ fun ProfileContent(
                 )
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(4.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp)
                 ) {
                     Icon(
                         modifier = Modifier.align(Alignment.TopEnd),
@@ -116,9 +203,11 @@ fun ProfileContent(
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Column(
-                        modifier = Modifier.align(Alignment.CenterStart).padding(8.dp)
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(8.dp)
                     ) {
-                        Text("13", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text(state.markers.size.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
                         Text("Markers", fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
@@ -133,7 +222,9 @@ fun ProfileContent(
                 )
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(4.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp)
                 ) {
                     Icon(
                         modifier = Modifier.align(Alignment.TopEnd),
@@ -142,45 +233,21 @@ fun ProfileContent(
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                     Column(
-                        modifier = Modifier.align(Alignment.CenterStart).padding(8.dp)
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(8.dp)
                     ) {
                         Text("8", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         Text("Friends", fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             }
-            Spacer(Modifier.width(16.dp))
-            Column(
-                modifier = Modifier.width(150.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier.size(80.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHighest),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Icon(imageVector = Icons.Default.Person,
-                        contentDescription = "default avatar",
-                        modifier = Modifier.size(68.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                    if (state.avatarUrl != "") {
-                        AsyncImage(
-                            modifier = Modifier.size(80.dp)
-                                .clip(CircleShape),
-                            model = state.avatarUrl,
-                            contentDescription = "user avatar",
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }
-                Text(state.fullName, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text("@${state.userName}", fontSize = 12.sp)
-            }
         }
+        Spacer(Modifier.height(16.dp))
         Column(
-            modifier = Modifier.fillMaxWidth().padding(24.dp, 0.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp, 0.dp)
         ) {
             Text("Bio", fontWeight = FontWeight.Bold)
             Text(state.bio, fontStyle = FontStyle.Italic,
@@ -191,7 +258,7 @@ fun ProfileContent(
 
 
 @Composable
-@Preview
+@Preview(showSystemUi = true)
 fun ProfileScreenPreview(modifier: Modifier = Modifier) {
     AppTheme(
         darkTheme = false

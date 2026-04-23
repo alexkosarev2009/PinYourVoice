@@ -3,7 +3,6 @@ package com.example.shareyourvoicemapbox.ui.screens.edit
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,7 +52,7 @@ class EditViewModel @Inject constructor(
     )
     val state: StateFlow<EditState> = _state.asStateFlow()
 
-    private val _playerState = MutableStateFlow(EditPlayerState())
+    private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
 
     private var timerJob: Job? = null
