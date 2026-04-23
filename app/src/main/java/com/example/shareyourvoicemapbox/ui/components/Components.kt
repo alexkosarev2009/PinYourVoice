@@ -48,6 +48,7 @@ import com.linc.audiowaveform.model.WaveformAlignment
 
 @Composable
 fun MarkerCard(
+    modifier: Modifier = Modifier,
     title: String,
     location: String,
     username: String,
@@ -64,9 +65,8 @@ fun MarkerCard(
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(8.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(12.dp)
     ) {
 
         Column {
@@ -178,16 +178,16 @@ fun MarkerCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(48.dp)
                         .padding(0.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.error),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Default.Map,
                         contentDescription = "Go to map",
-                        tint = MaterialTheme.colorScheme.onSecondary,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.clickable(
                             onClick = onOpenMap
                         )

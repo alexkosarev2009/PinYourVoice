@@ -118,6 +118,7 @@ fun ProfileScreen(
             }
             items(state.markers) { marker ->
                 MarkerCard(
+                    modifier = Modifier.padding(20.dp, 0.dp),
                     title = marker.title,
                     location = marker.location,
                     username = marker.authorUsername,
@@ -131,6 +132,7 @@ fun ProfileScreen(
                     playerState = PlayerState(),
                     name = marker.authorName
                 )
+                Spacer(Modifier.height(20.dp))
             }
         }
     }
@@ -185,7 +187,7 @@ fun ProfileContent(
         ) {
             ElevatedCard(
                 elevation = CardDefaults.elevatedCardElevation(8.dp),
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.height(80.dp).weight(1f),
                 colors = CardDefaults.elevatedCardColors(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -215,7 +217,7 @@ fun ProfileContent(
             Spacer(Modifier.width(24.dp))
             ElevatedCard(
                 elevation = CardDefaults.elevatedCardElevation(8.dp),
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.height(80.dp).weight(1f),
                 colors = CardDefaults.elevatedCardColors(
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
@@ -252,6 +254,12 @@ fun ProfileContent(
             Text("Bio", fontWeight = FontWeight.Bold)
             Text(state.bio, fontStyle = FontStyle.Italic,
                 fontSize = 16.sp)
+            Spacer(Modifier.height(16.dp))
+            Text(
+                "Markers",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+            )
         }
     }
 }
