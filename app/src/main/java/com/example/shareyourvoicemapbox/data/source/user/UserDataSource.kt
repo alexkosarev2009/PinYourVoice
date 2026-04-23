@@ -1,5 +1,6 @@
 package com.example.shareyourvoicemapbox.data.source.user
 
+import android.util.Log
 import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.UserDTO
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
@@ -23,7 +24,7 @@ class UserDataSource @Inject constructor(
             val result = client.get("${HOST}/api/users") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
             }
-            if (result.status != HttpStatusCode.Companion.OK) {
+            if (result.status != HttpStatusCode.OK) {
                 error("Status: ${result.status}")
             }
             result.body()
@@ -34,7 +35,7 @@ class UserDataSource @Inject constructor(
             val result = client.get("${HOST}/api/users/{$id}") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
             }
-            if (result.status != HttpStatusCode.Companion.OK) {
+            if (result.status != HttpStatusCode.OK) {
                 error("Status: ${result.status}")
             }
             result.body()
@@ -46,10 +47,22 @@ class UserDataSource @Inject constructor(
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
                 parameter("username", username)
             }
-            if (result.status != HttpStatusCode.Companion.OK) {
+            if (result.status != HttpStatusCode.OK) {
                 error("Status: ${result.status}")
             }
             result.body()
+        }
+    }
+    suspend fun getMe(): Result<UserDTO> = withContext(Dispatchers.IO) {
+        runCatching {
+            val result = client.get("${HOST}/api/users/me") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+            }
+            if (result.status != HttpStatusCode.OK) {
+                error("Status: ${result.status}")
+            }
+            val entity = result.body<UserDTO>()
+            entity
         }
     }
 }

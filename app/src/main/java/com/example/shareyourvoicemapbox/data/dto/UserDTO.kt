@@ -14,6 +14,6 @@ data class UserDTO (
     @SerialName("bio")
     val bio: String?,
 
-    @SerialName("pfp_url")
+    @SerialName("avatarUrl")
     val avatarUrl: String?,
 )

@@ -58,7 +58,6 @@ class MapViewModel @Inject constructor(
     val minDuration = 3_000L
     val maxDuration = 30_000L
 
-
     fun getData() {
         viewModelScope.launch {
             getMarkersUseCase().fold(
