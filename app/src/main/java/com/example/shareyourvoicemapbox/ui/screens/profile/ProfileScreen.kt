@@ -151,6 +151,7 @@ fun ProfileScreen(
                         imageVector = Icons.Default.KeyboardArrowUp,
                         contentDescription = "Scroll up",
                         modifier = Modifier
+                            .padding(0.dp, 4.dp, 0.dp, 0.dp)
                             .size(32.dp)
                             .clip(CircleShape)
                             .clickable(
