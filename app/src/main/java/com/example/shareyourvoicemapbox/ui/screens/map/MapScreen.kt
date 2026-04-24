@@ -520,7 +520,7 @@ fun MapContent(
                 mapViewportState = systemState.mapViewportState,
                 scaleBar = {},
                 compass = {
-                    Compass(modifier = Modifier.padding(0.dp, 120.dp))
+                    Compass(modifier = Modifier.padding(8.dp, 120.dp))
                 },
                 logo = {
                     Logo()

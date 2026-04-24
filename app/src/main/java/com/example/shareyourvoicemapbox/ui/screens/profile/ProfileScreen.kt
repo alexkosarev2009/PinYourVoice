@@ -1,11 +1,11 @@
 package com.example.shareyourvoicemapbox.ui.screens.profile
 
-import android.content.Context
-import android.location.Geocoder
-import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,40 +14,37 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.SwipeUpAlt
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
@@ -59,33 +56,42 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
+import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.components.MarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.util.Locale
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     navHostController: NavHostController,
     viewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>()
     ) {
 
     val state by viewModel.uiState.collectAsState()
 
-    val context = LocalContext.current
+    val listState = rememberLazyListState()
 
-    Scaffold(
-        topBar = {
+    val scope = rememberCoroutineScope()
+
+    val showScrollTop by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex >= 2
+        }
+    }
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.statusBarsPadding()
+    ) {
+        item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
-                    .statusBarsPadding()
-                    .padding(24.dp, 8.dp),
+                    .padding(24.dp, 8.dp, 24.dp, 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -107,33 +113,75 @@ fun ProfileScreen(
                     )
                 )
             }
-        },
-    ) { innerPadding ->
-        LazyColumn {
-            item {
-                ProfileContent(
-                    state = state,
-                    modifier = Modifier.padding(innerPadding)
+        }
+        item {
+            ProfileContent(
+                state = state,
+                onMarkersClick = {
+                    scope.launch {
+                        listState.animateScrollToItem(
+                            3,
+                            scrollOffset = -168
+                        )
+                    }
+                }
+            )
+        }
+        stickyHeader {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .statusBarsPadding()
+                    .padding(24.dp, 0.dp, 24.dp, 20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Markers",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
                 )
+                AnimatedVisibility(
+                    visible = showScrollTop,
+                    enter = fadeIn(tween(500)),
+                    exit = fadeOut(tween(500))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = "Scroll up",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .clickable(
+                                onClick = {
+                                    scope.launch {
+                                        listState.animateScrollToItem(0)
+                                    }
+                                }
+                            )
+                    )
+                }
+
             }
-            items(state.markers) { marker ->
-                MarkerCard(
-                    modifier = Modifier.padding(24.dp, 0.dp),
-                    title = marker.title,
-                    location = marker.location,
-                    username = marker.authorUsername,
-                    avatarUrl = marker.authorAvatarUrl,
-                    imageUrl = marker.imageUrl ?: "",
-                    onPlayClick = {  },
-                    onOpenMap = {  },
-                    amplitudes = emptyList(),
-                    waveformProgress = 0f,
-                    onWaveformProgressChange = {},
-                    playerState = PlayerState(),
-                    name = marker.authorName
-                )
-                Spacer(Modifier.height(20.dp))
-            }
+        }
+        items(state.markers) { marker ->
+            MarkerCard(
+                modifier = Modifier.padding(24.dp, 0.dp),
+                title = marker.title,
+                location = marker.location,
+                username = marker.authorUsername,
+                avatarUrl = marker.authorAvatarUrl,
+                imageUrl = marker.imageUrl ?: "",
+                onPlayClick = {  },
+                onOpenMap = {  },
+                amplitudes = emptyList(),
+                waveformProgress = 0f,
+                onWaveformProgressChange = {},
+                playerState = PlayerState(),
+                name = marker.authorName
+            )
+            Spacer(Modifier.height(20.dp))
         }
     }
 }
@@ -141,7 +189,8 @@ fun ProfileScreen(
 @Composable
 fun ProfileContent(
     modifier: Modifier = Modifier,
-    state: ProfileState
+    state: ProfileState,
+    onMarkersClick: () -> Unit,
     ) {
     Column(
         modifier = modifier
@@ -187,7 +236,12 @@ fun ProfileContent(
         ) {
             ElevatedCard(
                 elevation = CardDefaults.elevatedCardElevation(8.dp),
-                modifier = Modifier.height(80.dp).weight(1f),
+                modifier = Modifier
+                    .height(80.dp)
+                    .weight(1f)
+                    .clickable(
+                        onClick = onMarkersClick
+                    ),
                 colors = CardDefaults.elevatedCardColors(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -217,7 +271,9 @@ fun ProfileContent(
             Spacer(Modifier.width(24.dp))
             ElevatedCard(
                 elevation = CardDefaults.elevatedCardElevation(8.dp),
-                modifier = Modifier.height(80.dp).weight(1f),
+                modifier = Modifier
+                    .height(80.dp)
+                    .weight(1f),
                 colors = CardDefaults.elevatedCardColors(
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
@@ -255,13 +311,8 @@ fun ProfileContent(
             Text(state.bio, fontStyle = FontStyle.Italic,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Light)
-            Spacer(Modifier.height(16.dp))
-            Text(
-                "Markers",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-            )
         }
+        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -273,7 +324,8 @@ fun ProfileScreenPreview(modifier: Modifier = Modifier) {
         darkTheme = false
     ) {
         ProfileContent(
-            state = ProfileState()
+            state = ProfileState(),
+            onMarkersClick = {  },
         )
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -133,12 +135,30 @@ fun AppNav(
         bottomBar = {
             if (currentRoute in mainRoutes) {
                 NavigationBar(
+                    containerColor =
+                        if (isMapRoute(currentRoute ?: "")) Color.Transparent
+                        else NavigationBarDefaults.containerColor,
+                    modifier = if (isMapRoute(currentRoute ?: "")) Modifier.background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF0A1A2F),
+                                Color(0xFF0B1020),
+                                Color(0xFF05060A),
+                            )
+                        )
+                    )
+                    else Modifier
                 ) {
                     Route.entries.forEach { route ->
                         NavigationBarItem(
-                            colors = NavigationBarItemDefaults.colors(
+                            colors = if (isMapRoute(currentRoute ?: "")) NavigationBarItemDefaults.colors(
                                 indicatorColor = Color.Transparent,
-
+                                selectedIconColor = Color.White,
+                                selectedTextColor = Color.White,
+                                unselectedIconColor = Color.White.copy(alpha = 0.7f),
+                                unselectedTextColor = Color.White.copy(alpha = 0.7f)
+                            ) else NavigationBarItemDefaults.colors(
+                                indicatorColor = Color.Transparent
                             ),
                             selected = currentRoute == route.route,
                             onClick = {
@@ -175,4 +195,8 @@ fun AppNav(
             modifier = Modifier.padding(padding),
         )
     }
+}
+
+fun isMapRoute(route: String): Boolean {
+    return route == Route.MAP.route
 }
