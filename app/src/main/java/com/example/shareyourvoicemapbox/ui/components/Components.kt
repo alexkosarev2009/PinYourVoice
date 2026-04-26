@@ -1,7 +1,6 @@
 package com.example.shareyourvoicemapbox.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,11 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -45,6 +40,9 @@ import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MarkerCard(
@@ -61,6 +59,7 @@ fun MarkerCard(
     onWaveformProgressChange: (Float) -> Unit,
     playerState: PlayerState,
     name: String,
+    createdAt: String,
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
@@ -174,8 +173,17 @@ fun MarkerCard(
             Spacer(Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                val instant = Instant.parse(createdAt)
+
+                val formatter = DateTimeFormatter
+                    .ofPattern("dd-MM-yyyy")
+                    .withZone(ZoneId.systemDefault())
+
+                Text(formatter.format(instant))
+
                 Box(
                     modifier = Modifier
                         .size(48.dp)
@@ -214,7 +222,8 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
             waveformProgress = 0f,
             onWaveformProgressChange = {},
             playerState = PlayerState(),
-            name = "Саша Косарев"
+            name = "Саша Косарев",
+            createdAt = "2026-04-26T19:48:26.812081Z"
         )
     }
 }

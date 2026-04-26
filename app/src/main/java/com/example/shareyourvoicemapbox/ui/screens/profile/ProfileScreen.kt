@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.SwipeUpAlt
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -134,7 +135,7 @@ fun ProfileScreen(
                             },
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Notifications,
+                                imageVector = Icons.Outlined.Notifications,
                                 contentDescription = "Notifications",
                             )
                         }
@@ -227,6 +228,7 @@ fun ProfileScreen(
                     onWaveformProgressChange = {},
                     playerState = PlayerState(),
                     name = marker.authorName,
+                    createdAt = marker.createdAt
                 )
                 Spacer(Modifier.height(20.dp))
             }

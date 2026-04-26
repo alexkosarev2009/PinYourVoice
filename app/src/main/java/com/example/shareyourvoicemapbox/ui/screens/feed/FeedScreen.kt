@@ -201,6 +201,7 @@ fun FeedContent(
                         onWaveformProgressChange = {},
                         playerState = PlayerState(),
                         name = marker.authorName,
+                        createdAt = marker.createdAt
                     )
                 }
             }
