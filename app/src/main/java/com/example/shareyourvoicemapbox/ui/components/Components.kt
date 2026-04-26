@@ -181,16 +181,16 @@ fun MarkerCard(
                         .size(48.dp)
                         .padding(0.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer),
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .clickable(
+                        onClick = onOpenMap
+                    ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Default.Map,
                         contentDescription = "Go to map",
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.clickable(
-                            onClick = onOpenMap
-                        )
                     )
                 }
             }

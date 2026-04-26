@@ -4,5 +4,8 @@ import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 
 data class FeedState(
     val markers: List<MarkerEntity> = emptyList(),
-    val error: String = ""
+    val friendsMarkers: List<MarkerEntity> = emptyList(),
+    val error: String = "",
+    val isViewingPublic: Boolean = true,
+    val isRefreshing: Boolean = false,
 )

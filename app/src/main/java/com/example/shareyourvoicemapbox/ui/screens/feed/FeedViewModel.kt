@@ -25,19 +25,33 @@ class FeedViewModel @Inject constructor(
     }
 
     fun getData() {
+        _uiState.update {
+            it.copy(isRefreshing = true)
+        }
         viewModelScope.launch {
             getMarkersUseCase().fold(
                 onSuccess = { data ->
                     _uiState.update {
-                        it.copy(markers = data)
+                        it.copy(markers = data, isRefreshing = false)
                     }
                 },
                 onFailure = { error ->
                     _uiState.update {
-                        it.copy(error = error.message ?: "")
+                        it.copy(error = error.message ?: "", isRefreshing = false)
                     }
                 }
             )
+        }
+    }
+
+    fun viewPublic() {
+        _uiState.update {
+            it.copy(isViewingPublic = true)
+        }
+    }
+    fun viewFriends() {
+        _uiState.update {
+            it.copy(isViewingPublic = false)
         }
     }
 

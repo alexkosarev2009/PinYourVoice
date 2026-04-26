@@ -9,5 +9,6 @@ data class ProfileState (
     val error: String = "",
     val avatarUrl: String = "",
     val userId: Long = 0,
-    val markers: List<MarkerEntity> = emptyList()
+    val markers: List<MarkerEntity> = emptyList(),
+    val isRefreshing: Boolean = false,
 )

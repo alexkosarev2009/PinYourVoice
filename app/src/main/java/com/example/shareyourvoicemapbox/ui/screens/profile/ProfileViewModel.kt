@@ -53,6 +53,11 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun loadUserInfo() {
+        _uiState.update {
+            it.copy(
+                isRefreshing = true
+            )
+        }
         viewModelScope.launch {
             getMeUseCase().fold(
                 onSuccess = { user ->
@@ -84,6 +89,11 @@ class ProfileViewModel @Inject constructor(
                     }
                 }
             )
+            _uiState.update {
+                it.copy(
+                    isRefreshing = false
+                )
+            }
         }
     }
     fun onMenuClick() {

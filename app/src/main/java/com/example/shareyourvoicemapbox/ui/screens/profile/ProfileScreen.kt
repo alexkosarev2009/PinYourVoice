@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.shareyourvoicemapbox.ui.screens.profile
 
 import androidx.compose.animation.AnimatedVisibility
@@ -26,16 +28,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.SwipeUpAlt
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -74,6 +82,8 @@ fun ProfileScreen(
 
     val listState = rememberLazyListState()
 
+    val refreshState = rememberPullToRefreshState()
+
     val scope = rememberCoroutineScope()
 
     val showScrollTop by remember {
@@ -82,107 +92,151 @@ fun ProfileScreen(
         }
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.statusBarsPadding()
-    ) {
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(24.dp, 8.dp, 24.dp, 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "Profile",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                )
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            viewModel.onMenuClick()
-                            navHostController.navigate(SecondaryRoute.AUTH.route) {
-                                popUpTo(0)
-                            }
-                        }
-                    )
-                )
-            }
+    PullToRefreshBox(
+        isRefreshing = state.isRefreshing,
+        onRefresh = {
+            viewModel.loadUserInfo()
+        },
+        state = refreshState,
+        indicator = {
+            Indicator(
+                state = refreshState,
+                isRefreshing = state.isRefreshing,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
-        item {
-            ProfileContent(
-                state = state,
-                onMarkersClick = {
-                    scope.launch {
-                        listState.animateScrollToItem(
-                            3,
-                            scrollOffset = -168
-                        )
+    ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.statusBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(24.dp, 8.dp, 24.dp, 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        "Profile",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                    )
+                    Row {
+                        IconButton(
+                            onClick = {
+
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Notifications",
+                            )
+                        }
+
+                        Spacer(Modifier.width(4.dp))
+
+                        IconButton(
+                            onClick = {
+                                viewModel.onMenuClick()
+                                navHostController.navigate(SecondaryRoute.AUTH.route) {
+                                    popUpTo(0)
+                                }
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Menu",
+                            )
+                        }
                     }
                 }
-            )
-        }
-        stickyHeader {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .statusBarsPadding()
-                    .padding(24.dp, 0.dp, 24.dp, 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "Markers",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                )
-                AnimatedVisibility(
-                    visible = showScrollTop,
-                    enter = fadeIn(tween(500)),
-                    exit = fadeOut(tween(500))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowUp,
-                        contentDescription = "Scroll up",
-                        modifier = Modifier
-                            .padding(0.dp, 4.dp, 0.dp, 0.dp)
-                            .size(32.dp)
-                            .clip(CircleShape)
-                            .clickable(
-                                onClick = {
-                                    scope.launch {
-                                        listState.animateScrollToItem(0)
-                                    }
-                                }
+            }
+            item {
+                ProfileContent(
+                    state = state,
+                    onMarkersClick = {
+                        scope.launch {
+                            listState.animateScrollToItem(
+                                3,
+                                scrollOffset = -168,
                             )
+                        }
+                    },
+                )
+            }
+            stickyHeader {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .statusBarsPadding()
+                        .padding(24.dp, 0.dp, 24.dp, 24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        "Markers",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                    )
+                    Column() {
+                        Spacer(Modifier.height(4.dp))
+                        AnimatedVisibility(
+                            visible = showScrollTop,
+                            enter = fadeIn(tween(500)),
+                            exit = fadeOut(tween(500)),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowUp,
+                                contentDescription = "Scroll up",
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .clickable(
+                                        onClick = {
+                                            scope.launch {
+                                                listState.animateScrollToItem(0)
+                                            }
+                                        },
+                                    ),
+                            )
+                        }
+
+                    }
+
+                }
+            }
+            items(state.markers) { marker ->
+                MarkerCard(
+                    modifier = Modifier.padding(24.dp, 0.dp),
+                    title = marker.title,
+                    location = marker.location,
+                    username = marker.authorUsername,
+                    avatarUrl = marker.authorAvatarUrl,
+                    imageUrl = marker.imageUrl ?: "",
+                    onPlayClick = { },
+                    onOpenMap = { },
+                    amplitudes = emptyList(),
+                    waveformProgress = 0f,
+                    onWaveformProgressChange = {},
+                    playerState = PlayerState(),
+                    name = marker.authorName,
+                )
+                Spacer(Modifier.height(20.dp))
+            }
+            item {
+                if (state.markers == emptyList<MarkerEntity>()) {
+                    Text(
+                        "No markers yet",
                     )
                 }
-
             }
-        }
-        items(state.markers) { marker ->
-            MarkerCard(
-                modifier = Modifier.padding(24.dp, 0.dp),
-                title = marker.title,
-                location = marker.location,
-                username = marker.authorUsername,
-                avatarUrl = marker.authorAvatarUrl,
-                imageUrl = marker.imageUrl ?: "",
-                onPlayClick = {  },
-                onOpenMap = {  },
-                amplitudes = emptyList(),
-                waveformProgress = 0f,
-                onWaveformProgressChange = {},
-                playerState = PlayerState(),
-                name = marker.authorName
-            )
-            Spacer(Modifier.height(20.dp))
         }
     }
 }
