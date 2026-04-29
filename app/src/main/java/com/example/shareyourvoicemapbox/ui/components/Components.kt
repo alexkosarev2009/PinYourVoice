@@ -209,7 +209,7 @@ fun MarkerCard(
 @Composable
 @Preview(showSystemUi = false)
 fun MarkerCardPreview(modifier: Modifier = Modifier) {
-    AppTheme() {
+    AppTheme {
         MarkerCard(
             title = "Moscow City",
             location = "Moscow, Russia",
@@ -219,7 +219,7 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
             onPlayClick = {},
             onOpenMap = {},
             amplitudes = listOf(1, 2, 6, 15, 4, 7, 12, 24),
-            waveformProgress = 0f,
+            waveformProgress = 0.7f,
             onWaveformProgressChange = {},
             playerState = PlayerState(),
             name = "Саша Косарев",

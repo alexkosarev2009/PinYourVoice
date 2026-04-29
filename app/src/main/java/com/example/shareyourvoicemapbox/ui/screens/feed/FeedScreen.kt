@@ -141,7 +141,7 @@ fun FeedContent(
                         color = if (state.isViewingPublic) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onBackground,
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(8.dp))
                 }
                 Tab(
                     selected = !state.isViewingPublic,
@@ -152,7 +152,7 @@ fun FeedContent(
                         color = if (!state.isViewingPublic) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onBackground,
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(8.dp))
                 }
             }
             VerticalPager(

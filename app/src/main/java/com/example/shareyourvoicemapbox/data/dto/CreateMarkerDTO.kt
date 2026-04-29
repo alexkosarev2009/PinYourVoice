@@ -2,6 +2,7 @@ package com.example.shareyourvoicemapbox.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.Instant
 
 @Serializable
 data class CreateMarkerDTO(
@@ -20,4 +21,4 @@ data class CreateMarkerDTO(
     @SerialName("audioUrl")
     val audioUrl: String?,
 
-)
+    )
