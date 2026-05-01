@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -26,14 +25,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.SwipeUpAlt
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -41,7 +37,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -56,7 +51,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,12 +58,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
-import com.example.shareyourvoicemapbox.ui.components.MarkerCard
+import com.example.shareyourvoicemapbox.ui.components.ShortMarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
-import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -215,22 +207,15 @@ fun ProfileScreen(
                 }
             }
             items(state.markers) { marker ->
-                MarkerCard(
+                ShortMarkerCard(
                     modifier = Modifier.padding(24.dp, 0.dp),
-                    title = marker.title,
-                    location = marker.location,
-                    username = marker.authorUsername,
-                    avatarUrl = marker.authorAvatarUrl,
-                    imageUrl = marker.imageUrl ?: "",
-                    onPlayClick = { },
-                    onOpenMap = { },
-                    amplitudes = emptyList(),
+                    marker = marker,
+                    onMenuClick = {},
                     waveformProgress = 0f,
                     onWaveformProgressChange = {},
-                    name = marker.authorName,
-                    createdAt = marker.createdAt,
-                    audioUrl = marker.audioUrl,
-                    onMenuClick = {}
+                    onPlayClick = { },
+                    isPLaying = false,
+                    onOpenMap = {}
                 )
                 Spacer(Modifier.height(20.dp))
             }
