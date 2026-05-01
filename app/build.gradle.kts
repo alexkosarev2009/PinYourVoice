@@ -44,6 +44,9 @@ android {
 }
 
 dependencies {
+    // EXO PLAYER
+    implementation("androidx.media3:media3-exoplayer:1.4.1")
+
     // COIL
     implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc01")

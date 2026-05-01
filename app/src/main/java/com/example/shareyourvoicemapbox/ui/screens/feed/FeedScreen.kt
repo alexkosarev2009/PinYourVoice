@@ -33,8 +33,13 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -45,6 +50,7 @@ import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shareyourvoicemapbox.ui.components.MarkerCard
 import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
@@ -53,11 +59,35 @@ fun FeedScreen(
     viewModel: FeedViewModel = hiltViewModel<FeedViewModel>()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val scope = rememberCoroutineScope()
+    val playerState by viewModel.playerState.collectAsState()
     val pagerState = rememberPagerState(pageCount = { state.markers.size })
     val refreshState = rememberPullToRefreshState()
 
+    val waveformProgress by remember {
+        derivedStateOf {
+            (playerState.currentPosition / playerState.maxDuration.toFloat())
+                .coerceIn(0f, 1f)
+        }
+    }
+    LaunchedEffect(pagerState) {
+        var first = true
+
+        snapshotFlow { pagerState.currentPage }
+            .collect { page ->
+                if (first) {
+                    first = false
+                    return@collect
+                }
+                state.markers.getOrNull(page)?.let {
+                    viewModel.playAudio(it.audioUrl, page)
+                }
+            }
+    }
+
     FeedContent(
         state = state,
+        playerState = playerState,
         pagerState = pagerState,
         refreshState = refreshState,
         onViewPublicClick = {
@@ -66,12 +96,30 @@ fun FeedScreen(
         onViewFriendsClick = {
             viewModel.viewFriends()
         },
+        onSearchClick = {
+
+        },
         onRefresh = {
             viewModel.getData()
         },
-        onSearchClick = {
+        onPlayClick = { url, id ->
+            if (playerState.isPlaying && url == state.currentAudioUrl) {
+                viewModel.pauseAudio()
+            }
+            else {
+                viewModel.playAudio(url, id)
+                scope.launch {
+                    viewModel.getAudioDurationMs(url)
+                }
+            }
+        },
+        onOpenMap = {
 
-        }
+        },
+        onWaveformProgressChange = { progress ->
+            viewModel.onWaveformProgressChange(progress)
+        },
+        progress = waveformProgress
     )
 }
 
@@ -79,12 +127,17 @@ fun FeedScreen(
 fun FeedContent(
     modifier: Modifier = Modifier,
     state: FeedState,
+    playerState: PlayerState,
     pagerState: PagerState,
     refreshState: PullToRefreshState,
     onViewPublicClick: () -> Unit,
     onViewFriendsClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onPlayClick: (String, Int) -> Unit,
+    onOpenMap: () -> Unit,
+    onWaveformProgressChange: (Float) -> Unit,
+    progress: Float,
 ) {
     PullToRefreshBox(
         state = refreshState,
@@ -194,14 +247,16 @@ fun FeedContent(
                         username = marker.authorUsername,
                         avatarUrl = marker.authorAvatarUrl,
                         imageUrl = marker.imageUrl ?: "",
-                        onPlayClick = {},
-                        onOpenMap = {},
-                        amplitudes = listOf(),
-                        waveformProgress = 0f,
-                        onWaveformProgressChange = {},
-                        playerState = PlayerState(),
+                        onPlayClick = { onPlayClick(marker.audioUrl, page) },
+                        onOpenMap = onOpenMap,
+                        amplitudes = listOf(1, 2, 3, 2, 1),
+                        waveformProgress = if (state.currentAudioUrl == marker.audioUrl) progress else 0f,
+                        onWaveformProgressChange = onWaveformProgressChange,
                         name = marker.authorName,
-                        createdAt = marker.createdAt
+                        createdAt = marker.createdAt,
+                        audioUrl = marker.audioUrl,
+                        isPLaying = playerState.isPlaying && state.currentAudioUrl == marker.audioUrl,
+                        onMenuClick = {}
                     )
                 }
             }

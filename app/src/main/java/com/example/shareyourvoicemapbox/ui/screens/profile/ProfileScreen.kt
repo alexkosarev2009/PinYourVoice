@@ -227,9 +227,10 @@ fun ProfileScreen(
                     amplitudes = emptyList(),
                     waveformProgress = 0f,
                     onWaveformProgressChange = {},
-                    playerState = PlayerState(),
                     name = marker.authorName,
-                    createdAt = marker.createdAt
+                    createdAt = marker.createdAt,
+                    audioUrl = marker.audioUrl,
+                    onMenuClick = {}
                 )
                 Spacer(Modifier.height(20.dp))
             }

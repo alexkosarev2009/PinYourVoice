@@ -4,7 +4,7 @@ import android.media.MediaPlayer
 import android.util.Log
 import com.example.shareyourvoicemapbox.domain.player.AudioPlayer
 
-class AudioPlayerImpl: AudioPlayer{
+class AudioPlayerImpl: AudioPlayer {
     private var player: MediaPlayer? = null
 
     override fun play(filePath: String) {

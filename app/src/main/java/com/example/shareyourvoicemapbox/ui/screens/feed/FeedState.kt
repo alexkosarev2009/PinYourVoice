@@ -8,4 +8,6 @@ data class FeedState(
     val error: String = "",
     val isViewingPublic: Boolean = true,
     val isRefreshing: Boolean = false,
+    val currentPlayingId: Int = -1,
+    val currentAudioUrl: String = "",
 )

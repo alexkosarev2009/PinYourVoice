@@ -55,11 +55,13 @@ fun MarkerCard(
     onPlayClick: () -> Unit,
     onOpenMap: () -> Unit,
     amplitudes: List<Int>,
+    onMenuClick: () -> Unit,
     waveformProgress: Float,
     onWaveformProgressChange: (Float) -> Unit,
-    playerState: PlayerState,
     name: String,
     createdAt: String,
+    audioUrl: String,
+    isPLaying: Boolean = false
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
@@ -75,7 +77,6 @@ fun MarkerCard(
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 AsyncImage(
                     model = avatarUrl,
                     contentScale = ContentScale.Crop,
@@ -99,7 +100,7 @@ fun MarkerCard(
                     )
                 }
 
-                IconButton(onClick = { /* menu */ }) {
+                IconButton(onClick = onMenuClick) {
                     Icon(Icons.Default.MoreVert, contentDescription = null)
                 }
             }
@@ -141,7 +142,7 @@ fun MarkerCard(
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    val imageVector = if (playerState.isPlaying)
+                    val imageVector = if (isPLaying)
                         Icons.Default.Pause else Icons.Default.PlayArrow
                     Icon(
                         imageVector = imageVector,
@@ -221,9 +222,10 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
             amplitudes = listOf(1, 2, 6, 15, 4, 7, 12, 24),
             waveformProgress = 0.7f,
             onWaveformProgressChange = {},
-            playerState = PlayerState(),
             name = "Саша Косарев",
-            createdAt = "2026-04-26T19:48:26.812081Z"
+            createdAt = "2026-04-26T19:48:26.812081Z",
+            audioUrl = "",
+            onMenuClick = {}
         )
     }
 }
