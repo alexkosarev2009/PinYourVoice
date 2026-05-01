@@ -32,4 +32,7 @@ data class MarkerDTO(
 
     @SerialName("createdAt")
     val createdAt: String?,
+
+    @SerialName("amplitudes")
+    val amplitudes: String?,
 )

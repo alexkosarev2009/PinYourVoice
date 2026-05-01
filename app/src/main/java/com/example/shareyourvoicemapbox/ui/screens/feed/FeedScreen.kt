@@ -33,6 +33,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
 import com.example.shareyourvoicemapbox.ui.components.MarkerCard
 import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import kotlinx.coroutines.launch
@@ -80,9 +82,17 @@ fun FeedScreen(
                     return@collect
                 }
                 state.markers.getOrNull(page)?.let {
-                    viewModel.playAudio(it.audioUrl, page)
+                    scope.launch {
+                        viewModel.getAudioDurationMs(it.audioUrl)
+                        viewModel.playAudio(it.audioUrl, page)
+                    }
                 }
             }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.pauseAudio()
+        }
     }
 
     FeedContent(
@@ -107,9 +117,9 @@ fun FeedScreen(
                 viewModel.pauseAudio()
             }
             else {
-                viewModel.playAudio(url, id)
                 scope.launch {
                     viewModel.getAudioDurationMs(url)
+                    viewModel.playAudio(url, id)
                 }
             }
         },
@@ -249,7 +259,7 @@ fun FeedContent(
                         imageUrl = marker.imageUrl ?: "",
                         onPlayClick = { onPlayClick(marker.audioUrl, page) },
                         onOpenMap = onOpenMap,
-                        amplitudes = listOf(1, 2, 3, 2, 1),
+                        amplitudes = ParseAmplitudesUseCase().invoke(marker.amplitudes),
                         waveformProgress = if (state.currentAudioUrl == marker.audioUrl) progress else 0f,
                         onWaveformProgressChange = onWaveformProgressChange,
                         name = marker.authorName,
@@ -260,6 +270,8 @@ fun FeedContent(
                     )
                 }
             }
+            Spacer(Modifier.height(140.dp))
+            Text("No markers yet")
         }
     }
 }

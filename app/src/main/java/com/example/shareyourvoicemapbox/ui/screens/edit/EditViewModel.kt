@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shareyourvoicemapbox.data.constants.Constants
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.domain.UploadFileUseCase
 import com.example.shareyourvoicemapbox.domain.amplituda.ProcessAudioUseCase
@@ -25,7 +26,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 import java.net.URLDecoder
-import java.time.Instant
 import javax.inject.Inject
 
 const val MAX_TITLE_LEN = 30
@@ -57,7 +57,6 @@ class EditViewModel @Inject constructor(
     val playerState = _playerState.asStateFlow()
 
     private var timerJob: Job? = null
-
 
     fun processAudio() {
         viewModelScope.launch {
@@ -218,8 +217,9 @@ class EditViewModel @Inject constructor(
                     title = _state.value.title,
                     lat = _state.value.lat,
                     lng = _state.value.lng,
-                    imageUrl = imageKey,
-                    audioUrl = audioKey,
+                    imageUrl = Constants.YANDEX_STORAGE + imageKey,
+                    audioUrl = Constants.YANDEX_STORAGE + audioKey,
+                    amplitudes = _state.value.amplitudes.toString()
                 )
             ).fold(
                 onSuccess = {

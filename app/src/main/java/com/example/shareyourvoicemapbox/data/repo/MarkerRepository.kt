@@ -20,7 +20,8 @@ class MarkerRepository @Inject constructor(
                     authorName = markerDTO.authorName ?: return@mapNotNull null,
                     authorUsername = markerDTO.authorUsername ?: return@mapNotNull null,
                     authorAvatarUrl = markerDTO.authorAvatarUrl ?: return@mapNotNull null,
-                    createdAt = markerDTO.createdAt ?: return@mapNotNull null
+                    createdAt = markerDTO.createdAt ?: return@mapNotNull null,
+                    amplitudes = markerDTO.amplitudes ?: return@mapNotNull null,
                 )
             }
         }
@@ -37,7 +38,8 @@ class MarkerRepository @Inject constructor(
                     authorName = markerDTO.authorName ?: return@mapNotNull null,
                     authorUsername = markerDTO.authorUsername ?: return@mapNotNull null,
                     authorAvatarUrl = markerDTO.authorAvatarUrl ?: return@mapNotNull null,
-                    createdAt = markerDTO.createdAt ?: return@mapNotNull null
+                    createdAt = markerDTO.createdAt ?: return@mapNotNull null,
+                    amplitudes = markerDTO.amplitudes ?: return@mapNotNull null,
                 )
             }
         }
@@ -53,7 +55,8 @@ class MarkerRepository @Inject constructor(
                 authorName = markerDTO.authorName ?: error("Invalid MarkerDTO from server"),
                 authorUsername = markerDTO.authorUsername ?: error("Invalid MarkerDTO from server"),
                 authorAvatarUrl = markerDTO.authorAvatarUrl ?: error("Invalid MarkerDTO from server"),
-                createdAt = markerDTO.createdAt ?: error("Invalid MarkerDTO from server")
+                createdAt = markerDTO.createdAt ?: error("Invalid MarkerDTO from server"),
+                amplitudes = markerDTO.amplitudes ?: error("Invalid MarkerDTO from server")
             )
         }
     }

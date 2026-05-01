@@ -11,4 +11,5 @@ data class MarkerEntity(
     val authorUsername: String,
     val authorAvatarUrl: String,
     val createdAt: String,
+    val amplitudes: String,
 )

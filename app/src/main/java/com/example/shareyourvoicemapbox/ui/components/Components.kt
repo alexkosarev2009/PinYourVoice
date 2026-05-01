@@ -1,5 +1,6 @@
 package com.example.shareyourvoicemapbox.ui.components
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.example.shareyourvoicemapbox.data.constants.Constants
 import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
@@ -110,7 +112,7 @@ fun MarkerCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Fit
             )
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
@@ -169,6 +171,7 @@ fun MarkerCard(
                     spikeWidth = 4.dp,
                     spikeRadius = 32.dp,
                     waveformAlignment = WaveformAlignment.Center,
+                    spikeAnimationSpec = tween(500)
                 )
             }
             Spacer(Modifier.height(16.dp))
