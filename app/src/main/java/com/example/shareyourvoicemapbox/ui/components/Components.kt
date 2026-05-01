@@ -1,5 +1,6 @@
 package com.example.shareyourvoicemapbox.ui.components
 
+import android.text.format.DateUtils
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -45,6 +47,7 @@ import com.linc.audiowaveform.model.WaveformAlignment
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun MarkerCard(
@@ -180,13 +183,20 @@ fun MarkerCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val instant = Instant.parse(createdAt)
+                val instant = Instant.parse(createdAt).toEpochMilli()
+                val now = System.currentTimeMillis()
+                val relativeText = DateUtils.getRelativeTimeSpanString(
+                    instant,
+                    now,
+                    DateUtils.MINUTE_IN_MILLIS
+                ).toString()
 
                 val formatter = DateTimeFormatter
-                    .ofPattern("dd-MM-yyyy")
+                    .ofPattern("d MMMM yyyy")
                     .withZone(ZoneId.systemDefault())
+                    .withLocale(Locale.getDefault())
 
-                Text(formatter.format(instant))
+                Text(relativeText, fontWeight = FontWeight.Light)
 
                 Box(
                     modifier = Modifier
@@ -226,7 +236,7 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
             waveformProgress = 0.7f,
             onWaveformProgressChange = {},
             name = "Саша Косарев",
-            createdAt = "2026-04-26T19:48:26.812081Z",
+            createdAt = "2026-04-25T19:48:26.812081Z",
             audioUrl = "",
             onMenuClick = {}
         )
