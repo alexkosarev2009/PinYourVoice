@@ -89,6 +89,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
@@ -152,9 +153,9 @@ fun MapScreen(
         val window = (view.context as Activity).window
 
 
-//        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         onDispose {
-//            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
             viewModel.closeAddMarkerDialog()
             viewModel.onDeleteRecordingClick()
         }
@@ -429,7 +430,7 @@ fun MapScreen(
                         onLocationChange = { point ->
                             viewModel.updateUserLocation(point)
                         },
-                        onConfirmFineLoactionDialog = {
+                        onConfirmFineLocationDialog = {
                             val intent =
                                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                                     data = Uri.fromParts("package", context.packageName, null)
@@ -496,7 +497,7 @@ fun MapContent(
     animatedScale: Float,
     markerIcon: IconImage,
     onLocationChange: (Point) -> Unit,
-    onConfirmFineLoactionDialog: () -> Unit,
+    onConfirmFineLocationDialog: () -> Unit,
     onDismissFineLocationDialog: () -> Unit,
     offset: Dp,
     systemState: MapSystemState,
@@ -627,7 +628,7 @@ fun MapContent(
         }
         if (state.showFineLocationPermissionDialog) {
             PermissionSettingsDialog(
-                onConfirm = onConfirmFineLoactionDialog,
+                onConfirm = onConfirmFineLocationDialog,
                 onDismiss = onDismissFineLocationDialog,
                 title = "Couldn't fetch your current location",
                 text = "Please allow location access in App Settings.",

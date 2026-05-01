@@ -29,6 +29,7 @@ import java.net.URLDecoder
 import javax.inject.Inject
 
 const val MAX_TITLE_LEN = 30
+const val AMPLITUDES_SIZE: Int = 30
 
 @HiltViewModel
 class EditViewModel @Inject constructor(
@@ -219,7 +220,10 @@ class EditViewModel @Inject constructor(
                     lng = _state.value.lng,
                     imageUrl = Constants.YANDEX_STORAGE + imageKey,
                     audioUrl = Constants.YANDEX_STORAGE + audioKey,
-                    amplitudes = _state.value.amplitudes.toString()
+                    amplitudes = downsampleAmplitudes(
+                        _state.value.amplitudes,
+                        AMPLITUDES_SIZE
+                    ).toString()
                 )
             ).fold(
                 onSuccess = {
@@ -257,6 +261,22 @@ class EditViewModel @Inject constructor(
     fun clearError() {
         _state.update {
             it.copy(error = "")
+        }
+    }
+
+    private fun downsampleAmplitudes(
+        amplitudes: List<Int>,
+        targetSize: Int
+    ): List<Int> {
+        if (amplitudes.size <= targetSize) return amplitudes
+
+        val chunkSize = amplitudes.size.toFloat() / targetSize
+
+        return List(targetSize) { index ->
+            val start = (index * chunkSize).toInt()
+            val end = ((index + 1) * chunkSize).toInt().coerceAtMost(amplitudes.size)
+
+            amplitudes.subList(start, end).maxOrNull() ?: 0
         }
     }
 }

@@ -117,8 +117,13 @@ fun FeedScreen(
                 viewModel.pauseAudio()
             }
             else {
-                scope.launch {
-                    viewModel.getAudioDurationMs(url)
+                if (url != state.currentAudioUrl) {
+                    scope.launch {
+                        viewModel.getAudioDurationMs(url)
+                        viewModel.playAudio(url, id)
+                    }
+                }
+                else {
                     viewModel.playAudio(url, id)
                 }
             }
