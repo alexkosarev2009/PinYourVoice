@@ -12,7 +12,7 @@ class ExoPLayerImpl @Inject constructor(
 ): com.example.shareyourvoicemapbox.domain.player.ExoPlayer {
     private var player: ExoPlayer? = null
 
-    override fun play(url: String) {
+    override fun play(url: String, repeat: Int) {
         if (player == null) {
             player = ExoPlayer.Builder(context).build()
         }
@@ -23,6 +23,7 @@ class ExoPLayerImpl @Inject constructor(
 
         player?.apply {
             setMediaItem(mediaItem)
+            repeatMode = repeat
             prepare()
             play()
         }

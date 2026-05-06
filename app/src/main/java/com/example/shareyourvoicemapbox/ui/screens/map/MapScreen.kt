@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
+import android.text.format.DateUtils
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,6 +22,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,7 +47,10 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardVoice
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NearMe
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -85,6 +90,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -96,6 +102,7 @@ import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
+import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -115,6 +122,7 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.viewport.data.FollowPuckViewportStateOptions
 import kotlinx.coroutines.delay
 import java.net.URLEncoder
+import java.time.Instant
 import java.time.LocalTime
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -158,6 +166,8 @@ fun MapScreen(
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
             viewModel.closeAddMarkerDialog()
             viewModel.onDeleteRecordingClick()
+            viewModel.stopRecording()
+            viewModel.pauseAudio()
         }
     }
     val offset by animateDpAsState(
@@ -196,7 +206,7 @@ fun MapScreen(
         viewModel.actionFlow.collect { action ->
             when (action) {
                 is MapAction.OpenScreen -> {
-                    val encodedPath = URLEncoder.encode(systemState.currentAudioPath, "UTF-8")
+                    val encodedPath = URLEncoder.encode(systemState.currentRecordAudioPath, "UTF-8")
 
                     navHostController.navigate("${SecondaryRoute.EDIT.route}/${encodedPath}?lat=${systemState.userLocation?.latitude()}&lng=${systemState.userLocation?.longitude()}") {
                         launchSingleTop = true
@@ -453,10 +463,21 @@ fun MapScreen(
                         },
                         progress = progress,
                         minDuration = minDuration,
-                        currentMarker = currentMarker,
                         onViewMarkerDismiss = {
                             viewModel.closeViewMarkerDialog()
                         },
+                        currentMarker = currentMarker,
+                        onViewMarkerMenuClick = {
+
+                        },
+                        onViewMarkerPlayClick = { url ->
+                            if (systemState.isPlaying) {
+                                viewModel.pauseAudio()
+                            }
+                            else {
+                                viewModel.playAudio(url)
+                            }
+                        }
                     )
                 }
                 Box(
@@ -506,7 +527,9 @@ fun MapContent(
     progress: Float,
     minDuration: Long,
     onViewMarkerDismiss: () -> Unit,
-    currentMarker: MarkerEntity?
+    currentMarker: MarkerEntity?,
+    onViewMarkerMenuClick: () -> Unit,
+    onViewMarkerPlayClick: (String) -> Unit
 ) {
     Box(
         modifier = modifier,
@@ -613,8 +636,13 @@ fun MapContent(
         if (state.showViewMarkerDialog) {
             if (currentMarker != null) {
                 ViewMarkerDialog(
+                    marker = currentMarker,
                     onDismiss = onViewMarkerDismiss,
-                    marker = currentMarker
+                    onMenuClick = onViewMarkerMenuClick,
+                    onPlayClick = { url ->
+                        onViewMarkerPlayClick(url)
+                    },
+                    isPLaying = systemState.isPlaying
                 )
             }
         }
@@ -766,16 +794,183 @@ fun AddMarkerDialog(
 fun ViewMarkerDialog(
     marker: MarkerEntity,
     onDismiss: () -> Unit,
+    onMenuClick: () -> Unit,
+    onPlayClick: (String) -> Unit,
+    isPLaying: Boolean,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         scrimColor = Color.Transparent,
         ) {
-        AsyncImage(
-            model = "https://storage.yandexcloud.net/pin-your-voice/${marker.imageUrl}",
-            contentDescription = "Image",
-            modifier = Modifier.heightIn(min = 150.dp, max = 250.dp),
-            contentScale = ContentScale.Fit
+//        Column() {
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(12.dp, 0.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                AsyncImage(
+//                    model = marker.authorAvatarUrl,
+//                    contentScale = ContentScale.Crop,
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .size(42.dp)
+//                        .clip(CircleShape)
+//                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+//                )
+//
+//                Spacer(Modifier.width(10.dp))
+//
+//                Column(Modifier.weight(1f)) {
+//                    Text(
+//                        text = marker.authorName,
+//                        style = MaterialTheme.typography.titleMedium
+//                    )
+//                    Text(
+//                        text = "@${marker.authorUsername}",
+//                        style = MaterialTheme.typography.bodySmall,
+//                        color = Color.Gray
+//                    )
+//                }
+//
+//                IconButton(onClick = onMenuClick) {
+//                    Icon(Icons.Default.MoreVert, contentDescription = null)
+//                }
+//            }
+//        }
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp, 0.dp, 16.dp, 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AsyncImage(
+                    model = marker.authorAvatarUrl,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                )
+
+                Spacer(Modifier.width(10.dp))
+
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = marker.authorName,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = "@${marker.authorUsername}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+
+                IconButton(onClick = onMenuClick) {
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
+                }
+            }
+            HorizontalDivider(modifier = Modifier.padding(16.dp, 0.dp))
+            Row(
+                verticalAlignment = Alignment.Top
+            ) {
+                AsyncImage(
+                    model = marker.imageUrl,
+                    contentDescription = "image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .weight(1.5f)
+                        .padding(16.dp, 16.dp, 8.dp, 16.dp)
+                        .heightIn(max = 140.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(0.dp, 16.dp, 8.dp, 16.dp)
+                        .height(140.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Column() {
+                        Text(
+                            text = marker.title,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        Text(
+                            text = marker.location,
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        val instant = Instant.parse(marker.createdAt).toEpochMilli()
+                        val now = System.currentTimeMillis()
+                        val relativeText = DateUtils.getRelativeTimeSpanString(
+                            instant,
+                            now,
+                            DateUtils.MINUTE_IN_MILLIS
+                        ).toString()
+                        Spacer(Modifier.height(4.dp))
+                        Text(relativeText,
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .clickable(
+                                onClick = { onPlayClick(marker.audioUrl) },
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector =
+                                if (!isPLaying) Icons.Default.PlayArrow
+                                else Icons.Default.Pause,
+                            contentDescription = "Play audio",
+                            tint = MaterialTheme.colorScheme.background,
+                            modifier = Modifier.size(36.dp),
+                        )
+                    }
+
+
+
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+}
+
+@Composable
+@Preview
+fun ViewMarkerDialogPreview(modifier: Modifier = Modifier) {
+    AppTheme {
+        ViewMarkerDialog(
+            marker = MarkerEntity(
+                lat = 1.0,
+                lng = 1.0,
+                title = "Moscow City",
+                location = "Moscow, Russia",
+                authorUsername = "k1riesshka",
+                authorAvatarUrl = "https://i.pinimg.com/236x/68/31/12/68311248ba2f6e0ba94ff6da62eac9f6.jpg",
+                imageUrl = "",
+                amplitudes = listOf(1, 2, 6, 15, 4, 7, 12, 24).toString(),
+                authorName = "Саша Косарев",
+                createdAt = "2026-04-25T19:48:26.812081Z",
+                audioUrl = "",
+            ),
+            onDismiss = {},
+            onPlayClick = {},
+            onMenuClick = {},
+            isPLaying = false
         )
     }
 }

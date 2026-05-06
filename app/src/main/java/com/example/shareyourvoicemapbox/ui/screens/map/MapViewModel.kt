@@ -1,12 +1,15 @@
 package com.example.shareyourvoicemapbox.ui.screens.map
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.Player
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.network.NetworkMonitor
+import com.example.shareyourvoicemapbox.domain.player.exo.PauseExoAudioUseCase
+import com.example.shareyourvoicemapbox.domain.player.exo.PlayExoAudioUseCase
+import com.example.shareyourvoicemapbox.domain.player.exo.ResumeExoAudioUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.ReleaseRecorderUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StartRecordingUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StopRecordingUseCase
@@ -33,7 +36,10 @@ class MapViewModel @Inject constructor(
     private val stopRecordingUseCase: StopRecordingUseCase,
     private val releaseRecorderUseCase: ReleaseRecorderUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val networkMonitor: NetworkMonitor
+    private val networkMonitor: NetworkMonitor,
+    private val playExoAudioUseCase: PlayExoAudioUseCase,
+    private val pauseExoAudioUseCase: PauseExoAudioUseCase,
+    private val resumeExoAudioUseCase: ResumeExoAudioUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<MapState> = MutableStateFlow(MapState.Content())
@@ -131,7 +137,7 @@ class MapViewModel @Inject constructor(
         _systemState.update {
             it.copy(
                 isRecording = false,
-                currentAudioPath = if (isValid) path else null,
+                currentRecordAudioPath = if (isValid) path else null,
                 recordTimeMs = duration
             )
         }
@@ -169,7 +175,7 @@ class MapViewModel @Inject constructor(
             else state
         }
         _systemState.update { state ->
-            state.copy(currentAudioPath = null)
+            state.copy(currentRecordAudioPath = null)
         }
     }
     fun openMicPermissionDialog() {
@@ -230,7 +236,7 @@ class MapViewModel @Inject constructor(
     fun onDeleteRecordingClick() {
         _systemState.update {
             it.copy(
-                currentAudioPath = null,
+                currentRecordAudioPath = null,
                 recordTimeMs = 0L
             )
         }
@@ -255,6 +261,13 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             _currentMarker.emit(null)
         }
+        _systemState.update {
+            pauseAudio()
+            it.copy(
+                isPlaying = false,
+                currentPlayAudioPath = null
+            )
+        }
         _uiState.update { state ->
             if (state is MapState.Content) {
                 state.copy(
@@ -262,6 +275,38 @@ class MapViewModel @Inject constructor(
                 )
             }
             else state
+        }
+    }
+
+    fun playAudio(url: String) {
+        if (_systemState.value.currentPlayAudioPath != url) {
+            pauseAudio()
+            playExoAudioUseCase(url, repeatMode = Player.REPEAT_MODE_ONE)
+            _systemState.update {
+                it.copy(isPlaying = true, currentPlayAudioPath = url)
+            }
+        }
+        else {
+            if (_systemState.value.isPlaying) {
+                pauseAudio()
+                _systemState.update {
+                    it.copy(isPlaying = false)
+                }
+            } else {
+                resumeExoAudioUseCase()
+                _systemState.update {
+                    it.copy(isPlaying = true)
+                }
+            }
+        }
+    }
+
+    fun pauseAudio() {
+        if (_systemState.value.isPlaying) {
+            pauseExoAudioUseCase()
+            _systemState.update {
+                it.copy(isPlaying = false)
+            }
         }
     }
 

@@ -6,7 +6,10 @@ import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 data class MapSystemState(
     val isRecording: Boolean = false,
     val recordTimeMs: Long = 0L,
-    val currentAudioPath: String? = null,
+    val currentRecordAudioPath: String? = null,
+
+    val isPlaying: Boolean = false,
+    val currentPlayAudioPath: String? = null,
 
     val hasLocationPermission: Boolean = false,
     val userLocation: Point? = null,
