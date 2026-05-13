@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.shareyourvoicemapbox.data.constants.Constants
 import com.example.shareyourvoicemapbox.data.dto.AuthResponseDTO
 import com.example.shareyourvoicemapbox.data.dto.UserLoginDTO
+import com.example.shareyourvoicemapbox.data.dto.UserRegisterDTO
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -31,6 +32,18 @@ class AuthNetworkDataSource @Inject constructor(
                 error("Auth error: ${result.status}")
             }
             tokenStorage.save(result.body<AuthResponseDTO>().token)
+            true
+        }
+    }
+    suspend fun register(dto: UserRegisterDTO): Result<Boolean> = withContext(Dispatchers.IO) {
+        runCatching {
+            val result = client.post("${Constants.HOST}/api/users") {
+                contentType(ContentType.Application.Json)
+                setBody(dto)
+            }
+            if (result.status != HttpStatusCode.Created) {
+                error("Register error: ${result.status}")
+            }
             true
         }
     }

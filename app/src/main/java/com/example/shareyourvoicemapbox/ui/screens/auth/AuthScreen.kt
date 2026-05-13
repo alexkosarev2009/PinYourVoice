@@ -6,8 +6,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +19,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AlternateEmail
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SecondaryTabRow
@@ -75,8 +82,27 @@ fun AuthScreen(
         onSignInClick = {
             viewModel.onSignInClick()
         },
-        onSignUpClick = {
-            viewModel.onSignUpClick()
+        onSignUpClick = { viewModel.onSignUpClick() },
+        onEmailChange = { email ->
+            viewModel.onChangeRegisterInput(email, state.registerPassword)
+        },
+        onRegisterPasswordChange = { password ->
+            viewModel.onChangeRegisterInput(state.email, password)
+        },
+        onGoBackClick = {
+            viewModel.goBack()
+        },
+        onRegisterNameChange = { name ->
+            viewModel.onChangeNameInput(state.registerUsername, name)
+        },
+        onRegisterUsernameChange = { username ->
+            viewModel.onChangeNameInput(username, state.registerName)
+        },
+        onRegisterClick = {
+            viewModel.onRegisterClick()
+        },
+        onFinishRegisterClick = {
+            viewModel.finishRegister()
         }
     )
 }
@@ -91,6 +117,13 @@ fun AuthContent(
     onLoginClick: () -> Unit,
     onSignInClick: () -> Unit,
     onSignUpClick: () -> Unit,
+    onEmailChange: (String) -> Unit,
+    onRegisterPasswordChange: (String) -> Unit,
+    onRegisterUsernameChange: (String) -> Unit,
+    onRegisterNameChange: (String) -> Unit,
+    onGoBackClick: () -> Unit,
+    onRegisterClick: () -> Unit,
+    onFinishRegisterClick: () -> Unit,
 ) {
 
     Column(
@@ -200,7 +233,8 @@ fun AuthContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AnimatedVisibility(
-                    visible = state.isSignUpSelected,
+                    visible = state.isSignUpSelected
+                            && state.registerStep == 1,
                     enter = fadeIn(
                         animationSpec = tween(500),
                     ),
@@ -212,32 +246,20 @@ fun AuthContent(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         OutlinedTextField(
-                            value = state.username,
-                            onValueChange = onLoginChange,
+                            value = state.email,
+                            onValueChange = onEmailChange,
                             label = {
-                                Text("Login")
+                                Text("Email")
                             },
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
                             isError = state.error.isNotEmpty(),
                         )
                         Spacer(Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = state.username,
-                            onValueChange = onLoginChange,
-                            label = {
-                                Text("Login")
-                            },
-                            shape = RoundedCornerShape(16.dp),
-                            singleLine = true,
-                            isError = state.error.isNotEmpty(),
-                        )
-
-                        Spacer(Modifier.height(8.dp))
 
                         OutlinedTextField(
-                            value = state.password,
-                            onValueChange = onPasswordChange,
+                            value = state.registerPassword,
+                            onValueChange = onRegisterPasswordChange,
                             label = {
                                 Text("Password")
                             },
@@ -256,16 +278,105 @@ fun AuthContent(
                         )
                         Spacer(Modifier.height(8.dp))
                         Button(
-                            onClick = onLoginClick,
-                            enabled = state.isEnableLogin,
+                            onClick = onRegisterClick,
+                            enabled = state.isEnableRegister,
                         ) {
-                            Text("Sign in")
+                            Text("Sign up")
+                        }
+                    }
+                }
+            }
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AnimatedVisibility(
+                    visible = state.isSignUpSelected
+                            && state.registerStep == 2,
+                    enter = fadeIn(
+                        animationSpec = tween(500),
+                    ),
+                    exit = fadeOut(
+                        animationSpec = tween(500),
+                    ),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        OutlinedTextField(
+                            value = state.registerUsername,
+                            onValueChange = onRegisterUsernameChange,
+                            label = {
+                                Text("Username")
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.AlternateEmail,
+                                    contentDescription = "username"
+                                )
+                            },
+                            shape = RoundedCornerShape(16.dp),
+                            singleLine = true,
+                            isError = state.error.isNotEmpty(),
+                        )
+                        Spacer(Modifier.height(8.dp))
+
+                        OutlinedTextField(
+                            value = state.registerName,
+                            onValueChange = onRegisterNameChange,
+                            label = {
+                                Text("Full name")
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "full name"
+                                )
+                            },
+                            shape = RoundedCornerShape(16.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                            ),
+                            isError = state.error.isNotEmpty(),
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = state.error,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Button(
+                                onClick = onGoBackClick,
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                ),
+                            ) {
+                                Text("Back")
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            Button(
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .weight(1f),
+                                onClick = onFinishRegisterClick,
+                                enabled = state.isEnableRegister,
+                            ) {
+                                Text("Register")
+                            }
                         }
                     }
                 }
             }
         }
-
     }
 }
 
@@ -283,9 +394,16 @@ fun AuthScreenPreview(modifier: Modifier = Modifier) {
             },
             onPasswordChange = { password ->
             },
-            onSignUpClick = {},
+            onLoginClick = {},
             onSignInClick = {},
-            onLoginClick = {}
+            onSignUpClick = {},
+            onEmailChange = {},
+            onRegisterPasswordChange = {},
+            onRegisterUsernameChange = {},
+            onRegisterNameChange = {},
+            onGoBackClick = {},
+            onRegisterClick = {},
+            onFinishRegisterClick = {}
         )
     }
 }
