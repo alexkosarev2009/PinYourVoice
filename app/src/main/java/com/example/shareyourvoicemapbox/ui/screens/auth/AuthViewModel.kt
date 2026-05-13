@@ -130,7 +130,6 @@ class AuthViewModel @Inject constructor(
                     username = _uiState.value.registerUsername,
                     email = _uiState.value.email,
                     password = _uiState.value.registerPassword,
-                    avatarUrl = "https://storage.yandexcloud.net/pin-your-voice/images/default_avatar.jpg"
                 )
             ).fold(
                 onSuccess = {

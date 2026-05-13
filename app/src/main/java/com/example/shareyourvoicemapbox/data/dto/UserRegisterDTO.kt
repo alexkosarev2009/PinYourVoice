@@ -13,8 +13,4 @@ data class UserRegisterDTO(
     val email: String,
     @SerialName("password")
     val password: String,
-    @SerialName("bio")
-    val bio: String,
-    @SerialName("avatarUrl")
-    val avatarUrl: String
 )
