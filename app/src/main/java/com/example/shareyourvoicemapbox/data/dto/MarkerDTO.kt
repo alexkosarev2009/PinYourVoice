@@ -35,4 +35,7 @@ data class MarkerDTO(
 
     @SerialName("amplitudes")
     val amplitudes: String?,
+
+    @SerialName("icon")
+    val icon: Int?,
 )

@@ -170,6 +170,7 @@ fun FeedContent(
     ) {
         Column(
             modifier = Modifier.statusBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 modifier = Modifier

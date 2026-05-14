@@ -22,7 +22,27 @@ class MarkerRepository @Inject constructor(
                     authorAvatarUrl = markerDTO.authorAvatarUrl ?: return@mapNotNull null,
                     createdAt = markerDTO.createdAt ?: return@mapNotNull null,
                     amplitudes = markerDTO.amplitudes ?: return@mapNotNull null,
+                    icon = markerDTO.icon ?: return@mapNotNull null,
                 )
+            }
+        }
+    }
+    suspend fun getPublicMarkers(): Result<List<MarkerEntity>> {
+        return markerDataSource.getPublicMarkers().map { markerDTOS ->
+            markerDTOS.mapNotNull { markerDTO ->
+                MarkerEntity(
+                    title = markerDTO.title ?: return@mapNotNull null,
+                    lat = markerDTO.lat ?: return@mapNotNull null,
+                    lng = markerDTO.lng ?: return@mapNotNull null,
+                    imageUrl = markerDTO.imageUrl,
+                    audioUrl = markerDTO.audioUrl ?: return@mapNotNull null,
+                    authorName = markerDTO.authorName ?: return@mapNotNull null,
+                    authorUsername = markerDTO.authorUsername ?: return@mapNotNull null,
+                    authorAvatarUrl = markerDTO.authorAvatarUrl ?: return@mapNotNull null,
+                    createdAt = markerDTO.createdAt ?: return@mapNotNull null,
+                    amplitudes = markerDTO.amplitudes ?: return@mapNotNull null,
+                    icon = markerDTO.icon ?: return@mapNotNull null,
+                    )
             }
         }
     }
@@ -40,7 +60,8 @@ class MarkerRepository @Inject constructor(
                     authorAvatarUrl = markerDTO.authorAvatarUrl ?: return@mapNotNull null,
                     createdAt = markerDTO.createdAt ?: return@mapNotNull null,
                     amplitudes = markerDTO.amplitudes ?: return@mapNotNull null,
-                )
+                    icon = markerDTO.icon ?: return@mapNotNull null,
+                    )
             }
         }
     }
@@ -56,8 +77,9 @@ class MarkerRepository @Inject constructor(
                 authorUsername = markerDTO.authorUsername ?: error("Invalid MarkerDTO from server"),
                 authorAvatarUrl = markerDTO.authorAvatarUrl ?: error("Invalid MarkerDTO from server"),
                 createdAt = markerDTO.createdAt ?: error("Invalid MarkerDTO from server"),
-                amplitudes = markerDTO.amplitudes ?: error("Invalid MarkerDTO from server")
-            )
+                amplitudes = markerDTO.amplitudes ?: error("Invalid MarkerDTO from server"),
+                icon = markerDTO.icon ?: error("Invalid MarkerDTO from server"),
+                )
         }
     }
 }

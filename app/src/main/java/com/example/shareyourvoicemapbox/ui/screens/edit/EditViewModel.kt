@@ -3,6 +3,7 @@ package com.example.shareyourvoicemapbox.ui.screens.edit
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -223,10 +224,12 @@ class EditViewModel @Inject constructor(
                     amplitudes = downsampleAmplitudes(
                         _state.value.amplitudes,
                         AMPLITUDES_SIZE
-                    ).toString()
+                    ).toString(),
+                    icon = _state.value.chosenMarker
                 )
             ).fold(
                 onSuccess = {
+                    Log.d("MARKER", _state.value.chosenMarker.toString())
                     _state.update {
                         it.copy(isLoading = false,
                              isDone = true)
@@ -277,6 +280,12 @@ class EditViewModel @Inject constructor(
             val end = ((index + 1) * chunkSize).toInt().coerceAtMost(amplitudes.size)
 
             amplitudes.subList(start, end).maxOrNull() ?: 0
+        }
+    }
+
+    fun chooseMarker(markerIconId: Int) {
+        _state.update {
+            it.copy(chosenMarker = markerIconId)
         }
     }
 }

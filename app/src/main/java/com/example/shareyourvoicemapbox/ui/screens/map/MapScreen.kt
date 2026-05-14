@@ -117,6 +117,7 @@ import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import com.mapbox.maps.extension.compose.style.standard.LightPresetValue
 import com.mapbox.maps.extension.compose.style.standard.MapboxStandardStyle
 import com.mapbox.maps.extension.compose.style.standard.StandardStyleConfigurationState
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.viewport.data.FollowPuckViewportStateOptions
@@ -182,7 +183,7 @@ fun MapScreen(
     val markerIcon = rememberIconImage(
         key = "red-marker",
         painter =
-            painterResource(id = R.drawable.red_marker),
+            painterResource(id = R.drawable.bear_marker),
     )
 
     val context = LocalContext.current
@@ -436,7 +437,6 @@ fun MapScreen(
                             viewModel.onRecordRelease()
                         },
                         animatedScale = animatedScale,
-                        markerIcon = markerIcon,
                         onLocationChange = { point ->
                             viewModel.updateUserLocation(point)
                         },
@@ -516,7 +516,6 @@ fun MapContent(
     onRecordClick: () -> Unit,
     onRecordRelease: () -> Unit,
     animatedScale: Float,
-    markerIcon: IconImage,
     onLocationChange: (Point) -> Unit,
     onConfirmFineLocationDialog: () -> Unit,
     onDismissFineLocationDialog: () -> Unit,
@@ -583,9 +582,20 @@ fun MapContent(
                 }
                 state.markers.forEach { marker ->
                     val point = Point.fromLngLat(marker.lng, marker.lat)
+                    val markerIcon = rememberIconImage(
+                        key = "red-marker",
+                        painter =
+                            painterResource(id = when(marker.icon) {
+                                2 -> R.drawable.bear_marker
+                                3 -> R.drawable.demon_marker
+                                else -> R.drawable.red_marker
+                            }),
+                    )
+                    PointAnnotationOptions
                     PointAnnotation(
                         point = point,
                     ) {
+
                         iconImage = markerIcon
                         interactionsState.onClicked {
                             systemState.mapViewportState.flyTo(
@@ -966,6 +976,7 @@ fun ViewMarkerDialogPreview(modifier: Modifier = Modifier) {
                 authorName = "Саша Косарев",
                 createdAt = "2026-04-25T19:48:26.812081Z",
                 audioUrl = "",
+                icon = 1
             ),
             onDismiss = {},
             onPlayClick = {},

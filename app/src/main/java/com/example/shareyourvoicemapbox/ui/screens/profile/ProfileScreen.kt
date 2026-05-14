@@ -139,7 +139,9 @@ fun ProfileScreen(
                             onClick = {
                                 viewModel.onMenuClick()
                                 navHostController.navigate(SecondaryRoute.AUTH.route) {
-                                    popUpTo(0)
+                                    popUpTo(0) {
+                                        inclusive = true
+                                    }
                                 }
                             },
                         ) {

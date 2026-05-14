@@ -22,5 +22,8 @@ data class CreateMarkerDTO(
     val audioUrl: String?,
 
     @SerialName("amplitudes")
-    val amplitudes: String?
+    val amplitudes: String?,
+
+    @SerialName("icon")
+    val icon: Int?,
     )

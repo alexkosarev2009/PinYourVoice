@@ -5,8 +5,12 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -60,20 +64,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,6 +91,7 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
@@ -214,6 +225,15 @@ fun EditScreen(
                     )
                 }
             },
+            onRedMarkerClick = {
+                viewModel.chooseMarker(1)
+            },
+            onBearMarkerClick = {
+                viewModel.chooseMarker(2)
+            },
+            onDemonMarkerClick = {
+                viewModel.chooseMarker(3)
+            },
             imageScale = imageScale,
         )
     }
@@ -254,6 +274,12 @@ fun EditContent(
     maxDragPx: Float,
     onDrag: (PointerInputChange, Offset) -> Unit,
     onDragEnd: () -> Unit,
+    onRedMarkerClick: () -> Unit,
+    onBearMarkerClick: () -> Unit,
+    onDemonMarkerClick: () -> Unit,
+
+
+
     imageScale: Animatable<Float, AnimationVector1D>,
 ) {
     Column(
@@ -455,6 +481,122 @@ fun EditContent(
                 )
             }
         }
+        Spacer(Modifier.height(24.dp))
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Box(
+                Modifier.fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.secondaryContainer
+                            )
+                        )
+                    )
+            ) {
+                Column() {
+                    Text(
+                        "Choose your style...",
+                        modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontStyle = FontStyle.Italic
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        val (redElevation, redScale) =
+                            markerAnimation(state.chosenMarker, 1)
+
+                        val (bearElevation, bearScale) =
+                            markerAnimation(state.chosenMarker, 2)
+
+                        val (demonElevation, demonScale) =
+                            markerAnimation(state.chosenMarker, 3)
+                        ElevatedCard(
+                            modifier = Modifier.size(80.dp)
+                                .clickable(
+                                    onClick = onRedMarkerClick
+                                )
+                                .graphicsLayer {
+                                    scaleY = redScale
+                                    scaleX = redScale
+                                }.border(
+                                    width = if (state.chosenMarker == 1) 2.dp else 0.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
+                            elevation = CardDefaults.cardElevation(redElevation)
+                            ) {
+                            Box(
+                                Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.red_marker),
+                                    contentDescription = "",
+                                )
+                            }
+                        }
+                        ElevatedCard(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clickable(onClick = onBearMarkerClick)
+                                .graphicsLayer {
+                                    scaleY = bearScale
+                                    scaleX = bearScale
+                                }.border(
+                                    width = if (state.chosenMarker == 2) 2.dp else 0.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
+                            elevation = CardDefaults.cardElevation(bearElevation)
+                            ) {
+                            Box(
+                                Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.bear_marker),
+                                    contentDescription = "",
+                                )
+                            }
+                        }
+                        ElevatedCard(
+                            modifier = Modifier.size(80.dp).clickable(
+                                onClick = onDemonMarkerClick
+                            ).graphicsLayer {
+                                scaleY = demonScale
+                                scaleX = demonScale
+                            }.border(
+                                width = if (state.chosenMarker == 3) 2.dp else 0.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(12.dp)
+                            ),
+                            elevation = CardDefaults.cardElevation(demonElevation)
+
+
+                        ) {
+                            Box(
+                                Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.demon_marker),
+                                    contentDescription = "",
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -542,8 +684,30 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                 onDrag = { change, dragAmount -> },
                 onDragEnd = {},
                 maxDragPx = 250f,
+                onRedMarkerClick = {},
+                onDemonMarkerClick = {},
+                onBearMarkerClick = {},
                 imageScale = remember { Animatable(1f) },
             )
         }
     }
+}
+
+@Composable
+fun markerAnimation(
+    chosen: Int,
+    current: Int
+): Pair<Dp, Float> {
+
+    val elevation by animateDpAsState(
+        targetValue = if (chosen == current) 8.dp else 2.dp,
+        label = ""
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = if (chosen == current) 1.1f else 1f,
+        label = ""
+    )
+
+    return elevation to scale
 }

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
+import com.example.shareyourvoicemapbox.domain.markers.GetPublicMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.GetCurrentExoPositionUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.PauseExoAudioUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.PlayExoAudioUseCase
@@ -28,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val getMarkersUseCase: GetMarkersUseCase,
+    private val getPublicMarkersUseCase: GetPublicMarkersUseCase,
     private val playExoAudioUseCase: PlayExoAudioUseCase,
     private val resumeExoAudioUseCase: ResumeExoAudioUseCase,
     private val pauseExoAudioUseCase: PauseExoAudioUseCase,
@@ -53,7 +55,7 @@ class FeedViewModel @Inject constructor(
             it.copy(isRefreshing = true)
         }
         viewModelScope.launch {
-            getMarkersUseCase().fold(
+            getPublicMarkersUseCase().fold(
                 onSuccess = { data ->
                     _uiState.update {
                         it.copy(markers = data, isRefreshing = false)
@@ -72,11 +74,13 @@ class FeedViewModel @Inject constructor(
         _uiState.update {
             it.copy(isViewingPublic = true)
         }
+        getData()
     }
     fun viewFriends() {
         _uiState.update {
             it.copy(isViewingPublic = false)
         }
+        getData()
     }
 
     fun playAudio(url: String, id: Int) {

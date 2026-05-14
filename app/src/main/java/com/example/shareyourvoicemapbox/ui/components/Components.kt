@@ -433,6 +433,7 @@ fun ShortMarkerCardPreview() {
                 authorName = "Саша Косарев",
                 createdAt = "2026-04-25T19:48:26.812081Z",
                 audioUrl = "",
+                icon = 1
             ),
             onMenuClick = {},
             waveformProgress = 0.7f,
