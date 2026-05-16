@@ -8,6 +8,7 @@ import com.example.shareyourvoicemapbox.domain.entities.UserEntity
 import com.example.shareyourvoicemapbox.domain.location.ReverseGeocodeUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersByAuthorIdUseCase
 import com.example.shareyourvoicemapbox.domain.users.GetMeUseCase
+import com.example.shareyourvoicemapbox.domain.users.GetMyFriendsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +21,8 @@ class ProfileViewModel @Inject constructor(
     private val logOutUseCase: LogOutUseCase,
     private val getMeUseCase: GetMeUseCase,
     private val getMarkersByAuthorIdUseCase: GetMarkersByAuthorIdUseCase,
-    private val reverseGeocodeUseCase: ReverseGeocodeUseCase
+    private val reverseGeocodeUseCase: ReverseGeocodeUseCase,
+    private val getMyFriendsUseCase: GetMyFriendsUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileState())
@@ -70,6 +72,18 @@ class ProfileViewModel @Inject constructor(
                         onSuccess = { markers ->
                             _uiState.update {
                                 it.copy(markers = markers)
+                            }
+                        }
+                    )
+                    getMyFriendsUseCase().fold(
+                        onSuccess = { friends ->
+                            _uiState.update {
+                                it.copy(friends = friends)
+                            }
+                        },
+                        onFailure = { error ->
+                            _uiState.update {
+                                it.copy(error = error.message ?: "")
                             }
                         }
                     )

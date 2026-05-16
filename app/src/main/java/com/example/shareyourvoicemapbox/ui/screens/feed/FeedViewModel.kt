@@ -4,6 +4,8 @@ import android.media.MediaMetadataRetriever
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
+import com.example.shareyourvoicemapbox.domain.markers.GetMarkersByAuthorIdUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetPublicMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.GetCurrentExoPositionUseCase
@@ -11,6 +13,7 @@ import com.example.shareyourvoicemapbox.domain.player.exo.PauseExoAudioUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.PlayExoAudioUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.ResumeExoAudioUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.SeekExoToUseCase
+import com.example.shareyourvoicemapbox.domain.users.GetMyFriendsUseCase
 import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +38,8 @@ class FeedViewModel @Inject constructor(
     private val pauseExoAudioUseCase: PauseExoAudioUseCase,
     private val getCurrentExoPositionUseCase: GetCurrentExoPositionUseCase,
     private val seekExoToUseCase: SeekExoToUseCase,
+    private val getMyFriendsUseCase: GetMyFriendsUseCase,
+    private val getMarkersByAuthorIdUseCase: GetMarkersByAuthorIdUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedState())
@@ -64,6 +69,41 @@ class FeedViewModel @Inject constructor(
                 onFailure = { error ->
                     _uiState.update {
                         it.copy(error = error.message ?: "", isRefreshing = false)
+                    }
+                }
+            )
+        }
+    }
+    fun getFriendsMarker() {
+        _uiState.update {
+            it.copy(isRefreshing = true)
+        }
+        viewModelScope.launch {
+            getMyFriendsUseCase().fold(
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(error = error.message ?: "")
+                    }
+                },
+                onSuccess = { friends ->
+                    val friendMarkers = mutableListOf<MarkerEntity>()
+                    for (friend in friends) {
+                        getMarkersByAuthorIdUseCase(friend.id).fold(
+                            onFailure = { error1 ->
+                                _uiState.update {
+                                    it.copy(error = error1.message ?: "")
+                                }
+                            },
+                            onSuccess = { markers ->
+                                friendMarkers.addAll(markers)
+                            }
+                        )
+                    }
+                    _uiState.update {
+                        it.copy(
+                            markers = friendMarkers,
+                            isRefreshing = false
+                        )
                     }
                 }
             )

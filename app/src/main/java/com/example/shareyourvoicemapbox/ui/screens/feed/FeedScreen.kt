@@ -93,6 +93,17 @@ fun FeedScreen(
                 }
             }
     }
+
+    LaunchedEffect(state.isViewingPublic) {
+        viewModel.pauseAudio()
+        if (state.isViewingPublic) {
+            viewModel.getData()
+        }
+        else {
+            viewModel.getFriendsMarker()
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             viewModel.pauseAudio()

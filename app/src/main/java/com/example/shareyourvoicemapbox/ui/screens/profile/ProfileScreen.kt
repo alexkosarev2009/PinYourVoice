@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PeopleAlt
@@ -165,7 +166,11 @@ fun ProfileScreen(
                             )
                         }
                     },
-                )
+                    onNameIconClick = {},
+                ) {
+                    Icon(imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit")
+                }
             }
             stickyHeader {
                 Row(
@@ -243,6 +248,8 @@ fun ProfileContent(
     modifier: Modifier = Modifier,
     state: ProfileState,
     onMarkersClick: () -> Unit,
+    onNameIconClick: () -> Unit = {},
+    content: @Composable (() -> Unit) = {},
     ) {
     Column(
         modifier = modifier
@@ -276,7 +283,16 @@ fun ProfileContent(
                 }
             }
             Spacer(Modifier.height(8.dp))
-            Text(state.fullName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(28.dp, 0.dp, 0.dp, 0.dp)
+            ) {
+                Text(state.fullName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                IconButton(
+                    onClick = onNameIconClick,
+                    content = content
+                )
+            }
             Text("@${state.userName}", fontSize = 16.sp)
         }
         Spacer(Modifier.height(16.dp))
@@ -347,7 +363,7 @@ fun ProfileContent(
                             .align(Alignment.CenterStart)
                             .padding(8.dp)
                     ) {
-                        Text("8", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Text(state.friends.size.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         Text("Friends", fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
                     }
                 }

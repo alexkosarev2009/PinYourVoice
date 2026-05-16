@@ -33,6 +33,33 @@ class UserRepository @Inject constructor(
             )
         }
     }
+    suspend fun getMyFriends(): Result<List<UserEntity>> {
+        return userInfoDataSource.getMyFriends().map { dTOS ->
+            dTOS.mapNotNull { userDTO ->
+                UserEntity(
+                    id = userDTO.id ?: return@mapNotNull null,
+                    name = userDTO.name ?: return@mapNotNull null,
+                    username = userDTO.username ?: return@mapNotNull null,
+                    bio = userDTO.bio ?: "Empty bio",
+                    avatarUrl = userDTO.avatarUrl ?: "default/avatar.jpg",
+                )
+            }
+        }
+    }
+    suspend fun getFriendsByUserId(userId: Long): Result<List<UserEntity>> {
+        return userInfoDataSource.getFriendsByUserId(userId).map { dTOS ->
+            dTOS.mapNotNull { userDTO ->
+                UserEntity(
+                    id = userDTO.id ?: return@mapNotNull null,
+                    name = userDTO.name ?: return@mapNotNull null,
+                    username = userDTO.username ?: return@mapNotNull null,
+                    bio = userDTO.bio ?: "Empty bio",
+                    avatarUrl = userDTO.avatarUrl ?: "default/avatar.jpg",
+                )
+            }
+        }
+    }
+
     suspend fun getUserByUsername(username: String): Result<UserEntity> {
         return userInfoDataSource.getUserByUsername(username).map { userDTO ->
             UserEntity(

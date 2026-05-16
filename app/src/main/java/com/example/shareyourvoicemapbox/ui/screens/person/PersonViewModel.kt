@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.domain.entities.UserEntity
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersByAuthorIdUseCase
+import com.example.shareyourvoicemapbox.domain.users.GetFriendsByUserId
 import com.example.shareyourvoicemapbox.domain.users.GetUserByIdUseCase
 import com.example.shareyourvoicemapbox.domain.users.GetUserByUsername
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileState
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class PersonViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getUserByUsername: GetUserByUsername,
-    private val getMarkersByAuthorIdUseCase: GetMarkersByAuthorIdUseCase
+    private val getMarkersByAuthorIdUseCase: GetMarkersByAuthorIdUseCase,
+    private val getFriendsByUserId: GetFriendsByUserId,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ProfileState())
     val state = _state.asStateFlow()
@@ -52,6 +54,18 @@ class PersonViewModel @Inject constructor(
                                 markers = emptyList(),
                                 isRefreshing = false
                             )
+                        )
+                        getFriendsByUserId(user.id).fold(
+                            onSuccess = { friends ->
+                                _state.update {
+                                    it.copy(friends = friends)
+                                }
+                            },
+                            onFailure = { error ->
+                                _state.update {
+                                    it.copy(error = error.message ?: "")
+                                }
+                            }
                         )
                         getMarkersByAuthorIdUseCase(user.id).fold(
                             onFailure = { error ->

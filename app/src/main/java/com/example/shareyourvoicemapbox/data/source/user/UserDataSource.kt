@@ -32,7 +32,7 @@ class UserDataSource @Inject constructor(
     }
     suspend fun getUserById(id: Long): Result<UserDTO> = withContext(Dispatchers.IO) {
         runCatching {
-            val result = client.get("${HOST}/api/users/{$id}") {
+            val result = client.get("${HOST}/api/users/$id") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
             }
             if (result.status != HttpStatusCode.OK) {
@@ -63,6 +63,28 @@ class UserDataSource @Inject constructor(
             }
             val entity = result.body<UserDTO>()
             entity
+        }
+    }
+    suspend fun getMyFriends(): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val result = client.get("${HOST}/api/friends") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+            }
+            if (result.status != HttpStatusCode.OK) {
+                error("Status: ${result.status}")
+            }
+            result.body()
+        }
+    }
+    suspend fun getFriendsByUserId(userId: Long): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val result = client.get("${HOST}/api/friends/$userId") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+            }
+            if (result.status != HttpStatusCode.OK) {
+                error("Status: ${result.status}")
+            }
+            result.body()
         }
     }
 }
