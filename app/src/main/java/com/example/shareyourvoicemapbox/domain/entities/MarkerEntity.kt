@@ -1,6 +1,7 @@
 package com.example.shareyourvoicemapbox.domain.entities
 
 data class MarkerEntity(
+    val id: Long = -1L,
     val title: String,
     val location: String = "",
     val lat: Double,

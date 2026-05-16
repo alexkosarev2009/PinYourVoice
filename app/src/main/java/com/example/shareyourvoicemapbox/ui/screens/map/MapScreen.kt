@@ -158,6 +158,20 @@ fun MapScreen(
     )
     val view = LocalView.current
 
+    LaunchedEffect(Unit) {
+        viewModel.checkMarker()
+    }
+    LaunchedEffect(currentMarker) {
+        currentMarker?.let { marker ->
+            systemState.mapViewportState.flyTo(
+                cameraOptions {
+                    center(Point.fromLngLat(marker.lng, marker.lat))
+                    zoom(12.0)
+                }
+            )
+        }
+    }
+
     DisposableEffect(Unit) {
         val window = (view.context as Activity).window
 
@@ -169,6 +183,7 @@ fun MapScreen(
             viewModel.onDeleteRecordingClick()
             viewModel.stopRecording()
             viewModel.pauseAudio()
+            viewModel.clearMarker()
         }
     }
     val offset by animateDpAsState(
@@ -216,18 +231,6 @@ fun MapScreen(
 
                 }
             }
-        }
-    }
-    LaunchedEffect(Unit) {
-        val point = systemState.userLocation ?: return@LaunchedEffect
-
-        if (systemState.hasCenteredUser) {
-            systemState.mapViewportState.flyTo(
-                cameraOptions {
-                    center(point)
-                    zoom(14.0)
-                },
-            )
         }
     }
 
@@ -591,7 +594,6 @@ fun MapContent(
                                 else -> R.drawable.red_marker
                             }),
                     )
-                    PointAnnotationOptions
                     PointAnnotation(
                         point = point,
                     ) {

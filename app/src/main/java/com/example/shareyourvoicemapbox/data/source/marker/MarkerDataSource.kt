@@ -4,6 +4,7 @@ import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.data.dto.MarkerDTO
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
+import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -67,6 +68,19 @@ class MarkerDataSource @Inject constructor(
                 setBody(dto)
             }
             if (response.status != HttpStatusCode.Created) {
+                error("Error: ${response.status}")
+            }
+            response.body<MarkerDTO>()
+        }
+    }
+
+    suspend fun getMarkerById(id: Long): Result<MarkerDTO> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = client.get("${HOST}/api/markers/$id") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                contentType(ContentType.Application.Json)
+            }
+            if (response.status != HttpStatusCode.OK) {
                 error("Error: ${response.status}")
             }
             response.body<MarkerDTO>()

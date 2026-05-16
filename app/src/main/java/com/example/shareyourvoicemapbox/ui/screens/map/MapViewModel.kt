@@ -1,10 +1,12 @@
 package com.example.shareyourvoicemapbox.ui.screens.map
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
+import com.example.shareyourvoicemapbox.domain.markers.GetMarkerByIdUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.network.NetworkMonitor
 import com.example.shareyourvoicemapbox.domain.player.exo.PauseExoAudioUseCase
@@ -40,6 +42,7 @@ class MapViewModel @Inject constructor(
     private val playExoAudioUseCase: PlayExoAudioUseCase,
     private val pauseExoAudioUseCase: PauseExoAudioUseCase,
     private val resumeExoAudioUseCase: ResumeExoAudioUseCase,
+    private val getMarkerByIdUseCase: GetMarkerByIdUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<MapState> = MutableStateFlow(MapState.Content())
@@ -307,6 +310,47 @@ class MapViewModel @Inject constructor(
             _systemState.update {
                 it.copy(isPlaying = false)
             }
+        }
+    }
+
+    fun checkMarker() {
+        val markerId = savedStateHandle.get<String?>("markerId")
+        Log.d("MARKER", markerId.toString())
+        if (markerId != null && markerId.isNotEmpty()) {
+            viewModelScope.launch {
+                getMarkerByIdUseCase(markerId.toLong()).fold(
+                    onSuccess = { marker ->
+
+                        _currentMarker.emit(marker)
+                        _uiState.update { state ->
+                            if (state is MapState.Content) {
+                                state.copy(
+                                    showViewMarkerDialog = true,
+                                )
+                            }
+                            else state
+                        }
+                    },
+                    onFailure = { error ->
+                        _uiState.update { state ->
+                            if (state is MapState.Content) {
+                                state.copy(
+                                    error = error.message ?: "",
+                                )
+                            }
+                            else state
+                        }
+                    }
+                )
+
+            }
+        }
+    }
+
+    fun clearMarker() {
+        viewModelScope.launch {
+            _currentMarker.emit(null)
+            savedStateHandle.remove<String>("markerId")
         }
     }
 

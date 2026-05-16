@@ -12,6 +12,7 @@ class MarkerRepository @Inject constructor(
         return markerDataSource.getMarkers().map { markerDTOS ->
             markerDTOS.mapNotNull { markerDTO ->
                 MarkerEntity(
+                    id = markerDTO.id ?: return@mapNotNull null,
                     title = markerDTO.title ?: return@mapNotNull null,
                     lat = markerDTO.lat ?: return@mapNotNull null,
                     lng = markerDTO.lng ?: return@mapNotNull null,
@@ -31,6 +32,7 @@ class MarkerRepository @Inject constructor(
         return markerDataSource.getPublicMarkers().map { markerDTOS ->
             markerDTOS.mapNotNull { markerDTO ->
                 MarkerEntity(
+                    id = markerDTO.id ?: return@mapNotNull null,
                     title = markerDTO.title ?: return@mapNotNull null,
                     lat = markerDTO.lat ?: return@mapNotNull null,
                     lng = markerDTO.lng ?: return@mapNotNull null,
@@ -50,6 +52,7 @@ class MarkerRepository @Inject constructor(
         return markerDataSource.getMarkersByAuthorId(authorId).map { markerDTOS ->
             markerDTOS.mapNotNull { markerDTO ->
                 MarkerEntity(
+                    id = markerDTO.id ?: return@mapNotNull null,
                     title = markerDTO.title ?: return@mapNotNull null,
                     lat = markerDTO.lat ?: return@mapNotNull null,
                     lng = markerDTO.lng ?: return@mapNotNull null,
@@ -68,6 +71,7 @@ class MarkerRepository @Inject constructor(
     suspend fun createMarker(dto: CreateMarkerDTO): Result<MarkerEntity> {
         return markerDataSource.postMarker(dto).map { markerDTO ->
             MarkerEntity(
+                id = markerDTO.id ?: error("Invalid MarkerDTO from server"),
                 title = markerDTO.title ?: error("Invalid MarkerDTO from server"),
                 lat = markerDTO.lat ?: error("Invalid MarkerDTO from server"),
                 lng = markerDTO.lng ?: error("Invalid MarkerDTO from server"),
@@ -80,6 +84,24 @@ class MarkerRepository @Inject constructor(
                 amplitudes = markerDTO.amplitudes ?: error("Invalid MarkerDTO from server"),
                 icon = markerDTO.icon ?: error("Invalid MarkerDTO from server"),
                 )
+        }
+    }
+    suspend fun getMarkerById(id: Long): Result<MarkerEntity> {
+        return markerDataSource.getMarkerById(id).map { markerDTO ->
+            MarkerEntity(
+                id = markerDTO.id ?: error("Invalid MarkerDTO from server"),
+                title = markerDTO.title ?: error("Invalid MarkerDTO from server"),
+                lat = markerDTO.lat ?: error("Invalid MarkerDTO from server"),
+                lng = markerDTO.lng ?: error("Invalid MarkerDTO from server"),
+                imageUrl = markerDTO.imageUrl,
+                audioUrl = markerDTO.audioUrl ?: error("Invalid MarkerDTO from server"),
+                authorName = markerDTO.authorName ?: error("Invalid MarkerDTO from server"),
+                authorUsername = markerDTO.authorUsername ?: error("Invalid MarkerDTO from server"),
+                authorAvatarUrl = markerDTO.authorAvatarUrl ?: error("Invalid MarkerDTO from server"),
+                createdAt = markerDTO.createdAt ?: error("Invalid MarkerDTO from server"),
+                amplitudes = markerDTO.amplitudes ?: error("Invalid MarkerDTO from server"),
+                icon = markerDTO.icon ?: error("Invalid MarkerDTO from server"),
+            )
         }
     }
 }

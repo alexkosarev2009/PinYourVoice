@@ -6,6 +6,9 @@ import java.time.Instant
 
 @Serializable
 data class MarkerDTO(
+    @SerialName("id")
+    val id: Long?,
+
     @SerialName("title")
     val title: String?,
 

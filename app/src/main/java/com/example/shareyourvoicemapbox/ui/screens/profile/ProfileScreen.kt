@@ -61,6 +61,7 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.components.ShortMarkerCard
+import com.example.shareyourvoicemapbox.ui.navigation.Route
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import kotlinx.coroutines.launch
@@ -217,7 +218,9 @@ fun ProfileScreen(
                     onWaveformProgressChange = {},
                     onPlayClick = { },
                     isPLaying = false,
-                    onOpenMap = {}
+                    onOpenMap = {
+                        navHostController.navigate("${Route.MAP.route}?markerId=${marker.id}")
+                    }
                 )
                 Spacer(Modifier.height(20.dp))
             }

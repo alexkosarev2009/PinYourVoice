@@ -65,7 +65,8 @@ fun MarkerCard(
     name: String,
     createdAt: String,
     audioUrl: String,
-    isPLaying: Boolean = false
+    isPLaying: Boolean = false,
+    onNameClick: () -> Unit = {}
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
@@ -96,7 +97,10 @@ fun MarkerCard(
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = name,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.clickable(
+                            onClick = onNameClick
+                        )
                     )
                     Text(
                         text = "@$username",

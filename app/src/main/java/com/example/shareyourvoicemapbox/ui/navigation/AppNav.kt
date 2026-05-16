@@ -1,5 +1,6 @@
 package com.example.shareyourvoicemapbox.ui.navigation
 
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -58,15 +59,24 @@ fun AppNavHost(
         },
 
         ) {
-        Route.entries.forEach { route ->
-            composable(route.route) {
-                when (route) {
-                    Route.MAP -> MapScreen(modifier, navHostController)
-                    Route.FEED -> FeedScreen(modifier)
-                    Route.PROFILE -> ProfileScreen(modifier, navHostController = navHostController)
+
+        composable("${Route.MAP.route}?markerId={markerId}",
+            arguments = listOf(
+                navArgument("markerId") {
+                    type = NavType.StringType
+                    defaultValue = ""
                 }
-            }
+            )
+        ) {
+            MapScreen(modifier, navHostController)
         }
+        composable(Route.FEED.route) {
+            FeedScreen(modifier, navHostController = navHostController)
+        }
+        composable(Route.PROFILE.route) {
+            ProfileScreen(modifier, navHostController)
+        }
+
         composable("${SecondaryRoute.EDIT.route}/{audioPath}?lat={lat}&lng={lng}",
             enterTransition = {
                 slideInHorizontally(
@@ -133,7 +143,9 @@ fun AppNav(
         contentWindowInsets = WindowInsets.navigationBars,
 
         bottomBar = {
-            if (currentRoute in mainRoutes) {
+            Log.d("Route", currentRoute.toString())
+            if (currentRoute in mainRoutes || currentRoute == "map?markerId={markerId}") {
+
                 NavigationBar(
                     containerColor =
                         if (isMapRoute(currentRoute ?: "")) Color.Transparent

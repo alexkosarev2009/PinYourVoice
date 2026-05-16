@@ -49,8 +49,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
 import com.example.shareyourvoicemapbox.ui.components.MarkerCard
+import com.example.shareyourvoicemapbox.ui.navigation.Route
 import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -58,7 +60,8 @@ import kotlin.math.absoluteValue
 @Composable
 fun FeedScreen(
     modifier: Modifier = Modifier,
-    viewModel: FeedViewModel = hiltViewModel<FeedViewModel>()
+    viewModel: FeedViewModel = hiltViewModel<FeedViewModel>(),
+    navHostController: NavHostController
 ) {
     val state by viewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
@@ -128,8 +131,8 @@ fun FeedScreen(
                 }
             }
         },
-        onOpenMap = {
-
+        onOpenMap = { markerId ->
+            navHostController.navigate("${Route.MAP.route}?markerId=${markerId}")
         },
         onWaveformProgressChange = { progress ->
             viewModel.onWaveformProgressChange(progress)
@@ -150,7 +153,7 @@ fun FeedContent(
     onSearchClick: () -> Unit,
     onRefresh: () -> Unit,
     onPlayClick: (String, Int) -> Unit,
-    onOpenMap: () -> Unit,
+    onOpenMap: (Long) -> Unit,
     onWaveformProgressChange: (Float) -> Unit,
     progress: Float,
 ) {
@@ -264,7 +267,9 @@ fun FeedContent(
                         avatarUrl = marker.authorAvatarUrl,
                         imageUrl = marker.imageUrl ?: "",
                         onPlayClick = { onPlayClick(marker.audioUrl, page) },
-                        onOpenMap = onOpenMap,
+                        onOpenMap = {
+                            onOpenMap(marker.id)
+                        },
                         amplitudes = ParseAmplitudesUseCase().invoke(marker.amplitudes),
                         waveformProgress = if (state.currentAudioUrl == marker.audioUrl) progress else 0f,
                         onWaveformProgressChange = onWaveformProgressChange,
