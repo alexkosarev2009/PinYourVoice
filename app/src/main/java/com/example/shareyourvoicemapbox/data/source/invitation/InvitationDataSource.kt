@@ -5,8 +5,10 @@ import com.example.shareyourvoicemapbox.data.dto.InvitationDTO
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.patch
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,28 @@ class InvitationDataSource @Inject constructor(
                 error("Error: ${response.status}")
             }
             response.body<List<InvitationDTO>>()
+        }
+    }
+    suspend fun declineInvitation(id: Long): Result<Boolean> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = client.delete("${HOST}/api/friends/invitations/$id/decline") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+            }
+            if (response.status != HttpStatusCode.NoContent) {
+                error("Error: ${response.status}")
+            }
+            true
+        }
+    }
+    suspend fun acceptInvitation(id: Long): Result<Boolean> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = client.patch("${HOST}/api/friends/invitations/$id/accept") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+            }
+            if (response.status != HttpStatusCode.OK) {
+                error("Error: ${response.status}")
+            }
+            true
         }
     }
 }

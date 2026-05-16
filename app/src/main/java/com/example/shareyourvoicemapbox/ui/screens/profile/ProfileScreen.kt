@@ -126,7 +126,7 @@ fun ProfileScreen(
                     Row {
                         IconButton(
                             onClick = {
-
+                                navHostController.navigate(SecondaryRoute.INVITATIONS.route)
                             },
                         ) {
                             Icon(

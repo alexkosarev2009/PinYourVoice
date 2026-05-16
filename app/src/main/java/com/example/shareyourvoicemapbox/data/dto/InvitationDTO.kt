@@ -11,6 +11,15 @@ data class InvitationDTO(
     @SerialName("senderId")
     val senderId: Long?,
 
+    @SerialName("senderName")
+    val senderName: String?,
+
+    @SerialName("senderUsername")
+    val senderUsername: String?,
+
+    @SerialName("senderAvatarUrl")
+    val senderAvatarUrl: String?,
+
     @SerialName("createdAt")
     val createdAt: String?,
 )

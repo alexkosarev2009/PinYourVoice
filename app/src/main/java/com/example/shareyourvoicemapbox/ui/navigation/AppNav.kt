@@ -37,6 +37,7 @@ import androidx.navigation.navArgument
 import com.example.shareyourvoicemapbox.ui.screens.auth.AuthScreen
 import com.example.shareyourvoicemapbox.ui.screens.edit.EditScreen
 import com.example.shareyourvoicemapbox.ui.screens.feed.FeedScreen
+import com.example.shareyourvoicemapbox.ui.screens.invitation.InvitationScreen
 import com.example.shareyourvoicemapbox.ui.screens.map.MapScreen
 import com.example.shareyourvoicemapbox.ui.screens.person.PersonScreen
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileScreen
@@ -122,6 +123,9 @@ fun AppNavHost(
         }
         composable(SecondaryRoute.REGISTER.route) {
             RegisterScreen()
+        }
+        composable(SecondaryRoute.INVITATIONS.route) {
+            InvitationScreen(modifier, navHostController)
         }
         composable("${SecondaryRoute.PERSON.route}?username={username}",
             arguments = listOf(

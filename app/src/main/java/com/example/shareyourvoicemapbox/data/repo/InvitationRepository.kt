@@ -14,6 +14,9 @@ class InvitationRepository @Inject constructor(
                     id = invitationDTO.id ?: return@mapNotNull null,
                     senderId = invitationDTO.senderId ?: return@mapNotNull null,
                     createdAt = invitationDTO.createdAt ?: return@mapNotNull null,
+                    senderAvatarUrl = invitationDTO.senderAvatarUrl ?: return@mapNotNull null,
+                    senderName = invitationDTO.senderName ?: return@mapNotNull null,
+                    senderUsername = invitationDTO.senderUsername ?: return@mapNotNull null,
                 )
             }
         }

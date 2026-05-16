@@ -34,5 +34,6 @@ enum class SecondaryRoute(
     AUTH("auth"),
     REGISTER("register"),
     EDIT("edit_marker"),
-    PERSON("person")
+    PERSON("person"),
+    INVITATIONS("invitations")
 }

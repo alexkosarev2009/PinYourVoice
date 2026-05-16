@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Dangerous
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
@@ -42,7 +45,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
+import com.example.shareyourvoicemapbox.domain.entities.InvitationEntity
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
+import com.example.shareyourvoicemapbox.domain.entities.UserEntity
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
@@ -445,6 +450,120 @@ fun ShortMarkerCardPreview() {
             onPlayClick = {},
             isPLaying = false,
             onOpenMap = {}
+        )
+    }
+}
+
+@Composable
+fun InvitationCard(
+    invitation: InvitationEntity,
+    modifier: Modifier = Modifier,
+    onNameClick: () -> Unit = {},
+    onAcceptClick: (Long) -> Unit,
+    onDeclineClick: (Long) -> Unit
+) {
+    ElevatedCard() {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AsyncImage(
+                    model = invitation.senderAvatarUrl,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                )
+
+                Spacer(Modifier.width(10.dp))
+
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = invitation.senderName,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.clickable(
+                            onClick = onNameClick,
+                        ),
+                    )
+                    Text(
+                        text = "@${invitation.senderUsername}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        onAcceptClick(invitation.id)
+                    },
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+
+                ) {
+                    Icon(
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(28.dp),
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Accept invitation"
+                    )
+                }
+                Spacer(Modifier.width(16.dp))
+                IconButton(
+                    onClick = {
+                        onDeclineClick(invitation.id)
+                    },
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                ) {
+                    Icon(
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(28.dp),
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Accept invitation"
+                    )
+                }
+
+            }
+            val instant = Instant.parse(invitation.createdAt).toEpochMilli()
+            val now = System.currentTimeMillis()
+            val relativeText = DateUtils.getRelativeTimeSpanString(
+                instant,
+                now,
+                DateUtils.MINUTE_IN_MILLIS
+            ).toString()
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(relativeText, color = Color.Gray)
+        }
+    }
+}
+
+@Composable
+@Preview
+fun InvitationCardPreview(modifier: Modifier = Modifier) {
+    AppTheme {
+        InvitationCard(
+            invitation = InvitationEntity(
+                senderId = 1,
+                senderName = "Cаша Косарев",
+                senderUsername = "k1riesshka",
+                senderAvatarUrl = "TODO()",
+                createdAt = "2026-04-25T19:48:26.812081Z"
+            ),
+            onAcceptClick = {},
+            onNameClick = {},
+            onDeclineClick = {}
         )
     }
 }
