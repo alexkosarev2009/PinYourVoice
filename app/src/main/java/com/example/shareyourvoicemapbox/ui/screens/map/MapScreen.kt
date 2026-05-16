@@ -600,12 +600,6 @@ fun MapContent(
 
                         iconImage = markerIcon
                         interactionsState.onClicked {
-                            systemState.mapViewportState.flyTo(
-                                cameraOptions {
-                                    center(point)
-                                    bearing(0.0)
-                                },
-                            )
                             onMarkerClick(marker)
                             true
                         }

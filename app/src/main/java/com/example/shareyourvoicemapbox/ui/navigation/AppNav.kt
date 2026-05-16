@@ -38,6 +38,7 @@ import com.example.shareyourvoicemapbox.ui.screens.auth.AuthScreen
 import com.example.shareyourvoicemapbox.ui.screens.edit.EditScreen
 import com.example.shareyourvoicemapbox.ui.screens.feed.FeedScreen
 import com.example.shareyourvoicemapbox.ui.screens.map.MapScreen
+import com.example.shareyourvoicemapbox.ui.screens.person.PersonScreen
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileScreen
 import com.example.shareyourvoicemapbox.ui.screens.register.RegisterScreen
 
@@ -121,6 +122,15 @@ fun AppNavHost(
         }
         composable(SecondaryRoute.REGISTER.route) {
             RegisterScreen()
+        }
+        composable("${SecondaryRoute.PERSON.route}?username={username}",
+            arguments = listOf(
+                navArgument("username") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )) {
+            PersonScreen(modifier, navHostController)
         }
     }
 }

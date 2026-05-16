@@ -3,8 +3,8 @@ package com.example.shareyourvoicemapbox.ui.screens.profile
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 
 data class ProfileState (
-    val fullName: String = "defaultName",
-    val userName: String = "defaultUserName",
+    val fullName: String = "",
+    val userName: String = "",
     val bio: String = "Empty bio",
     val error: String = "",
     val avatarUrl: String = "",

@@ -53,6 +53,7 @@ import androidx.navigation.NavHostController
 import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
 import com.example.shareyourvoicemapbox.ui.components.MarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.Route
+import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.example.shareyourvoicemapbox.ui.screens.edit.PlayerState
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -137,7 +138,10 @@ fun FeedScreen(
         onWaveformProgressChange = { progress ->
             viewModel.onWaveformProgressChange(progress)
         },
-        progress = waveformProgress
+        progress = waveformProgress,
+        onNameClick = { username ->
+            navHostController.navigate("${SecondaryRoute.PERSON.route}?username=$username")
+        }
     )
 }
 
@@ -156,6 +160,7 @@ fun FeedContent(
     onOpenMap: (Long) -> Unit,
     onWaveformProgressChange: (Float) -> Unit,
     progress: Float,
+    onNameClick: (String) -> Unit,
 ) {
     PullToRefreshBox(
         state = refreshState,
@@ -277,7 +282,10 @@ fun FeedContent(
                         createdAt = marker.createdAt,
                         audioUrl = marker.audioUrl,
                         isPLaying = playerState.isPlaying && state.currentAudioUrl == marker.audioUrl,
-                        onMenuClick = {}
+                        onMenuClick = {},
+                        onNameClick = {
+                            onNameClick(marker.authorUsername)
+                        }
                     )
                 }
             }

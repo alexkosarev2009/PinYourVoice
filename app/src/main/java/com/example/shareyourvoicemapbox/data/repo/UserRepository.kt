@@ -22,10 +22,10 @@ class UserRepository @Inject constructor(
             }
         }
     }
-    suspend fun getUserById(id: Long): Result<UserEntity?> {
+    suspend fun getUserById(id: Long): Result<UserEntity> {
         return userInfoDataSource.getUserById(id).map { userDTO ->
             UserEntity(
-                id = userDTO.id ?: return@map null,
+                id = userDTO.id ?: throw AppException.UserNotFoundException(),
                 name = userDTO.name ?: throw AppException.UserNotFoundException(),
                 username = userDTO.username ?: throw AppException.UserNotFoundException(),
                 bio = userDTO.bio ?: "Empty bio",
@@ -33,12 +33,12 @@ class UserRepository @Inject constructor(
             )
         }
     }
-    suspend fun getUserByUsername(username: String): Result<UserEntity?> {
+    suspend fun getUserByUsername(username: String): Result<UserEntity> {
         return userInfoDataSource.getUserByUsername(username).map { userDTO ->
             UserEntity(
-                id = userDTO.id ?: return@map null,
-                name = userDTO.name ?: return@map null,
-                username = userDTO.username ?: return@map null,
+                id = userDTO.id ?: throw AppException.UserNotFoundException(),
+                name = userDTO.name ?: throw AppException.UserNotFoundException(),
+                username = userDTO.username ?: throw AppException.UserNotFoundException(),
                 bio = userDTO.bio ?: "Empty bio",
                 avatarUrl = userDTO.avatarUrl ?: "default/avatar.jpg",
             )

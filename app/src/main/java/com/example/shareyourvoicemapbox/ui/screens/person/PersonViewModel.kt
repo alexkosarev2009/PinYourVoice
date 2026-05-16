@@ -1,0 +1,92 @@
+package com.example.shareyourvoicemapbox.ui.screens.person
+
+import android.util.Log
+import androidx.compose.runtime.DisposableEffectResult
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.shareyourvoicemapbox.domain.entities.UserEntity
+import com.example.shareyourvoicemapbox.domain.markers.GetMarkersByAuthorIdUseCase
+import com.example.shareyourvoicemapbox.domain.users.GetUserByIdUseCase
+import com.example.shareyourvoicemapbox.domain.users.GetUserByUsername
+import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+
+@HiltViewModel
+class PersonViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val getUserByUsername: GetUserByUsername,
+    private val getMarkersByAuthorIdUseCase: GetMarkersByAuthorIdUseCase
+) : ViewModel() {
+    private val _state = MutableStateFlow(ProfileState())
+    val state = _state.asStateFlow()
+
+    private val _currentUser: MutableStateFlow<UserEntity?> = MutableStateFlow(null)
+    val currentUser = _currentUser.asStateFlow()
+
+    fun getPersonInfo() {
+        _state.update {
+            it.copy(isRefreshing = true)
+        }
+        val username = savedStateHandle.get<String>("username")
+        Log.d("PERSON", username.toString())
+        if (!username.isNullOrEmpty()) {
+            viewModelScope.launch {
+                getUserByUsername(username).fold(
+                    onSuccess = { user ->
+                        _currentUser.emit(user)
+                        _state.emit(
+                            ProfileState(
+                                fullName = user.name,
+                                userName = user.username,
+                                bio = user.bio ?: "Empty bio",
+                                error = "",
+                                avatarUrl = user.avatarUrl ?: "",
+                                userId = user.id,
+                                markers = emptyList(),
+                                isRefreshing = false
+                            )
+                        )
+                        getMarkersByAuthorIdUseCase(user.id).fold(
+                            onFailure = { error ->
+                                _state.update {
+                                    it.copy(error = error.message ?: "")
+                                }
+                            },
+                            onSuccess = { markers ->
+                                _state.update {
+                                    it.copy(markers = markers)
+                                }
+                            }
+                        )
+                    },
+                    onFailure = { error ->
+                        _state.update {
+                            it.copy(error = error.message ?: "")
+                        }
+                    }
+                )
+            }
+        }
+        _state.update {
+            it.copy(isRefreshing = false)
+        }
+    }
+
+    fun onMenuClick() {
+
+    }
+
+    fun clearUser() {
+        viewModelScope.launch {
+            _currentUser.emit(null)
+        }
+        savedStateHandle.remove<String>("username")
+    }
+}
