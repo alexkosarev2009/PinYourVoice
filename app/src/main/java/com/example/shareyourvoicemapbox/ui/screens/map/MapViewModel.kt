@@ -284,7 +284,9 @@ class MapViewModel @Inject constructor(
     fun playAudio(url: String) {
         if (_systemState.value.currentPlayAudioPath != url) {
             pauseAudio()
-            playExoAudioUseCase(url, repeatMode = Player.REPEAT_MODE_ONE)
+            viewModelScope.launch {
+                playExoAudioUseCase(url, repeatMode = Player.REPEAT_MODE_ONE)
+            }
             _systemState.update {
                 it.copy(isPlaying = true, currentPlayAudioPath = url)
             }

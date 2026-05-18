@@ -60,6 +60,10 @@ class EditViewModel @Inject constructor(
 
     private var timerJob: Job? = null
 
+    init {
+
+    }
+
     fun processAudio() {
         viewModelScope.launch {
             processAudioUseCase(_state.value.audioPath).fold(

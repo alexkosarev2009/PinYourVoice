@@ -7,7 +7,7 @@ import javax.inject.Inject
 class PlayExoAudioUseCase @Inject constructor(
     private val exoPlayer: ExoPlayer
 ) {
-    operator fun invoke(url: String, repeatMode: Int = Player.REPEAT_MODE_OFF) {
-        exoPlayer.play(url, repeat = repeatMode)
+    suspend operator fun invoke(url: String, repeatMode: Int = Player.REPEAT_MODE_OFF): Long {
+        return exoPlayer.play(url, repeat = repeatMode)
     }
 }

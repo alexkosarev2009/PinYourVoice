@@ -574,8 +574,7 @@ fun MapContent(
                     }
                     if (!systemState.hasCenteredUser) {
                         systemState.mapViewportState.transitionToFollowPuckState(
-                            followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
-                                .pitch(0.0).build(),
+                            followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder().pitch(70.0).build(),
                         )
                     }
 

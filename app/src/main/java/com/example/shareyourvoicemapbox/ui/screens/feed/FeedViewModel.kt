@@ -31,7 +31,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val getMarkersUseCase: GetMarkersUseCase,
     private val getPublicMarkersUseCase: GetPublicMarkersUseCase,
     private val playExoAudioUseCase: PlayExoAudioUseCase,
     private val resumeExoAudioUseCase: ResumeExoAudioUseCase,
@@ -126,12 +125,15 @@ class FeedViewModel @Inject constructor(
     fun playAudio(url: String, id: Int) {
         if (_uiState.value.currentAudioUrl != url) {
             pauseAudio()
-            playExoAudioUseCase(url)
-            _playerState.update {
-                it.copy(isPlaying = true)
-            }
-            _uiState.update {
-                it.copy(currentAudioUrl = url, currentPlayingId = id)
+            viewModelScope.launch {
+                val duration = playExoAudioUseCase(url)
+                _playerState.update {
+                    it.copy(isPlaying = true, maxDuration = duration)
+                }
+                Log.d("MAX DURATION", _playerState.value.maxDuration.toString())
+                _uiState.update {
+                    it.copy(currentAudioUrl = url, currentPlayingId = id)
+                }
             }
         }
         else {
@@ -171,9 +173,11 @@ class FeedViewModel @Inject constructor(
             while (isActive) {
                 val current = try {
                     getCurrentExoPositionUseCase()
+
                 } catch (e: Exception) {
                     0
                 }
+                Log.d("Current", current.toString())
 
                 val duration = _playerState.value.maxDuration
 

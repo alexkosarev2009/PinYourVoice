@@ -1,7 +1,7 @@
 package com.example.shareyourvoicemapbox.domain.player
 
 interface ExoPlayer {
-    fun play(url: String, repeat: Int)
+    suspend fun play(url: String, repeat: Int): Long
     fun resume()
     fun pause()
     fun release()

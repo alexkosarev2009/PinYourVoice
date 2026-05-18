@@ -87,7 +87,6 @@ fun FeedScreen(
                 }
                 state.markers.getOrNull(page)?.let {
                     scope.launch {
-                        viewModel.getAudioDurationMs(it.audioUrl)
                         viewModel.playAudio(it.audioUrl, page)
                     }
                 }
