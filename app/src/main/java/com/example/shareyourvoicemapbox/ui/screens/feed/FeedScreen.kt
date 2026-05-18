@@ -116,9 +116,15 @@ fun FeedScreen(
         refreshState = refreshState,
         onViewPublicClick = {
             viewModel.viewPublic()
+            scope.launch {
+                pagerState.scrollToPage(0)
+            }
         },
         onViewFriendsClick = {
             viewModel.viewFriends()
+            scope.launch {
+                pagerState.scrollToPage(0)
+            }
         },
         onSearchClick = {
 
