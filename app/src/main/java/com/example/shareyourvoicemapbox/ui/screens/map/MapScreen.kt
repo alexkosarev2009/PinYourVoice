@@ -480,6 +480,9 @@ fun MapScreen(
                             else {
                                 viewModel.playAudio(url)
                             }
+                        },
+                        onNameClick = { username ->
+                            navHostController.navigate("${SecondaryRoute.PERSON.route}?username=$username")
                         }
                     )
                 }
@@ -531,7 +534,8 @@ fun MapContent(
     onViewMarkerDismiss: () -> Unit,
     currentMarker: MarkerEntity?,
     onViewMarkerMenuClick: () -> Unit,
-    onViewMarkerPlayClick: (String) -> Unit
+    onViewMarkerPlayClick: (String) -> Unit,
+    onNameClick: (String) -> Unit
 ) {
     Box(
         modifier = modifier,
@@ -574,7 +578,7 @@ fun MapContent(
                     }
                     if (!systemState.hasCenteredUser) {
                         systemState.mapViewportState.transitionToFollowPuckState(
-                            followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder().pitch(70.0).build(),
+                            followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder().pitch(0.0).build(),
                         )
                     }
 
@@ -647,7 +651,8 @@ fun MapContent(
                     onPlayClick = { url ->
                         onViewMarkerPlayClick(url)
                     },
-                    isPLaying = systemState.isPlaying
+                    isPLaying = systemState.isPlaying,
+                    onNameClick = onNameClick
                 )
             }
         }
@@ -802,6 +807,7 @@ fun ViewMarkerDialog(
     onMenuClick: () -> Unit,
     onPlayClick: (String) -> Unit,
     isPLaying: Boolean,
+    onNameClick: (String) -> Unit = {}
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -865,7 +871,10 @@ fun ViewMarkerDialog(
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = marker.authorName,
-                        style = MaterialTheme.typography.titleMedium
+                        modifier = Modifier.clickable(
+                            onClick = { onNameClick(marker.authorUsername) },
+                        ),
+                        style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
                         text = "@${marker.authorUsername}",

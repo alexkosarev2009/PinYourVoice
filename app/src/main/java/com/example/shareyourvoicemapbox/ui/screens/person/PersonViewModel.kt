@@ -1,14 +1,13 @@
 package com.example.shareyourvoicemapbox.ui.screens.person
 
 import android.util.Log
-import androidx.compose.runtime.DisposableEffectResult
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.domain.entities.UserEntity
+import com.example.shareyourvoicemapbox.domain.invitation.InviteFriendUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersByAuthorIdUseCase
 import com.example.shareyourvoicemapbox.domain.users.GetFriendsByUserId
-import com.example.shareyourvoicemapbox.domain.users.GetUserByIdUseCase
 import com.example.shareyourvoicemapbox.domain.users.GetUserByUsername
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +24,7 @@ class PersonViewModel @Inject constructor(
     private val getUserByUsername: GetUserByUsername,
     private val getMarkersByAuthorIdUseCase: GetMarkersByAuthorIdUseCase,
     private val getFriendsByUserId: GetFriendsByUserId,
+    private val inviteFriendUseCase: InviteFriendUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(ProfileState())
     val state = _state.asStateFlow()
@@ -102,5 +102,11 @@ class PersonViewModel @Inject constructor(
             _currentUser.emit(null)
         }
         savedStateHandle.remove<String>("username")
+    }
+
+    fun invite(receiverId: Long) {
+        viewModelScope.launch {
+            inviteFriendUseCase(receiverId)
+        }
     }
 }

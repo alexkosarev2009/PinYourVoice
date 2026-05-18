@@ -124,7 +124,12 @@ fun FeedScreen(
 
         },
         onRefresh = {
-            viewModel.getData()
+            if (state.isViewingPublic) {
+                viewModel.getData()
+            }
+            else {
+                viewModel.getFriendsMarker()
+            }
         },
         onPlayClick = { url, id ->
             if (playerState.isPlaying && url == state.currentAudioUrl) {

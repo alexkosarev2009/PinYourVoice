@@ -172,8 +172,8 @@ fun PersonScreen(
                             )
                         }
                     },
-                    onNameIconClick = {
-
+                    onNameIconClick = { id ->
+                        viewModel.invite(id)
                     },
                 ) {
                     Icon(

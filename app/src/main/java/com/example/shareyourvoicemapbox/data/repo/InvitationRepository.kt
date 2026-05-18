@@ -21,4 +21,7 @@ class InvitationRepository @Inject constructor(
             }
         }
     }
+    suspend fun invite(receiverId: Long): Result<Boolean> {
+        return invitationDataSource.invite(receiverId)
+    }
 }

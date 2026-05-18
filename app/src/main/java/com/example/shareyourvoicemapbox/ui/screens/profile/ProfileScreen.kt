@@ -248,7 +248,7 @@ fun ProfileContent(
     modifier: Modifier = Modifier,
     state: ProfileState,
     onMarkersClick: () -> Unit,
-    onNameIconClick: () -> Unit = {},
+    onNameIconClick: (Long) -> Unit = {},
     content: @Composable (() -> Unit) = {},
     ) {
     Column(
@@ -289,8 +289,8 @@ fun ProfileContent(
             ) {
                 Text(state.fullName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 IconButton(
-                    onClick = onNameIconClick,
-                    content = content
+                    onClick = { onNameIconClick(state.userId) },
+                    content = content,
                 )
             }
             Text("@${state.userName}", fontSize = 16.sp)
