@@ -84,7 +84,7 @@ class EditViewModel @Inject constructor(
     fun onTitleChange(newTitle: String) {
         if (newTitle.length <= MAX_TITLE_LEN) {
             _state.update { state ->
-                state.copy(title = newTitle.filter { it.isLetterOrDigit() })
+                state.copy(title = newTitle)
             }
         }
     }

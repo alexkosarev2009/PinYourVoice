@@ -14,13 +14,20 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -43,6 +50,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocationAlt
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
@@ -79,6 +87,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -94,6 +103,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -166,8 +176,7 @@ fun MapScreen(
             systemState.mapViewportState.flyTo(
                 cameraOptions {
                     center(Point.fromLngLat(marker.lng, marker.lat))
-                    zoom(12.0)
-                }
+                },
             )
         }
     }
@@ -224,10 +233,11 @@ fun MapScreen(
                 is MapAction.OpenScreen -> {
                     val encodedPath = URLEncoder.encode(systemState.currentRecordAudioPath, "UTF-8")
 
-                    navHostController.navigate("${SecondaryRoute.EDIT.route}/${encodedPath}?lat=${systemState.userLocation?.latitude()}&lng=${systemState.userLocation?.longitude()}") {
+                    navHostController.navigate("${SecondaryRoute.EDIT.route}/${encodedPath}?lat=${systemState.mapViewportState.cameraState?.center?.latitude()}&lng=${systemState.mapViewportState.cameraState?.center?.longitude()}") {
                         launchSingleTop = true
                         restoreState = true
                     }
+                    viewModel.goBackToRecording()
 
                 }
             }
@@ -307,92 +317,94 @@ fun MapScreen(
                     snackbarHost = {
                     },
                     floatingActionButton = {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            FloatingActionButton(
-                                modifier = Modifier.size(48.dp),
-                                onClick = {
-                                    when {
-                                        fineLocationPermissionState.status.isGranted -> {
-                                            systemState.mapViewportState.transitionToFollowPuckState(
-                                                followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
-                                                    .pitch(0.0).build(),
-                                            )
-                                        }
-
-                                        fineLocationPermissionState.status.shouldShowRationale -> {
-                                            viewModel.openFineLocationPermissionDialog()
-                                        }
-
-                                        else -> {
-                                            val isPermanentlyDenied =
-                                                !fineLocationPermissionState.status.shouldShowRationale
-
-                                            if (isPermanentlyDenied) {
-                                                viewModel.openFineLocationPermissionDialog()
-                                            } else {
-                                                launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                                            }
-                                        }
-                                    }
-                                },
-                                shape = CircleShape,
+                        if (!systemState.isRecordingSaved) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.NearMe,
-                                    contentDescription = "My location",
-                                    modifier = Modifier.size(28.dp),
-                                )
-                            }
-                            Spacer(Modifier.height(8.dp))
-                            FloatingActionButton(
-                                onClick = {
-                                    val audioGranted = audioPermissionState.status.isGranted
-                                    val locationGranted =
-                                        fineLocationPermissionState.status.isGranted
-
-                                    when {
-                                        audioGranted && locationGranted -> {
-                                            viewModel.openAddMarkerDialog()
-                                            systemState.mapViewportState.transitionToFollowPuckState(
-                                                followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
-                                                    .pitch(0.0).build(),
-                                            )
-                                        }
-
-                                        !audioGranted -> {
-                                            when {
-                                                audioPermissionState.status.shouldShowRationale -> {
-                                                    viewModel.openMicPermissionDialog()
-                                                }
-
-                                                else -> {
-                                                    launcher.launch(Manifest.permission.RECORD_AUDIO)
-                                                }
+                                FloatingActionButton(
+                                    modifier = Modifier.size(48.dp),
+                                    onClick = {
+                                        when {
+                                            fineLocationPermissionState.status.isGranted -> {
+                                                systemState.mapViewportState.transitionToFollowPuckState(
+                                                    followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
+                                                        .pitch(0.0).build(),
+                                                )
                                             }
-                                        }
 
-                                        !locationGranted -> {
-                                            when {
-                                                fineLocationPermissionState.status.shouldShowRationale -> {
+                                            fineLocationPermissionState.status.shouldShowRationale -> {
+                                                viewModel.openFineLocationPermissionDialog()
+                                            }
+
+                                            else -> {
+                                                val isPermanentlyDenied =
+                                                    !fineLocationPermissionState.status.shouldShowRationale
+
+                                                if (isPermanentlyDenied) {
                                                     viewModel.openFineLocationPermissionDialog()
-                                                }
-
-                                                else -> {
+                                                } else {
                                                     launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                                                 }
                                             }
                                         }
-                                    }
-                                },
-                                shape = CircleShape,
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.AddLocationAlt,
-                                    contentDescription = "Add marker",
-                                    modifier = Modifier.size(30.dp),
-                                )
+                                    },
+                                    shape = CircleShape,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.NearMe,
+                                        contentDescription = "My location",
+                                        modifier = Modifier.size(28.dp),
+                                    )
+                                }
+                                Spacer(Modifier.height(8.dp))
+                                FloatingActionButton(
+                                    onClick = {
+                                        val audioGranted = audioPermissionState.status.isGranted
+                                        val locationGranted =
+                                            fineLocationPermissionState.status.isGranted
+
+                                        when {
+                                            audioGranted && locationGranted -> {
+                                                viewModel.openAddMarkerDialog()
+                                                systemState.mapViewportState.transitionToFollowPuckState(
+                                                    followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
+                                                        .pitch(0.0).build(),
+                                                )
+                                            }
+
+                                            !audioGranted -> {
+                                                when {
+                                                    audioPermissionState.status.shouldShowRationale -> {
+                                                        viewModel.openMicPermissionDialog()
+                                                    }
+
+                                                    else -> {
+                                                        launcher.launch(Manifest.permission.RECORD_AUDIO)
+                                                    }
+                                                }
+                                            }
+
+                                            !locationGranted -> {
+                                                when {
+                                                    fineLocationPermissionState.status.shouldShowRationale -> {
+                                                        viewModel.openFineLocationPermissionDialog()
+                                                    }
+
+                                                    else -> {
+                                                        launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    shape = CircleShape,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.AddLocationAlt,
+                                        contentDescription = "Add marker",
+                                        modifier = Modifier.size(30.dp),
+                                    )
+                                }
                             }
                         }
                         LaunchedEffect(currentState.error) {
@@ -400,7 +412,7 @@ fun MapScreen(
                                 snackbarHostState.showSnackbar(
                                     message = "Couldn't load markers",
                                     duration = SnackbarDuration.Short,
-                                    withDismissAction = true
+                                    withDismissAction = true,
                                 )
                             }
                         }
@@ -413,14 +425,11 @@ fun MapScreen(
                             viewModel.openViewMarkerDialog(marker)
                         },
                         onAddMarkerDismiss = {
-                            if (!systemState.isRecording) {
-                                viewModel.onDeleteRecordingClick()
-                                viewModel.closeAddMarkerDialog()
-                            } else {
+                            if (systemState.isRecording) {
                                 viewModel.onRecordRelease()
-                                viewModel.onDeleteRecordingClick()
-                                viewModel.closeAddMarkerDialog()
                             }
+                            viewModel.onDeleteRecordingClick()
+                            viewModel.closeAddMarkerDialog()
                         },
                         onConfirmPermissionSettingsDialog = {
                             val intent =
@@ -457,6 +466,10 @@ fun MapScreen(
                         offset = offset,
                         systemState = systemState,
                         onSaveRecordingClick = {
+                            systemState.mapViewportState.transitionToFollowPuckState(
+                                followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
+                                    .pitch(0.0).build(),
+                            )
                             viewModel.onRecordRelease()
                             viewModel.onSaveRecordingClick()
                         },
@@ -476,14 +489,20 @@ fun MapScreen(
                         onViewMarkerPlayClick = { url ->
                             if (systemState.isPlaying) {
                                 viewModel.pauseAudio()
-                            }
-                            else {
+                            } else {
                                 viewModel.playAudio(url)
                             }
                         },
                         onNameClick = { username ->
                             navHostController.navigate("${SecondaryRoute.PERSON.route}?username=$username")
-                        }
+                        },
+                        onConfirmLocationClick = {
+                            viewModel.openEditScreen()
+
+                        },
+                        onGoBackClick = {
+                            viewModel.goBackToRecording()
+                        },
                     )
                 }
                 Box(
@@ -491,7 +510,7 @@ fun MapScreen(
                         .fillMaxSize()
                         .statusBarsPadding()
                         .padding(0.dp, 8.dp),
-                    contentAlignment = Alignment.TopCenter
+                    contentAlignment = Alignment.TopCenter,
                 ) {
                     SnackbarHost(snackbarHostState) { data ->
                         Snackbar(
@@ -501,7 +520,7 @@ fun MapScreen(
                             contentColor = MaterialTheme.colorScheme.onError,
                             modifier = Modifier
                                 .widthIn(max = 280.dp)
-                                .statusBarsPadding()
+                                .statusBarsPadding(),
                         )
                     }
                 }
@@ -535,7 +554,9 @@ fun MapContent(
     currentMarker: MarkerEntity?,
     onViewMarkerMenuClick: () -> Unit,
     onViewMarkerPlayClick: (String) -> Unit,
-    onNameClick: (String) -> Unit
+    onNameClick: (String) -> Unit,
+    onConfirmLocationClick: () -> Unit,
+    onGoBackClick: () -> Unit,
 ) {
     Box(
         modifier = modifier,
@@ -567,9 +588,9 @@ fun MapContent(
                                     else -> LightPresetValue.NIGHT
                                 }
                             }
-                        }
+                        },
                     )
-                }
+                },
             ) {
                 MapEffect(Unit) { mapView ->
                     mapView.location.updateSettings {
@@ -578,7 +599,8 @@ fun MapContent(
                     }
                     if (!systemState.hasCenteredUser) {
                         systemState.mapViewportState.transitionToFollowPuckState(
-                            followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder().pitch(0.0).build(),
+                            followPuckViewportStateOptions = FollowPuckViewportStateOptions.Builder()
+                                .pitch(0.0).build(),
                         )
                     }
 
@@ -591,11 +613,13 @@ fun MapContent(
                     val markerIcon = rememberIconImage(
                         key = "red-marker",
                         painter =
-                            painterResource(id = when(marker.icon) {
-                                2 -> R.drawable.bear_marker
-                                3 -> R.drawable.demon_marker
-                                else -> R.drawable.red_marker
-                            }),
+                            painterResource(
+                                id = when (marker.icon) {
+                                    2 -> R.drawable.bear_marker
+                                    3 -> R.drawable.demon_marker
+                                    else -> R.drawable.red_marker
+                                },
+                            ),
                     )
                     PointAnnotation(
                         point = point,
@@ -628,51 +652,137 @@ fun MapContent(
                     ),
             )
         }
-        if (state.showAddMarkerDialog) {
-            AddMarkerDialog(
-                onDismiss = onAddMarkerDismiss,
-                onRecordClick = onRecordClick,
-                animatedScale = animatedScale,
-                onRecordRelease = onRecordRelease,
-                offset = offset,
-                systemState = systemState,
-                onSaveRecordingClick = onSaveRecordingClick,
-                onDeleteRecordingClick = onDeleteRecordingClick,
-                progress = progress,
-                minDuration = minDuration,
+        if (systemState.isRecordingSaved) {
+            val infiniteTransition = rememberInfiniteTransition(label = "")
+
+            val offsetY by infiniteTransition.animateFloat(
+                initialValue = -50f,
+                targetValue = -10f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(
+                        durationMillis = 1500,
+                        easing = FastOutSlowInEasing
+                    ),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = ""
             )
-        }
-        if (state.showViewMarkerDialog) {
-            if (currentMarker != null) {
-                ViewMarkerDialog(
-                    marker = currentMarker,
-                    onDismiss = onViewMarkerDismiss,
-                    onMenuClick = onViewMarkerMenuClick,
-                    onPlayClick = { url ->
-                        onViewMarkerPlayClick(url)
-                    },
-                    isPLaying = systemState.isPlaying,
-                    onNameClick = onNameClick
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.red_marker),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .graphicsLayer {
+                            translationY = offsetY
+                        }
+                        .align(Alignment.Center)
                 )
+                Canvas(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(2.dp)
+                        .align(Alignment.Center)
+                        .zIndex(-1f)
+
+                ) {
+
+                    val dashHeight = 4.dp.toPx()
+                    val gapHeight = 4.dp.toPx()
+
+                    var startY = 0f
+
+                    while (startY < size.height) {
+
+                        drawLine(
+                            color = Color.White.copy(alpha = 0.8f),
+                            start = Offset(size.width / 2, startY),
+                            end = Offset(size.width / 2, startY + dashHeight),
+                            strokeWidth = size.width
+                        )
+
+                        startY += dashHeight + gapHeight
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.Bottom,
+
+                    ) {
+                    FloatingActionButton(
+                        onClick = onGoBackClick,
+                        shape = CircleShape,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back to recording",
+                            modifier = Modifier.size(30.dp),
+                        )
+                    }
+                    FloatingActionButton(
+                        onClick = onConfirmLocationClick,
+                        shape = CircleShape,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Confirm location",
+                            modifier = Modifier.size(30.dp),
+                        )
+                    }
+                }
             }
         }
-        if (state.showMicPermissionDialog) {
-            PermissionSettingsDialog(
-                onConfirm = onConfirmPermissionSettingsDialog,
-                onDismiss = onDismissPermissionSettingsDialog,
-                title = "Couldn't record audio",
-                text = "Please allow microphone access in App Settings.",
+    }
+    if (state.showAddMarkerDialog && !systemState.isRecordingSaved) {
+        AddMarkerDialog(
+            onDismiss = onAddMarkerDismiss,
+            onRecordClick = onRecordClick,
+            animatedScale = animatedScale,
+            onRecordRelease = onRecordRelease,
+            offset = offset,
+            systemState = systemState,
+            onSaveRecordingClick = onSaveRecordingClick,
+            onDeleteRecordingClick = onDeleteRecordingClick,
+            progress = progress,
+            minDuration = minDuration,
+        )
+    }
+    if (state.showViewMarkerDialog) {
+        if (currentMarker != null) {
+            ViewMarkerDialog(
+                marker = currentMarker,
+                onDismiss = onViewMarkerDismiss,
+                onMenuClick = onViewMarkerMenuClick,
+                onPlayClick = { url ->
+                    onViewMarkerPlayClick(url)
+                },
+                isPLaying = systemState.isPlaying,
+                onNameClick = onNameClick,
             )
         }
-        if (state.showFineLocationPermissionDialog) {
-            PermissionSettingsDialog(
-                onConfirm = onConfirmFineLocationDialog,
-                onDismiss = onDismissFineLocationDialog,
-                title = "Couldn't fetch your current location",
-                text = "Please allow location access in App Settings.",
-            )
-        }
-
+    }
+    if (state.showMicPermissionDialog) {
+        PermissionSettingsDialog(
+            onConfirm = onConfirmPermissionSettingsDialog,
+            onDismiss = onDismissPermissionSettingsDialog,
+            title = "Couldn't record audio",
+            text = "Please allow microphone access in App Settings.",
+        )
+    }
+    if (state.showFineLocationPermissionDialog) {
+        PermissionSettingsDialog(
+            onConfirm = onConfirmFineLocationDialog,
+            onDismiss = onDismissFineLocationDialog,
+            title = "Couldn't fetch your current location",
+            text = "Please allow location access in App Settings.",
+        )
     }
 }
 
@@ -807,12 +917,12 @@ fun ViewMarkerDialog(
     onMenuClick: () -> Unit,
     onPlayClick: (String) -> Unit,
     isPLaying: Boolean,
-    onNameClick: (String) -> Unit = {}
+    onNameClick: (String) -> Unit = {},
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         scrimColor = Color.Transparent,
-        ) {
+    ) {
 //        Column() {
 //            Row(
 //                modifier = Modifier
@@ -854,7 +964,7 @@ fun ViewMarkerDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp, 0.dp, 16.dp, 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 AsyncImage(
                     model = marker.authorAvatarUrl,
@@ -863,7 +973,7 @@ fun ViewMarkerDialog(
                     modifier = Modifier
                         .size(42.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest),
                 )
 
                 Spacer(Modifier.width(10.dp))
@@ -879,7 +989,7 @@ fun ViewMarkerDialog(
                     Text(
                         text = "@${marker.authorUsername}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                        color = Color.Gray,
                     )
                 }
 
@@ -889,7 +999,7 @@ fun ViewMarkerDialog(
             }
             HorizontalDivider(modifier = Modifier.padding(16.dp, 0.dp))
             Row(
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Top,
             ) {
                 AsyncImage(
                     model = marker.imageUrl,
@@ -908,30 +1018,31 @@ fun ViewMarkerDialog(
                         .padding(0.dp, 16.dp, 8.dp, 16.dp)
                         .height(140.dp),
                     verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.Start,
                 ) {
                     Column() {
                         Text(
                             text = marker.title,
-                            style = MaterialTheme.typography.titleLarge
+                            style = MaterialTheme.typography.titleLarge,
                         )
 
                         Text(
                             text = marker.location,
                             color = Color.Gray,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                         val instant = Instant.parse(marker.createdAt).toEpochMilli()
                         val now = System.currentTimeMillis()
                         val relativeText = DateUtils.getRelativeTimeSpanString(
                             instant,
                             now,
-                            DateUtils.MINUTE_IN_MILLIS
+                            DateUtils.MINUTE_IN_MILLIS,
                         ).toString()
                         Spacer(Modifier.height(4.dp))
-                        Text(relativeText,
+                        Text(
+                            relativeText,
                             color = Color.Gray,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                     Box(
@@ -953,7 +1064,6 @@ fun ViewMarkerDialog(
                             modifier = Modifier.size(36.dp),
                         )
                     }
-
 
 
                 }
@@ -980,16 +1090,15 @@ fun ViewMarkerDialogPreview(modifier: Modifier = Modifier) {
                 authorName = "Саша Косарев",
                 createdAt = "2026-04-25T19:48:26.812081Z",
                 audioUrl = "",
-                icon = 1
+                icon = 1,
             ),
             onDismiss = {},
             onPlayClick = {},
             onMenuClick = {},
-            isPLaying = false
+            isPLaying = false,
         )
     }
 }
-
 
 
 @Composable

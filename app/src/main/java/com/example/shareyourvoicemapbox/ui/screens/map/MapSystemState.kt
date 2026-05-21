@@ -11,6 +11,8 @@ data class MapSystemState(
     val isPlaying: Boolean = false,
     val currentPlayAudioPath: String? = null,
 
+    val isRecordingSaved: Boolean = false,
+
     val hasLocationPermission: Boolean = false,
     val userLocation: Point? = null,
     val hasCenteredUser: Boolean = false,

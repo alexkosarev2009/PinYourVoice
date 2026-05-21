@@ -232,8 +232,8 @@ class MapViewModel @Inject constructor(
         releaseRecorderUseCase()
     }
     fun onSaveRecordingClick() {
-        viewModelScope.launch {
-            _actionFlow.emit(MapAction.OpenScreen(SecondaryRoute.EDIT.route))
+        _systemState.update {
+            it.copy(isRecordingSaved = true)
         }
     }
     fun onDeleteRecordingClick() {
@@ -353,6 +353,23 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             _currentMarker.emit(null)
             savedStateHandle.remove<String>("markerId")
+        }
+    }
+
+    fun openEditScreen() {
+        viewModelScope.launch {
+            _actionFlow.emit(MapAction.OpenScreen(SecondaryRoute.EDIT.route))
+        }
+    }
+    fun goBackToRecording() {
+        _uiState.update { state ->
+            if (state is MapState.Content) {
+                state.copy(showAddMarkerDialog = true)
+            }
+            else state
+        }
+        _systemState.update {
+            it.copy(isRecordingSaved = false)
         }
     }
 

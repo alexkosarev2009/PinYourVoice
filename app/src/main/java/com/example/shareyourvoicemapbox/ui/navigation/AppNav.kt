@@ -162,9 +162,9 @@ fun AppNav(
 
                 NavigationBar(
                     containerColor =
-                        if (isMapRoute(currentRoute ?: "")) Color.Transparent
+                        if (currentRoute == "map?markerId={markerId}") Color.Transparent
                         else NavigationBarDefaults.containerColor,
-                    modifier = if (isMapRoute(currentRoute ?: "")) Modifier.background(
+                    modifier = if (currentRoute == "map?markerId={markerId}") Modifier.background(
                         Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF0A1A2F),
@@ -175,9 +175,11 @@ fun AppNav(
                     )
                     else Modifier
                 ) {
+                    if (currentRoute == "map?markerId={markerId}") Log.d("BAR", "YES")
                     Route.entries.forEach { route ->
+
                         NavigationBarItem(
-                            colors = if (isMapRoute(currentRoute ?: "")) NavigationBarItemDefaults.colors(
+                            colors = if (currentRoute == "map?markerId={markerId}") NavigationBarItemDefaults.colors(
                                 indicatorColor = Color.Transparent,
                                 selectedIconColor = Color.White,
                                 selectedTextColor = Color.White,
@@ -186,7 +188,10 @@ fun AppNav(
                             ) else NavigationBarItemDefaults.colors(
                                 indicatorColor = Color.Transparent
                             ),
-                            selected = currentRoute == route.route,
+                            selected = when(route) {
+                                Route.MAP -> currentRoute == "map?markerId={markerId}"
+                                else -> currentRoute == route.route
+                            },
                             onClick = {
                                 navController.navigate(route.route) {
                                     launchSingleTop = true
@@ -198,9 +203,10 @@ fun AppNav(
                             },
                             icon = {
                                 Icon(
-                                    imageVector = if (currentRoute == route.route)
-                                        route.icon
-                                    else route.iconOutlined,
+                                    imageVector = when(route) {
+                                        Route.MAP -> if (currentRoute == "map?markerId={markerId}") route.icon else route.iconOutlined
+                                        else -> if (route.route == currentRoute) route.icon else route.iconOutlined
+                                    },
                                     contentDescription = route.contentDescription,
                                     modifier = Modifier.size(28.dp),
                                 )
@@ -221,8 +227,4 @@ fun AppNav(
             modifier = Modifier.padding(padding),
         )
     }
-}
-
-fun isMapRoute(route: String): Boolean {
-    return route == Route.MAP.route
 }
