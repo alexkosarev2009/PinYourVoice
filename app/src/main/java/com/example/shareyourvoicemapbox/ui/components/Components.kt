@@ -20,12 +20,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Dangerous
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,6 +36,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,14 +47,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
 import com.example.shareyourvoicemapbox.domain.entities.InvitationEntity
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
-import com.example.shareyourvoicemapbox.domain.entities.UserEntity
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
@@ -57,6 +62,7 @@ import java.time.Instant
 fun MarkerCard(
     modifier: Modifier = Modifier,
     title: String,
+    id: Long,
     location: String,
     username: String,
     avatarUrl: String,
@@ -71,6 +77,7 @@ fun MarkerCard(
     createdAt: String,
     audioUrl: String,
     isPLaying: Boolean = false,
+    onReportClick: (Long) -> Unit,
     onNameClick: () -> Unit = {}
 ) {
     ElevatedCard(
@@ -114,8 +121,26 @@ fun MarkerCard(
                     )
                 }
 
-                IconButton(onClick = onMenuClick) {
-                    Icon(Icons.Default.MoreVert, contentDescription = null)
+                var expanded by remember { mutableStateOf(false) }
+                Box(
+                    modifier = Modifier
+                ) {
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Report") },
+                            leadingIcon = { Icon(Icons.Default.Flag, null) },
+                            onClick = {
+                                onReportClick(id)
+                                expanded = false
+                            },
+                        )
+                    }
                 }
             }
             HorizontalDivider(modifier = Modifier.padding(0.dp, 0.dp))
@@ -250,7 +275,10 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
             name = "Саша Косарев",
             createdAt = "2026-04-25T19:48:26.812081Z",
             audioUrl = "",
-            onMenuClick = {}
+            onMenuClick = {},
+            id = 1L,
+            onNameClick = {},
+            onReportClick = {}
         )
     }
 }
@@ -264,7 +292,10 @@ fun ShortMarkerCard(
     onWaveformProgressChange: (Float) -> Unit,
     onPlayClick: () -> Unit,
     isPLaying: Boolean,
-    onOpenMap: () -> Unit
+    onOpenMap: () -> Unit,
+    onDeleteClick: (Long) -> Unit,
+    onReportClick: (Long) -> Unit,
+    isDeleteVisible: Boolean = false
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
@@ -303,8 +334,47 @@ fun ShortMarkerCard(
                     )
                 }
 
-                IconButton(onClick = onMenuClick) {
-                    Icon(Icons.Default.MoreVert, contentDescription = null)
+                var expanded by remember { mutableStateOf(false) }
+                Box(
+                    modifier = Modifier
+                ) {
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        if (isDeleteVisible) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "Delete Marker",
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Delete, null,
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                },
+
+                                onClick = {
+                                    onDeleteClick(marker.id)
+                                    expanded = false
+                                }
+                            )
+                        }
+                        DropdownMenuItem(
+                            text = { Text("Report") },
+                            leadingIcon = { Icon(Icons.Default.Flag, null) },
+                            onClick = {
+                                onReportClick(marker.id)
+                                expanded = false
+                            },
+                        )
+                    }
                 }
             }
             HorizontalDivider(modifier = Modifier.padding(0.dp, 0.dp))
@@ -449,7 +519,9 @@ fun ShortMarkerCardPreview() {
             onWaveformProgressChange = {},
             onPlayClick = {},
             isPLaying = false,
-            onOpenMap = {}
+            onOpenMap = {},
+            onDeleteClick = {},
+            onReportClick = {}
         )
     }
 }
@@ -565,5 +637,36 @@ fun InvitationCardPreview(modifier: Modifier = Modifier) {
             onNameClick = {},
             onDeclineClick = {}
         )
+    }
+}
+
+@Composable
+fun MinimalDropdownMenu(
+
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(
+        modifier = Modifier
+    ) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Delete Marker", color = MaterialTheme.colorScheme.error) },
+                leadingIcon = { Icon(Icons.Default.Delete, null,
+                    tint = MaterialTheme.colorScheme.error) },
+
+                onClick = { /* Do something... */ }
+            )
+            DropdownMenuItem(
+                text = { Text("Report") },
+                leadingIcon = { Icon(Icons.Default.Flag, null) },
+                onClick = { /* Do something... */ },
+            )
+        }
     }
 }

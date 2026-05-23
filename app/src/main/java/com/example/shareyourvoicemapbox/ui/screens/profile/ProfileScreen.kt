@@ -24,14 +24,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +43,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -76,6 +81,10 @@ fun ProfileScreen(
 
     val state by viewModel.uiState.collectAsState()
 
+    val showDeleteMarkerDialog by viewModel.showDeleteMarkerDialog.collectAsState()
+
+    val currentMarkerId by viewModel.currentMarkerId.collectAsState()
+
     val listState = rememberLazyListState()
 
     val refreshState = rememberPullToRefreshState()
@@ -86,6 +95,55 @@ fun ProfileScreen(
         derivedStateOf {
             listState.firstVisibleItemIndex >= 2
         }
+    }
+    if (showDeleteMarkerDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.closeDeleteMarkerDialog()
+            },
+            shape = RoundedCornerShape(28.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = {
+                Text(
+                    text = "Delete marker?",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to permanently delete this marker?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteMarker(currentMarkerId)
+                        viewModel.closeDeleteMarkerDialog()
+                    },
+                ) {
+                    Text(
+                        text = "Delete",
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.closeDeleteMarkerDialog()
+                    },
+                ) {
+                    Text(
+                        text = "Cancel",
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            },
+        )
     }
 
     PullToRefreshBox(
@@ -148,7 +206,7 @@ fun ProfileScreen(
                             },
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Menu,
+                                imageVector = Icons.AutoMirrored.Filled.Logout,
                                 contentDescription = "Menu",
                             )
                         }
@@ -216,7 +274,9 @@ fun ProfileScreen(
             }
             items(state.markers) { marker ->
                 ShortMarkerCard(
-                    modifier = Modifier.padding(24.dp, 0.dp),
+                    modifier = Modifier
+                        .padding(24.dp, 0.dp)
+                        .animateItem(),
                     marker = marker,
                     onMenuClick = {},
                     waveformProgress = 0f,
@@ -225,7 +285,14 @@ fun ProfileScreen(
                     isPLaying = false,
                     onOpenMap = {
                         navHostController.navigate("${Route.MAP.route}?markerId=${marker.id}")
-                    }
+                    },
+                    onReportClick = { id ->
+
+                    },
+                    onDeleteClick = { id ->
+                        viewModel.openDeleteMarkerDialog(id)
+                    },
+                    isDeleteVisible = true
                 )
                 Spacer(Modifier.height(20.dp))
             }

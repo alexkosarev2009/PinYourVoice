@@ -162,6 +162,9 @@ fun FeedScreen(
         progress = waveformProgress,
         onNameClick = { username ->
             navHostController.navigate("${SecondaryRoute.PERSON.route}?username=$username")
+        },
+        onReportClick = { id ->
+
         }
     )
 }
@@ -182,6 +185,7 @@ fun FeedContent(
     onWaveformProgressChange: (Float) -> Unit,
     progress: Float,
     onNameClick: (String) -> Unit,
+    onReportClick: (Long) -> Unit
 ) {
     PullToRefreshBox(
         state = refreshState,
@@ -287,6 +291,7 @@ fun FeedContent(
                                     fraction = 1f - pageOffset.coerceIn(0f, 1f),
                                 )
                             },
+                        id = marker.id,
                         title = marker.title,
                         location = marker.location,
                         username = marker.authorUsername,
@@ -306,7 +311,10 @@ fun FeedContent(
                         onMenuClick = {},
                         onNameClick = {
                             onNameClick(marker.authorUsername)
-                        }
+                        },
+                        onReportClick = {
+                            onReportClick(marker.id)
+                        },
                     )
                 }
             }

@@ -86,6 +86,11 @@ class MarkerRepository @Inject constructor(
                 )
         }
     }
+
+    suspend fun deleteMarker(id: Long): Result<Unit> {
+        return markerDataSource.deleteMarker(id)
+    }
+
     suspend fun getMarkerById(id: Long): Result<MarkerEntity> {
         return markerDataSource.getMarkerById(id).map { markerDTO ->
             MarkerEntity(

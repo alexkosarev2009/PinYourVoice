@@ -57,6 +57,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.KeyboardVoice
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NearMe
@@ -64,6 +65,8 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -815,31 +818,6 @@ fun MapContent(
                         onLocationChange(point)
                     }
                 }
-//                state.markers.forEach { marker ->
-//                    val point = Point.fromLngLat(marker.lng, marker.lat)
-//                    val markerIcon = rememberIconImage(
-//                        key = "red-marker",
-//                        painter =
-//                            painterResource(
-//                                id = when (marker.icon) {
-//                                    2 -> R.drawable.bear_marker
-//                                    3 -> R.drawable.demon_marker
-//                                    else -> R.drawable.red_marker
-//                                },
-//                            ),
-//                    )
-//
-//                    PointAnnotation(
-//                        point = point,
-//                    ) {
-//
-//                        iconImage = markerIcon
-//                        interactionsState.onClicked {
-//                            onMarkerClick(marker)
-//                            true
-//                        }
-//                    }
-//                }
             }
         }
         AnimatedVisibility(
@@ -973,6 +951,9 @@ fun MapContent(
                 },
                 isPLaying = systemState.isPlaying,
                 onNameClick = onNameClick,
+                onReportClick = { id ->
+
+                }
             )
         }
     }
@@ -1126,47 +1107,12 @@ fun ViewMarkerDialog(
     onPlayClick: (String) -> Unit,
     isPLaying: Boolean,
     onNameClick: (String) -> Unit = {},
+    onReportClick: (Long) -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         scrimColor = Color.Transparent,
     ) {
-//        Column() {
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(12.dp, 0.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                AsyncImage(
-//                    model = marker.authorAvatarUrl,
-//                    contentScale = ContentScale.Crop,
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .size(42.dp)
-//                        .clip(CircleShape)
-//                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-//                )
-//
-//                Spacer(Modifier.width(10.dp))
-//
-//                Column(Modifier.weight(1f)) {
-//                    Text(
-//                        text = marker.authorName,
-//                        style = MaterialTheme.typography.titleMedium
-//                    )
-//                    Text(
-//                        text = "@${marker.authorUsername}",
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = Color.Gray
-//                    )
-//                }
-//
-//                IconButton(onClick = onMenuClick) {
-//                    Icon(Icons.Default.MoreVert, contentDescription = null)
-//                }
-//            }
-//        }
         Column {
             Row(
                 modifier = Modifier
@@ -1201,8 +1147,26 @@ fun ViewMarkerDialog(
                     )
                 }
 
-                IconButton(onClick = onMenuClick) {
-                    Icon(Icons.Default.MoreVert, contentDescription = null)
+                var expanded by remember { mutableStateOf(false) }
+                Box(
+                    modifier = Modifier
+                ) {
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Report") },
+                            leadingIcon = { Icon(Icons.Default.Flag, null) },
+                            onClick = {
+                                onReportClick(marker.id)
+                                expanded = false
+                            },
+                        )
+                    }
                 }
             }
             HorizontalDivider(modifier = Modifier.padding(16.dp, 0.dp))
@@ -1304,6 +1268,7 @@ fun ViewMarkerDialogPreview(modifier: Modifier = Modifier) {
             onPlayClick = {},
             onMenuClick = {},
             isPLaying = false,
+            onReportClick = {}
         )
     }
 }

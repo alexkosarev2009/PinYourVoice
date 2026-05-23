@@ -4,6 +4,7 @@ import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.domain.entities.UserEntity
 
 data class ProfileState (
+    val id: Long = -1L,
     val fullName: String = "",
     val userName: String = "",
     val friends: List<UserEntity> = emptyList(),

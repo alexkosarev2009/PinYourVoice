@@ -263,6 +263,12 @@ fun PersonScreen(
                     isPLaying = false,
                     onOpenMap = {
                         navHostController.navigate("${Route.MAP.route}?markerId=${marker.id}")
+                    },
+                    onReportClick = {
+
+                    },
+                    onDeleteClick = {
+
                     }
                 )
                 Spacer(Modifier.height(20.dp))

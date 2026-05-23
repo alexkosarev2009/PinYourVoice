@@ -7,6 +7,7 @@ import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -71,6 +72,17 @@ class MarkerDataSource @Inject constructor(
                 error("Error: ${response.status}")
             }
             response.body<MarkerDTO>()
+        }
+    }
+
+    suspend fun deleteMarker(id: Long): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val result = client.delete("$HOST/api/markers/$id") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+            }
+            if (result.status != HttpStatusCode.NoContent) {
+                error("Error: ${result.status}")
+            }
         }
     }
 
