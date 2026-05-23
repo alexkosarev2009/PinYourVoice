@@ -22,17 +22,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -51,11 +55,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.components.ShortMarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.Route
-import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileContent
 import kotlinx.coroutines.launch
 
@@ -66,6 +70,10 @@ fun PersonScreen(
     viewModel: PersonViewModel = hiltViewModel<PersonViewModel>()
 ) {
     val state by viewModel.state.collectAsState()
+
+    val friendAdded by viewModel.friendAdded.collectAsState()
+
+    val isDeleteFriendDialogOpened by viewModel.isDeleteFriendDialogOpened.collectAsState()
 
     val listState = rememberLazyListState()
 
@@ -83,12 +91,24 @@ fun PersonScreen(
         viewModel.getPersonInfo()
     }
 
+
     DisposableEffect(Unit) {
         onDispose {
             viewModel.clearUser()
         }
     }
 
+    if (isDeleteFriendDialogOpened) {
+        DeleteFriendDialog(
+            onDismiss = {
+                viewModel.closeDeleteFriendDialog()
+            },
+            onConfirm = {
+                viewModel.deleteFriend(state.userId)
+                viewModel.closeDeleteFriendDialog()
+            }
+        )
+    }
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
         onRefresh = {
@@ -146,11 +166,6 @@ fun PersonScreen(
                         IconButton(
                             onClick = {
                                 viewModel.onMenuClick()
-                                navHostController.navigate(SecondaryRoute.AUTH.route) {
-                                    popUpTo(0) {
-                                        inclusive = true
-                                    }
-                                }
                             },
                         ) {
                             Icon(
@@ -173,13 +188,26 @@ fun PersonScreen(
                         }
                     },
                     onNameIconClick = { id ->
-                        viewModel.invite(id)
+                        if (!friendAdded) {
+                            viewModel.invite(id)
+                        }
+                        else {
+                            viewModel.openDeleteFriendDialog()
+                        }
                     },
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.PersonAdd,
-                        contentDescription = "Add friend"
-                    )
+                    if (friendAdded) {
+                        Icon(
+                            imageVector = Icons.Default.Group,
+                            contentDescription = "Delete friend"
+                        )
+                    }
+                    else {
+                        Icon(
+                            imageVector = Icons.Default.PersonAdd,
+                            contentDescription = "Add friend"
+                        )
+                    }
                 }
             }
             stickyHeader {
@@ -251,4 +279,51 @@ fun PersonScreen(
             }
         }
     }
+}
+
+@Composable
+fun DeleteFriendDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = {
+            Text(
+                text = "Delete friend?",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
+        text = {
+            Text(
+                text = "Are you sure you want to remove this user from your friends list?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+            ) {
+                Text(
+                    text = "Delete",
+                    color = MaterialTheme.colorScheme.error,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+            ) {
+                Text(
+                    text = "Cancel",
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        },
+    )
 }

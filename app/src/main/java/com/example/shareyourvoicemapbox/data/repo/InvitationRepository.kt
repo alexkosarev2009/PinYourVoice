@@ -24,4 +24,8 @@ class InvitationRepository @Inject constructor(
     suspend fun invite(receiverId: Long): Result<Boolean> {
         return invitationDataSource.invite(receiverId)
     }
+
+    suspend fun delete(receiverId: Long): Result<Unit> {
+        return invitationDataSource.deleteFriend(receiverId)
+    }
 }

@@ -259,6 +259,33 @@ class MapViewModel @Inject constructor(
             else state
         }
     }
+    fun openViewMarkerDialogById(markerId: Long) {
+        viewModelScope.launch {
+            getMarkerByIdUseCase(markerId).fold(
+                onSuccess = { marker ->
+                    _currentMarker.emit(marker)
+                    _uiState.update { state ->
+                        if (state is MapState.Content) {
+                            state.copy(
+                                showViewMarkerDialog = true,
+                            )
+                        }
+                        else state
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update { state ->
+                        if (state is MapState.Content) {
+                            state.copy(
+                                error = error.message ?: "",
+                            )
+                        }
+                        else state
+                    }
+                }
+            )
+        }
+    }
 
     fun closeViewMarkerDialog() {
         viewModelScope.launch {

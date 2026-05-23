@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.domain.entities.UserEntity
+import com.example.shareyourvoicemapbox.domain.invitation.DeleteFriendUseCase
 import com.example.shareyourvoicemapbox.domain.invitation.InviteFriendUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersByAuthorIdUseCase
 import com.example.shareyourvoicemapbox.domain.users.GetFriendsByUserId
@@ -24,13 +25,20 @@ class PersonViewModel @Inject constructor(
     private val getUserByUsername: GetUserByUsername,
     private val getMarkersByAuthorIdUseCase: GetMarkersByAuthorIdUseCase,
     private val getFriendsByUserId: GetFriendsByUserId,
-    private val inviteFriendUseCase: InviteFriendUseCase
+    private val inviteFriendUseCase: InviteFriendUseCase,
+    private val deleteFriendUseCase: DeleteFriendUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ProfileState())
     val state = _state.asStateFlow()
 
     private val _currentUser: MutableStateFlow<UserEntity?> = MutableStateFlow(null)
     val currentUser = _currentUser.asStateFlow()
+
+    private val _friendAdded = MutableStateFlow(false)
+    val friendAdded = _friendAdded.asStateFlow()
+
+    private val _isDeleteFriendDialogOpened = MutableStateFlow(false)
+    val isDeleteFriendDialogOpened = _isDeleteFriendDialogOpened.asStateFlow()
 
     fun getPersonInfo() {
         _state.update {
@@ -107,6 +115,33 @@ class PersonViewModel @Inject constructor(
     fun invite(receiverId: Long) {
         viewModelScope.launch {
             inviteFriendUseCase(receiverId)
+            _friendAdded.emit(true)
+        }
+    }
+
+    fun deleteFriend(id: Long) {
+        viewModelScope.launch {
+            deleteFriendUseCase(id).fold(
+                onSuccess = {
+                    _friendAdded.emit(false)
+                },
+                onFailure = { error ->
+                    _state.update {
+                        it.copy(error = error.message ?: "")
+                    }
+                }
+            )
+        }
+    }
+
+    fun openDeleteFriendDialog() {
+        viewModelScope.launch {
+            _isDeleteFriendDialogOpened.emit(true)
+        }
+    }
+    fun closeDeleteFriendDialog() {
+        viewModelScope.launch {
+            _isDeleteFriendDialogOpened.emit(false)
         }
     }
 }

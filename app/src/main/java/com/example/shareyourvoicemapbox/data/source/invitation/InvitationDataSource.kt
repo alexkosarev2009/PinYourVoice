@@ -68,4 +68,14 @@ class InvitationDataSource @Inject constructor(
             true
         }
     }
+    suspend fun deleteFriend(receiverId: Long): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = client.delete("${HOST}/api/friends/delete/$receiverId") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+            }
+            if (response.status != HttpStatusCode.NoContent) {
+                error("Error: ${response.status}")
+            }
+        }
+    }
 }

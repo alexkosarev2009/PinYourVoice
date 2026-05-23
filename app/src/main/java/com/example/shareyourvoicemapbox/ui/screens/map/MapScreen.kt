@@ -5,12 +5,15 @@ package com.example.shareyourvoicemapbox.ui.screens.map
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -117,17 +120,29 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
+import com.mapbox.maps.RenderedQueryGeometry
+import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
-import com.mapbox.maps.extension.compose.annotation.IconImage
-import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import com.mapbox.maps.extension.compose.style.standard.LightPresetValue
 import com.mapbox.maps.extension.compose.style.standard.MapboxStandardStyle
 import com.mapbox.maps.extension.compose.style.standard.StandardStyleConfigurationState
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.extension.style.expressions.dsl.generated.get
+import com.mapbox.maps.extension.style.expressions.dsl.generated.has
+import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.match
+import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.not
+import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.step
+import com.mapbox.maps.extension.style.layers.addLayer
+import com.mapbox.maps.extension.style.layers.generated.circleLayer
+import com.mapbox.maps.extension.style.layers.generated.symbolLayer
+import com.mapbox.maps.extension.style.sources.addSource
+import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
+import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.viewport.data.FollowPuckViewportStateOptions
@@ -135,6 +150,8 @@ import kotlinx.coroutines.delay
 import java.net.URLEncoder
 import java.time.Instant
 import java.time.LocalTime
+
+const val CLUSTER_MAX_ZOOM = 14L
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
@@ -421,8 +438,8 @@ fun MapScreen(
                     MapContent(
                         state = currentState,
                         overlayVisible = overlayVisible,
-                        onMarkerClick = { marker ->
-                            viewModel.openViewMarkerDialog(marker)
+                        onMarkerClick = { id ->
+                            viewModel.openViewMarkerDialogById(id)
                         },
                         onAddMarkerDismiss = {
                             if (systemState.isRecording) {
@@ -503,6 +520,7 @@ fun MapScreen(
                         onGoBackClick = {
                             viewModel.goBackToRecording()
                         },
+                        context = context
                     )
                 }
                 Box(
@@ -533,8 +551,9 @@ fun MapScreen(
 fun MapContent(
     modifier: Modifier = Modifier,
     state: MapState.Content,
+    context: Context,
     overlayVisible: Boolean,
-    onMarkerClick: (MarkerEntity) -> Unit,
+    onMarkerClick: (Long) -> Unit,
     onAddMarkerDismiss: () -> Unit,
     onConfirmPermissionSettingsDialog: () -> Unit,
     onDismissPermissionSettingsDialog: () -> Unit,
@@ -592,6 +611,194 @@ fun MapContent(
                     )
                 },
             ) {
+                val clusterSymbolColor = Color.Black.toHex()
+                val clusterStrokeColor = MaterialTheme.colorScheme.error.toHex()
+                val clusterCircleColor = Color.White.toHex()
+                MapEffect(state.markers) { mapView ->
+
+                    mapView.mapboxMap.getStyle { style ->
+
+                        if (style.styleSourceExists("markers-source")) {
+                            style.removeStyleLayer("unclustered-points")
+                            style.removeStyleLayer("clusters")
+                            style.removeStyleLayer("cluster-count")
+                            style.removeStyleSource("markers-source")
+                        }
+
+                        val source = geoJsonSource("markers-source") {
+
+                            featureCollection(
+                                FeatureCollection.fromFeatures(
+                                    state.markers.map { marker ->
+
+                                        Feature.fromGeometry(
+                                            Point.fromLngLat(marker.lng, marker.lat)
+                                        ).apply {
+                                            addNumberProperty("markerId", marker.id)
+                                            addNumberProperty("iconId", marker.icon)
+                                        }
+                                    }
+                                )
+                            )
+
+                            cluster(true)
+                            clusterRadius(50)
+                            clusterMaxZoom(CLUSTER_MAX_ZOOM)
+                        }
+
+                        style.addSource(source)
+
+                        style.addLayer(
+                            circleLayer("clusters", "markers-source") {
+
+                                filter(has("point_count"))
+
+                                circleColor(clusterCircleColor)
+
+                                circleStrokeColor(clusterStrokeColor)
+
+                                circleStrokeWidth(5.0)
+
+                                circleRadius(
+                                    step {
+                                        get("point_count")
+
+                                        literal(16)
+
+                                        stop {
+                                            literal(5)
+                                            literal(18)
+                                        }
+
+                                        stop {
+                                            literal(10)
+                                            literal(20)
+                                        }
+
+                                        stop {
+                                            literal(30)
+                                            literal(22)
+                                        }
+                                    }
+                                )
+                            }
+                        )
+                        style.addLayer(
+                            symbolLayer("cluster-count", "markers-source") {
+
+                                filter(has("point_count"))
+
+                                textField(get("point_count"))
+
+                                textSize(step {
+                                    get("point_count")
+
+                                    literal(14)
+
+                                    stop {
+                                        literal(5)
+                                        literal(16)
+                                    }
+
+                                    stop {
+                                        literal(10)
+                                        literal(18)
+                                    }
+
+                                    stop {
+                                        literal(30)
+                                        literal(20)
+                                    }
+                                })
+
+                                textColor(clusterSymbolColor)
+                            }
+                        )
+                        style.addImage(
+                            "red-marker-icon",
+                            BitmapFactory.decodeResource(
+                                context.resources,
+                                R.drawable.red_marker
+                            )
+                        )
+                        style.addImage(
+                            "bear-marker-icon",
+                            BitmapFactory.decodeResource(
+                                context.resources,
+                                R.drawable.bear_marker
+                            )
+                        )
+                        style.addImage(
+                            "demon-marker-icon",
+                            BitmapFactory.decodeResource(
+                                context.resources,
+                                R.drawable.demon_marker
+                            )
+                        )
+
+                        style.addLayer(
+                            symbolLayer("unclustered-points", "markers-source") {
+
+                                filter(not(has("point_count")))
+
+                                iconImage(
+                                    match {
+                                        get("iconId")
+
+                                        stop {
+                                            literal(2)
+                                            literal("bear-marker-icon")
+                                        }
+
+                                        stop {
+                                            literal(3)
+                                            literal("demon-marker-icon")
+                                        }
+
+                                        literal("red-marker-icon")
+                                    }
+                                )
+
+                                iconSize(0.35)
+
+                            }
+
+                        )
+                    }
+                    mapView.mapboxMap.addOnMapClickListener { point ->
+
+                        val screenPoint = mapView.mapboxMap.pixelForCoordinate(point)
+
+                        mapView.mapboxMap.queryRenderedFeatures(
+                            RenderedQueryGeometry(screenPoint),
+                            RenderedQueryOptions(
+                                listOf(
+                                    "clusters",
+                                    "unclustered-points"
+                                ),
+                                null
+                            ),
+                            callback = { result ->
+                                val features = result.value ?: return@queryRenderedFeatures
+
+                                val feature = features.firstOrNull()?.queriedFeature?.feature
+                                    ?: return@queryRenderedFeatures
+
+                                if (feature.hasProperty("point_count")) {
+
+                                    Toast.makeText(context, "Cluster clicked", Toast.LENGTH_SHORT).show()
+
+                                } else {
+
+                                    val markerId = feature.getNumberProperty("markerId")
+                                    onMarkerClick(markerId.toLong())
+                                }
+                            }
+                        )
+                        true
+                    }
+                }
+
                 MapEffect(Unit) { mapView ->
                     mapView.location.updateSettings {
                         locationPuck = createDefault2DPuck(withBearing = true)
@@ -608,30 +815,31 @@ fun MapContent(
                         onLocationChange(point)
                     }
                 }
-                state.markers.forEach { marker ->
-                    val point = Point.fromLngLat(marker.lng, marker.lat)
-                    val markerIcon = rememberIconImage(
-                        key = "red-marker",
-                        painter =
-                            painterResource(
-                                id = when (marker.icon) {
-                                    2 -> R.drawable.bear_marker
-                                    3 -> R.drawable.demon_marker
-                                    else -> R.drawable.red_marker
-                                },
-                            ),
-                    )
-                    PointAnnotation(
-                        point = point,
-                    ) {
-
-                        iconImage = markerIcon
-                        interactionsState.onClicked {
-                            onMarkerClick(marker)
-                            true
-                        }
-                    }
-                }
+//                state.markers.forEach { marker ->
+//                    val point = Point.fromLngLat(marker.lng, marker.lat)
+//                    val markerIcon = rememberIconImage(
+//                        key = "red-marker",
+//                        painter =
+//                            painterResource(
+//                                id = when (marker.icon) {
+//                                    2 -> R.drawable.bear_marker
+//                                    3 -> R.drawable.demon_marker
+//                                    else -> R.drawable.red_marker
+//                                },
+//                            ),
+//                    )
+//
+//                    PointAnnotation(
+//                        point = point,
+//                    ) {
+//
+//                        iconImage = markerIcon
+//                        interactionsState.onClicked {
+//                            onMarkerClick(marker)
+//                            true
+//                        }
+//                    }
+//                }
             }
         }
         AnimatedVisibility(
@@ -1151,4 +1359,13 @@ fun rememberHour(): Int {
     }
 
     return hour
+}
+
+fun Color.toHex(): String {
+    return String.format(
+        "#%02X%02X%02X",
+        (red * 255).toInt(),
+        (green * 255).toInt(),
+        (blue * 255).toInt()
+    )
 }
