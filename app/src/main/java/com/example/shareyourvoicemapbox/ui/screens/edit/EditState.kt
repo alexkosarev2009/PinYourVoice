@@ -14,4 +14,6 @@ data class EditState(
     val lat: Double = 0.0,
     val isDone: Boolean = false,
     val chosenMarker: Int = 1,
+
+    val isPublicSelected: Boolean = false,
 )

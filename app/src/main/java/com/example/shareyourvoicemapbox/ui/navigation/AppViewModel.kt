@@ -15,6 +15,6 @@ class AppViewModel @Inject constructor(
     ) {
         Route.MAP.route
     } else {
-        Route.MAP.route
+        SecondaryRoute.AUTH.route
     }
 }

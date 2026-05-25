@@ -37,6 +37,17 @@ class MarkerDataSource @Inject constructor(
             response.body<List<MarkerDTO>>()
         }
     }
+    suspend fun getAvailableMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = client.get("${HOST}/api/markers/available") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+            }
+            if (response.status != HttpStatusCode.OK) {
+                error("Error: ${response.status}")
+            }
+            response.body<List<MarkerDTO>>()
+        }
+    }
     suspend fun getPublicMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/markers/public") {

@@ -26,4 +26,7 @@ data class CreateMarkerDTO(
 
     @SerialName("icon")
     val icon: Int?,
-    )
+
+    @SerialName("visibility")
+    val visibility: Int?,
+)

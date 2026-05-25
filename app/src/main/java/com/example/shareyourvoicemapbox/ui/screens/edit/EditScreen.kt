@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.shareyourvoicemapbox.ui.screens.edit
 
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,21 +38,27 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -235,6 +243,12 @@ fun EditScreen(
                 viewModel.chooseMarker(3)
             },
             imageScale = imageScale,
+            onFriendsOnlyClick = {
+                viewModel.onPublicClick()
+            },
+            onPublicClick = {
+                viewModel.onFriendsOnlyClick()
+            }
         )
     }
     LaunchedEffect(state.error) {
@@ -277,6 +291,8 @@ fun EditContent(
     onRedMarkerClick: () -> Unit,
     onBearMarkerClick: () -> Unit,
     onDemonMarkerClick: () -> Unit,
+    onPublicClick: () -> Unit,
+    onFriendsOnlyClick: () -> Unit,
 
 
 
@@ -598,6 +614,51 @@ fun EditContent(
             }
         }
 
+        Spacer(Modifier.height(24.dp))
+
+        SecondaryTabRow (
+            selectedTabIndex = 0
+        ) {
+            Tab(
+                selected = state.isPublicSelected,
+                onClick = onPublicClick
+            ) {
+                Row(
+                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Public,
+                        contentDescription = null,
+                        tint = if (state.isPublicSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("Public",
+                        color = if (state.isPublicSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onBackground)
+                }
+            }
+            Tab(
+                selected = !state.isPublicSelected,
+                onClick = onFriendsOnlyClick
+            ) {
+                Row(
+                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PeopleAlt,
+                        contentDescription = null,
+                        tint = if (!state.isPublicSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("Friends-only",
+                        color = if (!state.isPublicSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onBackground)
+                }
+            }
+        }
+
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter,
@@ -643,6 +704,7 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
             topBar = {
                 Row(
                     Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
                         onClick = {
@@ -653,12 +715,18 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                             contentDescription = "Go back",
                         )
                     }
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        "Create marker",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                    )
                 }
             },
         ) { innerPadding ->
             EditContent(
                 modifier = modifier.padding(innerPadding),
-                state = EditState(isLoading = true),
+                state = EditState(isLoading = false, isPublicSelected = true),
                 playerState = PlayerState(),
                 waveformProgress = 1f,
                 amplitudes = listOf(
@@ -688,6 +756,8 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                 onDemonMarkerClick = {},
                 onBearMarkerClick = {},
                 imageScale = remember { Animatable(1f) },
+                onPublicClick = {},
+                onFriendsOnlyClick = {},
             )
         }
     }

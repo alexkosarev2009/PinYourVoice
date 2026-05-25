@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
+import com.example.shareyourvoicemapbox.domain.markers.GetAvailableMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkerByIdUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.network.NetworkMonitor
@@ -33,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val getMarkersUseCase: GetMarkersUseCase,
+    private val getAvailableMarkersUseCase: GetAvailableMarkersUseCase,
     private val startRecordingUseCase: StartRecordingUseCase,
     private val stopRecordingUseCase: StopRecordingUseCase,
     private val releaseRecorderUseCase: ReleaseRecorderUseCase,
@@ -69,7 +70,7 @@ class MapViewModel @Inject constructor(
 
     fun getData() {
         viewModelScope.launch {
-            getMarkersUseCase().fold(
+            getAvailableMarkersUseCase().fold(
                 onSuccess = { data ->
                     val current = _uiState.value
                     if (current is MapState.Content) {

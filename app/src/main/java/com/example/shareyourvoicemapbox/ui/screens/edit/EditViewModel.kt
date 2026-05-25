@@ -229,7 +229,8 @@ class EditViewModel @Inject constructor(
                         _state.value.amplitudes,
                         AMPLITUDES_SIZE
                     ).toString(),
-                    icon = _state.value.chosenMarker
+                    icon = _state.value.chosenMarker,
+                    visibility = if (_state.value.isPublicSelected) 1 else 2
                 )
             ).fold(
                 onSuccess = {
@@ -290,6 +291,18 @@ class EditViewModel @Inject constructor(
     fun chooseMarker(markerIconId: Int) {
         _state.update {
             it.copy(chosenMarker = markerIconId)
+        }
+    }
+
+    fun onPublicClick() {
+        _state.update {
+            it.copy(isPublicSelected = true)
+        }
+    }
+
+    fun onFriendsOnlyClick() {
+        _state.update {
+            it.copy(isPublicSelected = false)
         }
     }
 }
