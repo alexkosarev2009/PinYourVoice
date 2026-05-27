@@ -8,7 +8,7 @@ import androidx.media3.common.Player
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.domain.markers.GetAvailableMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkerByIdUseCase
-import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
+import com.example.shareyourvoicemapbox.domain.markers.GetMarkersByAuthorIdUseCase
 import com.example.shareyourvoicemapbox.domain.network.NetworkMonitor
 import com.example.shareyourvoicemapbox.domain.player.exo.PauseExoAudioUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.PlayExoAudioUseCase
@@ -16,6 +16,8 @@ import com.example.shareyourvoicemapbox.domain.player.exo.ResumeExoAudioUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.ReleaseRecorderUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StartRecordingUseCase
 import com.example.shareyourvoicemapbox.domain.recorder.StopRecordingUseCase
+import com.example.shareyourvoicemapbox.domain.users.GetMeUseCase
+import com.example.shareyourvoicemapbox.domain.users.GetMyFriendsUseCase
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.mapbox.geojson.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,6 +46,9 @@ class MapViewModel @Inject constructor(
     private val pauseExoAudioUseCase: PauseExoAudioUseCase,
     private val resumeExoAudioUseCase: ResumeExoAudioUseCase,
     private val getMarkerByIdUseCase: GetMarkerByIdUseCase,
+    private val getMyFriendsUseCase: GetMyFriendsUseCase,
+    private val getMarkersByAuthorIdUseCase: GetMarkersByAuthorIdUseCase,
+    private val getMeUseCase: GetMeUseCase,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<MapState> = MutableStateFlow(MapState.Content())
@@ -68,6 +73,20 @@ class MapViewModel @Inject constructor(
     val minDuration = 3_000L
     val maxDuration = 30_000L
 
+    fun viewPublic() {
+        getData()
+        _systemState.update {
+            it.copy(isPublicSelected = true)
+        }
+    }
+
+    fun viewFriends() {
+        getFriendsMarkers()
+        _systemState.update {
+            it.copy(isPublicSelected = false)
+        }
+    }
+
     fun getData() {
         viewModelScope.launch {
             getAvailableMarkersUseCase().fold(
@@ -85,6 +104,70 @@ class MapViewModel @Inject constructor(
                     if (current is MapState.Content) {
                         _uiState.value = current.copy(
                             error = error.message ?: ""
+                        )
+                    }
+                }
+            )
+        }
+    }
+    fun getFriendsMarkers() {
+        viewModelScope.launch {
+            getMyFriendsUseCase().fold(
+                onFailure = { error ->
+                    val current = _uiState.value
+                    if (current is MapState.Content) {
+                        _uiState.value = current.copy(
+                            error = error.message ?: ""
+                        )
+                    }
+                },
+                onSuccess = { friends ->
+                    val friendMarkers = mutableListOf<MarkerEntity>()
+                    for (friend in friends) {
+                        getMarkersByAuthorIdUseCase(friend.id).fold(
+                            onFailure = { error1 ->
+                                val current = _uiState.value
+                                if (current is MapState.Content) {
+                                    _uiState.value = current.copy(
+                                        error = error1.message ?: ""
+                                    )
+                                }
+                            },
+                            onSuccess = { markers ->
+                                friendMarkers.addAll(markers)
+                            }
+                        )
+                    }
+                    getMeUseCase.invoke().fold(
+                        onSuccess = { me ->
+                            getMarkersByAuthorIdUseCase(me.id).fold(
+                                onFailure = { error ->
+                                    val current = _uiState.value
+                                    if (current is MapState.Content) {
+                                        _uiState.value = current.copy(
+                                            error = error.message ?: ""
+                                        )
+                                    }
+                                },
+                                onSuccess = { markers ->
+                                    friendMarkers.addAll(markers)
+                                }
+                            )
+                        },
+                        onFailure = { error ->
+                            val current = _uiState.value
+                            if (current is MapState.Content) {
+                                _uiState.value = current.copy(
+                                    error = error.message ?: ""
+                                )
+                            }
+                        }
+                    )
+                    val current = _uiState.value
+                    if (current is MapState.Content) {
+                        _uiState.value = current.copy(
+                            markers = friendMarkers,
+                            error = ""
                         )
                     }
                 }

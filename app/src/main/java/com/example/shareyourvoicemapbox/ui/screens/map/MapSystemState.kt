@@ -17,4 +17,6 @@ data class MapSystemState(
     val userLocation: Point? = null,
     val hasCenteredUser: Boolean = false,
     val mapViewportState: MapViewportState = MapViewportState(),
+
+    val isPublicSelected: Boolean = true,
     )

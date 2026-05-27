@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
@@ -224,6 +225,7 @@ fun AppNav(
                                 unselectedTextColor = Color.White.copy(alpha = 0.7f),
                             ) else NavigationBarItemDefaults.colors(
                                 indicatorColor = Color.Transparent,
+                                selectedTextColor = MaterialTheme.colorScheme.onBackground
                             ),
                             selected = when (route) {
                                 Route.MAP -> currentRoute == "map?markerId={markerId}"

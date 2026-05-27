@@ -13,7 +13,6 @@ import android.net.Uri
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -47,6 +46,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
@@ -62,7 +62,9 @@ import androidx.compose.material.icons.filled.KeyboardVoice
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -75,6 +77,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonColors
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -525,7 +531,13 @@ fun MapScreen(
                         context = context,
                         onReportClick = { id ->
                             navHostController.navigate("${SecondaryRoute.REPORT.route}/$id")
-                        }
+                        },
+                        onPublicClick = {
+                            viewModel.viewPublic()
+                        },
+                        onFriendsClick = {
+                            viewModel.viewFriends()
+                        },
                     )
                 }
                 Box(
@@ -581,7 +593,9 @@ fun MapContent(
     onNameClick: (String) -> Unit,
     onConfirmLocationClick: () -> Unit,
     onGoBackClick: () -> Unit,
-    onReportClick: (Long) -> Unit
+    onReportClick: (Long) -> Unit,
+    onPublicClick: () -> Unit,
+    onFriendsClick: () -> Unit,
 ) {
     Box(
         modifier = modifier,
@@ -638,13 +652,13 @@ fun MapContent(
                                     state.markers.map { marker ->
 
                                         Feature.fromGeometry(
-                                            Point.fromLngLat(marker.lng, marker.lat)
+                                            Point.fromLngLat(marker.lng, marker.lat),
                                         ).apply {
                                             addNumberProperty("markerId", marker.id)
                                             addNumberProperty("iconId", marker.icon)
                                         }
-                                    }
-                                )
+                                    },
+                                ),
                             )
 
                             cluster(true)
@@ -685,9 +699,9 @@ fun MapContent(
                                             literal(30)
                                             literal(22)
                                         }
-                                    }
+                                    },
                                 )
-                            }
+                            },
                         )
                         style.addLayer(
                             symbolLayer("cluster-count", "markers-source") {
@@ -696,50 +710,52 @@ fun MapContent(
 
                                 textField(get("point_count"))
 
-                                textSize(step {
-                                    get("point_count")
+                                textSize(
+                                    step {
+                                        get("point_count")
 
-                                    literal(14)
+                                        literal(14)
 
-                                    stop {
-                                        literal(5)
-                                        literal(16)
-                                    }
+                                        stop {
+                                            literal(5)
+                                            literal(16)
+                                        }
 
-                                    stop {
-                                        literal(10)
-                                        literal(18)
-                                    }
+                                        stop {
+                                            literal(10)
+                                            literal(18)
+                                        }
 
-                                    stop {
-                                        literal(30)
-                                        literal(20)
-                                    }
-                                })
+                                        stop {
+                                            literal(30)
+                                            literal(20)
+                                        }
+                                    },
+                                )
 
                                 textColor(clusterSymbolColor)
-                            }
+                            },
                         )
                         style.addImage(
                             "red-marker-icon",
                             BitmapFactory.decodeResource(
                                 context.resources,
-                                R.drawable.red_marker
-                            )
+                                R.drawable.red_marker,
+                            ),
                         )
                         style.addImage(
                             "bear-marker-icon",
                             BitmapFactory.decodeResource(
                                 context.resources,
-                                R.drawable.bear_marker
-                            )
+                                R.drawable.bear_marker,
+                            ),
                         )
                         style.addImage(
                             "demon-marker-icon",
                             BitmapFactory.decodeResource(
                                 context.resources,
-                                R.drawable.demon_marker
-                            )
+                                R.drawable.demon_marker,
+                            ),
                         )
 
                         style.addLayer(
@@ -762,14 +778,14 @@ fun MapContent(
                                         }
 
                                         literal("red-marker-icon")
-                                    }
+                                    },
                                 )
 
                                 iconSize(0.35)
 
-                            }
+                            },
 
-                        )
+                            )
                     }
                     mapView.mapboxMap.addOnMapClickListener { point ->
 
@@ -780,9 +796,9 @@ fun MapContent(
                             RenderedQueryOptions(
                                 listOf(
                                     "clusters",
-                                    "unclustered-points"
+                                    "unclustered-points",
                                 ),
-                                null
+                                null,
                             ),
                             callback = { result ->
                                 val features = result.value ?: return@queryRenderedFeatures
@@ -798,7 +814,7 @@ fun MapContent(
                                     val markerId = feature.getNumberProperty("markerId")
                                     onMarkerClick(markerId.toLong())
                                 }
-                            }
+                            },
                         )
                         true
                     }
@@ -849,14 +865,14 @@ fun MapContent(
                 animationSpec = infiniteRepeatable(
                     animation = tween(
                         durationMillis = 1500,
-                        easing = FastOutSlowInEasing
+                        easing = FastOutSlowInEasing,
                     ),
-                    repeatMode = RepeatMode.Reverse
+                    repeatMode = RepeatMode.Reverse,
                 ),
-                label = ""
+                label = "",
             )
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 Image(
                     painter = painterResource(R.drawable.red_marker),
@@ -866,16 +882,16 @@ fun MapContent(
                         .graphicsLayer {
                             translationY = offsetY
                         }
-                        .align(Alignment.Center)
+                        .align(Alignment.Center),
                 )
                 Canvas(
                     modifier = Modifier
                         .height(30.dp)
                         .width(2.dp)
                         .align(Alignment.Center)
-                        .zIndex(-1f)
+                        .zIndex(-1f),
 
-                ) {
+                    ) {
 
                     val dashHeight = 4.dp.toPx()
                     val gapHeight = 4.dp.toPx()
@@ -888,7 +904,7 @@ fun MapContent(
                             color = Color.White.copy(alpha = 0.8f),
                             start = Offset(size.width / 2, startY),
                             end = Offset(size.width / 2, startY + dashHeight),
-                            strokeWidth = size.width
+                            strokeWidth = size.width,
                         )
 
                         startY += dashHeight + gapHeight
@@ -916,7 +932,7 @@ fun MapContent(
                         onClick = onConfirmLocationClick,
                         shape = CircleShape,
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
@@ -942,6 +958,61 @@ fun MapContent(
             minDuration = minDuration,
         )
     }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding(),
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.statusBarsPadding().systemBarsPadding(),
+        ) {
+            SegmentedButton(
+                colors = SegmentedButtonDefaults.colors(
+                    inactiveContainerColor = MaterialTheme.colorScheme.background,
+                    activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = 0,
+                    count = 2,
+                ),
+                onClick = onPublicClick,
+                selected = systemState.isPublicSelected,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Public,
+                        contentDescription = "Global",
+                    )
+                },
+                label = {
+                    Text("Global")
+                },
+            )
+            SegmentedButton(
+                colors = SegmentedButtonDefaults.colors(
+                    inactiveContainerColor = MaterialTheme.colorScheme.background,
+                    activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = 1,
+                    count = 2,
+                ),
+                onClick = onFriendsClick,
+                selected = !systemState.isPublicSelected,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.People,
+                        contentDescription = "Friends",
+                    )
+                },
+                label = {
+                    Text("Friends")
+                },
+            )
+        }
+    }
     if (state.showViewMarkerDialog) {
         if (currentMarker != null) {
             ViewMarkerDialog(
@@ -955,7 +1026,7 @@ fun MapContent(
                 onNameClick = onNameClick,
                 onReportClick = { id ->
                     onReportClick(id)
-                }
+                },
             )
         }
     }
@@ -1109,7 +1180,7 @@ fun ViewMarkerDialog(
     onPlayClick: (String) -> Unit,
     isPLaying: Boolean,
     onNameClick: (String) -> Unit = {},
-    onReportClick: (Long) -> Unit
+    onReportClick: (Long) -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -1151,14 +1222,14 @@ fun ViewMarkerDialog(
 
                 var expanded by remember { mutableStateOf(false) }
                 Box(
-                    modifier = Modifier
+                    modifier = Modifier,
                 ) {
                     IconButton(onClick = { expanded = !expanded }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More options")
                     }
                     DropdownMenu(
                         expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        onDismissRequest = { expanded = false },
                     ) {
                         DropdownMenuItem(
                             text = { Text("Report") },
@@ -1270,7 +1341,7 @@ fun ViewMarkerDialogPreview(modifier: Modifier = Modifier) {
             onPlayClick = {},
             onMenuClick = {},
             isPLaying = false,
-            onReportClick = {}
+            onReportClick = {},
         )
     }
 }
@@ -1333,6 +1404,6 @@ fun Color.toHex(): String {
         "#%02X%02X%02X",
         (red * 255).toInt(),
         (green * 255).toInt(),
-        (blue * 255).toInt()
+        (blue * 255).toInt(),
     )
 }
