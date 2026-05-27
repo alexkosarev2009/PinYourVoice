@@ -68,6 +68,28 @@ class MarkerRepository @Inject constructor(
             }
         }
     }
+
+    suspend fun searchMarkersByTitle(query: String): Result<List<MarkerEntity>> {
+        return markerDataSource.searchMarkerByTitle(query).map { markerDTOS ->
+            markerDTOS.mapNotNull { markerDTO ->
+                MarkerEntity(
+                    id = markerDTO.id ?: return@mapNotNull null,
+                    title = markerDTO.title ?: return@mapNotNull null,
+                    lat = markerDTO.lat ?: return@mapNotNull null,
+                    lng = markerDTO.lng ?: return@mapNotNull null,
+                    imageUrl = markerDTO.imageUrl,
+                    audioUrl = markerDTO.audioUrl ?: return@mapNotNull null,
+                    authorName = markerDTO.authorName ?: return@mapNotNull null,
+                    authorUsername = markerDTO.authorUsername ?: return@mapNotNull null,
+                    authorAvatarUrl = markerDTO.authorAvatarUrl ?: return@mapNotNull null,
+                    createdAt = markerDTO.createdAt ?: return@mapNotNull null,
+                    amplitudes = markerDTO.amplitudes ?: return@mapNotNull null,
+                    icon = markerDTO.icon ?: return@mapNotNull null,
+                )
+            }
+        }
+    }
+
     suspend fun getMarkersByAuthorId(authorId: Long): Result<List<MarkerEntity>> {
         return markerDataSource.getMarkersByAuthorId(authorId).map { markerDTOS ->
             markerDTOS.mapNotNull { markerDTO ->

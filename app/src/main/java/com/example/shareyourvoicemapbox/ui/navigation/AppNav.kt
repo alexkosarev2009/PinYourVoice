@@ -16,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,11 +37,13 @@ import androidx.navigation.navArgument
 import com.example.shareyourvoicemapbox.ui.screens.auth.AuthScreen
 import com.example.shareyourvoicemapbox.ui.screens.edit.EditScreen
 import com.example.shareyourvoicemapbox.ui.screens.feed.FeedScreen
+import com.example.shareyourvoicemapbox.ui.screens.friends.FriendsScreen
 import com.example.shareyourvoicemapbox.ui.screens.invitation.InvitationScreen
 import com.example.shareyourvoicemapbox.ui.screens.map.MapScreen
 import com.example.shareyourvoicemapbox.ui.screens.person.PersonScreen
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileScreen
 import com.example.shareyourvoicemapbox.ui.screens.report.ReportScreen
+import com.example.shareyourvoicemapbox.ui.screens.search.SearchScreen
 
 @Composable
 fun AppNavHost(
@@ -79,6 +80,18 @@ fun AppNavHost(
         }
         composable(Route.PROFILE.route) {
             ProfileScreen(modifier, navHostController)
+        }
+        composable(SecondaryRoute.SEARCH.route) {
+            SearchScreen(modifier, navHostController)
+        }
+        composable("${SecondaryRoute.FRIENDS.route}?userId={userId}",
+            arguments = listOf(
+                navArgument("userId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+            )) {
+            FriendsScreen(modifier, navHostController)
         }
 
         composable(

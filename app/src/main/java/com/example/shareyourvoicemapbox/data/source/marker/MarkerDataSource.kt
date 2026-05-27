@@ -109,4 +109,19 @@ class MarkerDataSource @Inject constructor(
             response.body<MarkerDTO>()
         }
     }
+
+    suspend fun searchMarkerByTitle(
+        query: String
+    ): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = client.get("${HOST}/api/markers/search") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                parameter("query", query)
+            }
+            if (response.status != HttpStatusCode.OK) {
+                error("Error: ${response.status}")
+            }
+            response.body<List<MarkerDTO>>()
+        }
+    }
 }

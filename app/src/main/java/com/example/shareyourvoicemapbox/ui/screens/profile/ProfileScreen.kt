@@ -29,8 +29,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
@@ -225,6 +223,9 @@ fun ProfileScreen(
                         }
                     },
                     onNameIconClick = {},
+                    onFriendsClick = {
+                        navHostController.navigate("${SecondaryRoute.FRIENDS.route}?userId=${state.userId}")
+                    }
                 ) {
                     Icon(imageVector = Icons.Default.Edit,
                         contentDescription = "Edit")
@@ -316,6 +317,7 @@ fun ProfileContent(
     state: ProfileState,
     onMarkersClick: () -> Unit,
     onNameIconClick: (Long) -> Unit = {},
+    onFriendsClick: () -> Unit,
     content: @Composable (() -> Unit) = {},
     ) {
     Column(
@@ -408,7 +410,10 @@ fun ProfileContent(
                 elevation = CardDefaults.elevatedCardElevation(8.dp),
                 modifier = Modifier
                     .height(80.dp)
-                    .weight(1f),
+                    .weight(1f)
+                    .clickable(
+                        onClick = onFriendsClick
+                    ),
                 colors = CardDefaults.elevatedCardColors(
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
@@ -460,7 +465,8 @@ fun ProfileScreenPreview(modifier: Modifier = Modifier) {
     ) {
         ProfileContent(
             state = ProfileState(),
-            onMarkersClick = {  },
+            onMarkersClick = {},
+            onFriendsClick = {}
         )
     }
 }

@@ -53,6 +53,7 @@ class PersonViewModel @Inject constructor(
                         _currentUser.emit(user)
                         _state.emit(
                             ProfileState(
+                                id = user.id,
                                 fullName = user.name,
                                 userName = user.username,
                                 bio = user.bio ?: "Empty bio",

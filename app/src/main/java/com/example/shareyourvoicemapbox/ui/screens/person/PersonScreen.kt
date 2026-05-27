@@ -196,6 +196,9 @@ fun PersonScreen(
                             viewModel.openDeleteFriendDialog()
                         }
                     },
+                    onFriendsClick = {
+                        navHostController.navigate("${SecondaryRoute.FRIENDS.route}?userId=${state.userId}")
+                    }
                 ) {
                     if (friendAdded) {
                         Icon(

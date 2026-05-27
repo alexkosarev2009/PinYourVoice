@@ -11,7 +11,7 @@ data class ProfileState (
     val bio: String = "Empty bio",
     val error: String = "",
     val avatarUrl: String = "",
-    val userId: Long = 0,
+    val userId: Long = -1L,
     val markers: List<MarkerEntity> = emptyList(),
     val isRefreshing: Boolean = false,
 )

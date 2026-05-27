@@ -1,4 +1,4 @@
-package com.example.shareyourvoicemapbox.ui.screens.invitation
+package com.example.shareyourvoicemapbox.ui.screens.friends
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,17 +11,12 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,20 +28,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.shareyourvoicemapbox.ui.components.InvitationCard
+import com.example.shareyourvoicemapbox.ui.components.FriendCard
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InvitationScreen(
+fun FriendsScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    viewModel: InvitationViewModel = hiltViewModel<InvitationViewModel>()
+    viewModel: FriendsViewModel = hiltViewModel<FriendsViewModel>()
 ) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getInvitations()
+        viewModel.getData()
     }
 
     LazyColumn(
@@ -73,26 +67,22 @@ fun InvitationScreen(
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "Friend Invitations",
+                    "Friends",
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                 )
             }
         }
-        items(state.invitations,
+        items(state.friends,
             key = { it.id }
-        ) { invitation ->
-            InvitationCard(
-                invitation = invitation,
-                modifier = Modifier.animateItem(),
+        ) { friend ->
+            FriendCard(
+                friend = friend,
                 onNameClick = {
-                    navHostController.navigate("${SecondaryRoute.PERSON.route}?username=${invitation.senderUsername}")
+                    navHostController.navigate("${SecondaryRoute.PERSON.route}?username=${friend.username}")
                 },
-                onDeclineClick = {
-                    viewModel.declineInvitation(invitation.id)
-                },
-                onAcceptClick = {
-                    viewModel.acceptInvitation(invitation.id)
+                onAddClick = {
+                    viewModel.invite(friend.id)
                 }
             )
             Spacer(Modifier.height(20.dp))

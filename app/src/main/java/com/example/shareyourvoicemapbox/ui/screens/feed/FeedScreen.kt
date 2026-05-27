@@ -127,7 +127,7 @@ fun FeedScreen(
             }
         },
         onSearchClick = {
-
+            navHostController.navigate(SecondaryRoute.SEARCH.route)
         },
         onRefresh = {
             if (state.isViewingPublic) {

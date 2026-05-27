@@ -35,6 +35,8 @@ enum class SecondaryRoute(
     EDIT("edit_marker"),
     PERSON("person"),
     INVITATIONS("invitations"),
+    REPORT("report"),
+    SEARCH("search"),
 
-    REPORT("report")
+    FRIENDS("friends")
 }

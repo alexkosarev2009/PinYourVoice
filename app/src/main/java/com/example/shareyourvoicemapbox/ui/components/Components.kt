@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -53,6 +54,7 @@ import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
 import com.example.shareyourvoicemapbox.domain.entities.InvitationEntity
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
+import com.example.shareyourvoicemapbox.domain.entities.UserEntity
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
@@ -618,6 +620,87 @@ fun InvitationCard(
 
             Text(relativeText, color = Color.Gray)
         }
+    }
+}
+
+@Composable
+fun FriendCard(
+    friend: UserEntity,
+    modifier: Modifier = Modifier,
+    onNameClick: () -> Unit,
+    onAddClick: () -> Unit,
+) {
+    ElevatedCard() {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AsyncImage(
+                    model = friend.avatarUrl,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                )
+
+                Spacer(Modifier.width(10.dp))
+
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = friend.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.clickable(
+                            onClick = onNameClick,
+                        ),
+                    )
+                    Text(
+                        text = "@${friend.username}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                    )
+                }
+                Spacer(Modifier.width(16.dp))
+                IconButton(
+                    onClick = onAddClick,
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                ) {
+                    Icon(
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(28.dp),
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = "Accept invitation"
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+@Preview
+fun FriendCardPreview(modifier: Modifier = Modifier) {
+    AppTheme() {
+        FriendCard(
+            friend = UserEntity(
+                id = 0,
+                name = "Саша Косарев",
+                username = "k1riesshka",
+                bio = "Empty bio",
+                avatarUrl = "",
+            ),
+            onNameClick = {},
+            onAddClick = {}
+        )
     }
 }
 
