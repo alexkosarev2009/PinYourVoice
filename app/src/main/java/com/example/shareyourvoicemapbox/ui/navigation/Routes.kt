@@ -32,8 +32,9 @@ enum class SecondaryRoute(
     val route: String
 ) {
     AUTH("auth"),
-    REGISTER("register"),
     EDIT("edit_marker"),
     PERSON("person"),
-    INVITATIONS("invitations")
+    INVITATIONS("invitations"),
+
+    REPORT("report")
 }

@@ -60,6 +60,7 @@ import androidx.navigation.NavHostController
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.components.ShortMarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.Route
+import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileContent
 import kotlinx.coroutines.launch
 
@@ -264,11 +265,10 @@ fun PersonScreen(
                     onOpenMap = {
                         navHostController.navigate("${Route.MAP.route}?markerId=${marker.id}")
                     },
-                    onReportClick = {
-
+                    onReportClick = { id ->
+                        navHostController.navigate("${SecondaryRoute.REPORT.route}/$id")
                     },
                     onDeleteClick = {
-
                     }
                 )
                 Spacer(Modifier.height(20.dp))

@@ -518,12 +518,14 @@ fun MapScreen(
                         },
                         onConfirmLocationClick = {
                             viewModel.openEditScreen()
-
                         },
                         onGoBackClick = {
                             viewModel.goBackToRecording()
                         },
-                        context = context
+                        context = context,
+                        onReportClick = { id ->
+                            navHostController.navigate("${SecondaryRoute.REPORT.route}/$id")
+                        }
                     )
                 }
                 Box(
@@ -579,6 +581,7 @@ fun MapContent(
     onNameClick: (String) -> Unit,
     onConfirmLocationClick: () -> Unit,
     onGoBackClick: () -> Unit,
+    onReportClick: (Long) -> Unit
 ) {
     Box(
         modifier = modifier,
@@ -789,7 +792,6 @@ fun MapContent(
 
                                 if (feature.hasProperty("point_count")) {
 
-                                    Toast.makeText(context, "Cluster clicked", Toast.LENGTH_SHORT).show()
 
                                 } else {
 
@@ -952,7 +954,7 @@ fun MapContent(
                 isPLaying = systemState.isPlaying,
                 onNameClick = onNameClick,
                 onReportClick = { id ->
-
+                    onReportClick(id)
                 }
             )
         }

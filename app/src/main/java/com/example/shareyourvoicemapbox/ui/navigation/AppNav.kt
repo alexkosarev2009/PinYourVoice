@@ -41,7 +41,7 @@ import com.example.shareyourvoicemapbox.ui.screens.invitation.InvitationScreen
 import com.example.shareyourvoicemapbox.ui.screens.map.MapScreen
 import com.example.shareyourvoicemapbox.ui.screens.person.PersonScreen
 import com.example.shareyourvoicemapbox.ui.screens.profile.ProfileScreen
-import com.example.shareyourvoicemapbox.ui.screens.register.RegisterScreen
+import com.example.shareyourvoicemapbox.ui.screens.report.ReportScreen
 
 @Composable
 fun AppNavHost(
@@ -62,13 +62,14 @@ fun AppNavHost(
 
         ) {
 
-        composable("${Route.MAP.route}?markerId={markerId}",
+        composable(
+            "${Route.MAP.route}?markerId={markerId}",
             arguments = listOf(
                 navArgument("markerId") {
                     type = NavType.StringType
                     defaultValue = ""
-                }
-            )
+                },
+            ),
         ) {
             MapScreen(modifier, navHostController)
         }
@@ -79,33 +80,34 @@ fun AppNavHost(
             ProfileScreen(modifier, navHostController)
         }
 
-        composable("${SecondaryRoute.EDIT.route}/{audioPath}?lat={lat}&lng={lng}",
+        composable(
+            "${SecondaryRoute.EDIT.route}/{audioPath}?lat={lat}&lng={lng}",
             enterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { it },
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
             exitTransition = {
                 slideOutHorizontally(
                     targetOffsetX = { -it },
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
             popEnterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { -it },
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
             popExitTransition = {
                 slideOutHorizontally(
                     targetOffsetX = { it },
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
             arguments = listOf(
-                navArgument("audioPath") {type = NavType.StringType},
+                navArgument("audioPath") { type = NavType.StringType },
                 navArgument("lat") {
                     type = NavType.StringType
                     defaultValue = "0.0"
@@ -113,35 +115,70 @@ fun AppNavHost(
                 navArgument("lng") {
                     type = NavType.StringType
                     defaultValue = "0.0"
-                }
-            )
+                },
+            ),
         ) {
             EditScreen(navHostController = navHostController, modifier = modifier)
         }
         composable(SecondaryRoute.AUTH.route) {
             AuthScreen(navHostController = navHostController)
         }
-        composable(SecondaryRoute.REGISTER.route) {
-            RegisterScreen()
-        }
         composable(SecondaryRoute.INVITATIONS.route) {
             InvitationScreen(modifier, navHostController)
         }
-        composable("${SecondaryRoute.PERSON.route}?username={username}",
+        composable(
+            "${SecondaryRoute.PERSON.route}?username={username}",
             arguments = listOf(
                 navArgument("username") {
                     type = NavType.StringType
                     defaultValue = ""
-                }
-            )) {
+                },
+            ),
+        ) {
             PersonScreen(modifier, navHostController)
+        }
+        composable(
+            "${SecondaryRoute.REPORT.route}/{markerId}",
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(500),
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(500),
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(500),
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(500),
+                )
+            },
+            arguments = listOf(
+                navArgument("markerId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+            ),
+        ) {
+            ReportScreen(modifier, navHostController)
         }
     }
 }
+
 @Composable
 fun AppNav(
     modifier: Modifier = Modifier,
-    viewModel: AppViewModel = hiltViewModel<AppViewModel>()
+    viewModel: AppViewModel = hiltViewModel<AppViewModel>(),
 ) {
     val startDestination = viewModel.startDestination
 
@@ -170,10 +207,10 @@ fun AppNav(
                                 Color(0xFF0A1A2F),
                                 Color(0xFF0B1020),
                                 Color(0xFF05060A),
-                            )
-                        )
+                            ),
+                        ),
                     )
-                    else Modifier
+                    else Modifier,
                 ) {
                     if (currentRoute == "map?markerId={markerId}") Log.d("BAR", "YES")
                     Route.entries.forEach { route ->
@@ -184,11 +221,11 @@ fun AppNav(
                                 selectedIconColor = Color.White,
                                 selectedTextColor = Color.White,
                                 unselectedIconColor = Color.White.copy(alpha = 0.7f),
-                                unselectedTextColor = Color.White.copy(alpha = 0.7f)
+                                unselectedTextColor = Color.White.copy(alpha = 0.7f),
                             ) else NavigationBarItemDefaults.colors(
-                                indicatorColor = Color.Transparent
+                                indicatorColor = Color.Transparent,
                             ),
-                            selected = when(route) {
+                            selected = when (route) {
                                 Route.MAP -> currentRoute == "map?markerId={markerId}"
                                 else -> currentRoute == route.route
                             },
@@ -203,7 +240,7 @@ fun AppNav(
                             },
                             icon = {
                                 Icon(
-                                    imageVector = when(route) {
+                                    imageVector = when (route) {
                                         Route.MAP -> if (currentRoute == "map?markerId={markerId}") route.icon else route.iconOutlined
                                         else -> if (route.route == currentRoute) route.icon else route.iconOutlined
                                     },
@@ -218,8 +255,8 @@ fun AppNav(
                     }
                 }
             }
-        }
-        ) { padding ->
+        },
+    ) { padding ->
 
         AppNavHost(
             navHostController = navController,

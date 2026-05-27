@@ -164,7 +164,7 @@ fun FeedScreen(
             navHostController.navigate("${SecondaryRoute.PERSON.route}?username=$username")
         },
         onReportClick = { id ->
-
+            navHostController.navigate("${SecondaryRoute.REPORT.route}/$id")
         }
     )
 }
