@@ -152,4 +152,15 @@ class ProfileViewModel @Inject constructor(
             _showDeleteMarkerDialog.emit(false)
         }
     }
+
+    fun closeLogOutDialog() {
+        _uiState.update {
+            it.copy(showLogOutDialog = false)
+        }
+    }
+    fun openLogOutDialog() {
+        _uiState.update {
+            it.copy(showLogOutDialog = true)
+        }
+    }
 }

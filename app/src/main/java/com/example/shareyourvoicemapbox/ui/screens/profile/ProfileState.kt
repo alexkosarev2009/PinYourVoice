@@ -14,4 +14,5 @@ data class ProfileState (
     val userId: Long = -1L,
     val markers: List<MarkerEntity> = emptyList(),
     val isRefreshing: Boolean = false,
+    val showLogOutDialog: Boolean = false,
 )

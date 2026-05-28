@@ -74,8 +74,8 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    viewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>()
-    ) {
+    viewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>(),
+) {
 
     val state by viewModel.uiState.collectAsState()
 
@@ -143,6 +143,60 @@ fun ProfileScreen(
             },
         )
     }
+    if (state.showLogOutDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.closeLogOutDialog()
+            },
+            shape = RoundedCornerShape(28.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = {
+                Text(
+                    text = "Log out?",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to log out?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.closeLogOutDialog()
+                        viewModel.onLogOutClick()
+                        navHostController.navigate(SecondaryRoute.AUTH.route) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                ) {
+                    Text(
+                        text = "Log out",
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.closeLogOutDialog()
+                    },
+                ) {
+                    Text(
+                        text = "Cancel",
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            },
+        )
+    }
 
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
@@ -156,9 +210,9 @@ fun ProfileScreen(
                 isRefreshing = state.isRefreshing,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter),
             )
-        }
+        },
     ) {
         LazyColumn(
             state = listState,
@@ -195,12 +249,7 @@ fun ProfileScreen(
 
                         IconButton(
                             onClick = {
-                                viewModel.onMenuClick()
-                                navHostController.navigate(SecondaryRoute.AUTH.route) {
-                                    popUpTo(0) {
-                                        inclusive = true
-                                    }
-                                }
+                                viewModel.openLogOutDialog()
                             },
                         ) {
                             Icon(
@@ -225,10 +274,12 @@ fun ProfileScreen(
                     onNameIconClick = {},
                     onFriendsClick = {
                         navHostController.navigate("${SecondaryRoute.FRIENDS.route}?userId=${state.userId}")
-                    }
+                    },
                 ) {
-                    Icon(imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit")
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit",
+                    )
                 }
             }
             stickyHeader {
@@ -293,7 +344,7 @@ fun ProfileScreen(
                     onDeleteClick = { id ->
                         viewModel.openDeleteMarkerDialog(id)
                     },
-                    isDeleteVisible = true
+                    isDeleteVisible = true,
                 )
                 Spacer(Modifier.height(20.dp))
             }
@@ -319,27 +370,29 @@ fun ProfileContent(
     onNameIconClick: (Long) -> Unit = {},
     onFriendsClick: () -> Unit,
     content: @Composable (() -> Unit) = {},
-    ) {
+) {
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceContainerHighest),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
 
-                Icon(imageVector = Icons.Default.Person,
+                Icon(
+                    imageVector = Icons.Default.Person,
                     contentDescription = "default avatar",
                     modifier = Modifier.size(68.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 if (state.avatarUrl != "") {
                     AsyncImage(
                         modifier = Modifier
@@ -347,14 +400,14 @@ fun ProfileContent(
                             .clip(CircleShape),
                         model = state.avatarUrl,
                         contentDescription = "user avatar",
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
                     )
                 }
             }
             Spacer(Modifier.height(8.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(28.dp, 0.dp, 0.dp, 0.dp)
+                modifier = Modifier.padding(28.dp, 0.dp, 0.dp, 0.dp),
             ) {
                 Text(state.fullName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 IconButton(
@@ -369,7 +422,7 @@ fun ProfileContent(
             modifier = Modifier
                 .padding(24.dp, 0.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
         ) {
             ElevatedCard(
                 elevation = CardDefaults.elevatedCardElevation(8.dp),
@@ -377,31 +430,40 @@ fun ProfileContent(
                     .height(80.dp)
                     .weight(1f)
                     .clickable(
-                        onClick = onMarkersClick
+                        onClick = onMarkersClick,
                     ),
                 colors = CardDefaults.elevatedCardColors(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(4.dp)
+                        .padding(4.dp),
                 ) {
                     Icon(
                         modifier = Modifier.align(Alignment.TopEnd),
                         imageVector = Icons.Default.Place,
                         contentDescription = "marker",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                     Column(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .padding(8.dp)
+                            .padding(8.dp),
                     ) {
-                        Text(state.markers.size.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                        Text("Markers", fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
+                        Text(
+                            state.markers.size.toString(),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                        Text(
+                            "Markers",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
                     }
                 }
             }
@@ -412,31 +474,40 @@ fun ProfileContent(
                     .height(80.dp)
                     .weight(1f)
                     .clickable(
-                        onClick = onFriendsClick
+                        onClick = onFriendsClick,
                     ),
                 colors = CardDefaults.elevatedCardColors(
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                )
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(4.dp)
+                        .padding(4.dp),
                 ) {
                     Icon(
                         modifier = Modifier.align(Alignment.TopEnd),
                         imageVector = Icons.Default.PeopleAlt,
                         contentDescription = "marker",
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Column(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .padding(8.dp)
+                            .padding(8.dp),
                     ) {
-                        Text(state.friends.size.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                        Text("Friends", fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
+                        Text(
+                            state.friends.size.toString(),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            "Friends",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
                     }
                 }
             }
@@ -445,12 +516,14 @@ fun ProfileContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp, 0.dp)
+                .padding(24.dp, 0.dp),
         ) {
             Text("Bio", fontWeight = FontWeight.Bold)
-            Text(state.bio, fontStyle = FontStyle.Italic,
+            Text(
+                state.bio, fontStyle = FontStyle.Italic,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Light)
+                fontWeight = FontWeight.Light,
+            )
         }
         Spacer(Modifier.height(16.dp))
     }
@@ -461,12 +534,12 @@ fun ProfileContent(
 @Preview(showSystemUi = true)
 fun ProfileScreenPreview(modifier: Modifier = Modifier) {
     AppTheme(
-        darkTheme = false
+        darkTheme = false,
     ) {
         ProfileContent(
             state = ProfileState(),
             onMarkersClick = {},
-            onFriendsClick = {}
+            onFriendsClick = {},
         )
     }
 }
