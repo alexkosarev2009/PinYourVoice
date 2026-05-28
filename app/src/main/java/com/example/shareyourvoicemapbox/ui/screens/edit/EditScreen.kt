@@ -244,10 +244,10 @@ fun EditScreen(
             },
             imageScale = imageScale,
             onFriendsOnlyClick = {
-                viewModel.onPublicClick()
+                viewModel.onFriendsOnlyClick()
             },
             onPublicClick = {
-                viewModel.onFriendsOnlyClick()
+                viewModel.onPublicClick()
             }
         )
     }
@@ -617,7 +617,7 @@ fun EditContent(
         Spacer(Modifier.height(24.dp))
 
         SecondaryTabRow (
-            selectedTabIndex = 0
+            selectedTabIndex = if (state.isPublicSelected) 0 else 1
         ) {
             Tab(
                 selected = state.isPublicSelected,

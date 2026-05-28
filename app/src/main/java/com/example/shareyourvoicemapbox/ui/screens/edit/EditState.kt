@@ -15,5 +15,5 @@ data class EditState(
     val isDone: Boolean = false,
     val chosenMarker: Int = 1,
 
-    val isPublicSelected: Boolean = false,
+    val isPublicSelected: Boolean = true,
 )

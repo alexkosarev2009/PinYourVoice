@@ -199,11 +199,21 @@ fun MapScreen(
     }
     LaunchedEffect(currentMarker) {
         currentMarker?.let { marker ->
-            systemState.mapViewportState.flyTo(
-                cameraOptions {
-                    center(Point.fromLngLat(marker.lng, marker.lat))
-                },
-            )
+            if ((systemState.mapViewportState.cameraState?.zoom ?: 0.0) < 15.0) {
+                systemState.mapViewportState.flyTo(
+                    cameraOptions {
+                        center(Point.fromLngLat(marker.lng, marker.lat))
+                        zoom(15.0)
+                    },
+                )
+            }
+            else {
+                systemState.mapViewportState.flyTo(
+                    cameraOptions {
+                        center(Point.fromLngLat(marker.lng, marker.lat))
+                    },
+                )
+            }
         }
     }
 
