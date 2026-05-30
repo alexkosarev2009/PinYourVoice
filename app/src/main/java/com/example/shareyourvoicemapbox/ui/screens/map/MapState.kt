@@ -1,7 +1,6 @@
 package com.example.shareyourvoicemapbox.ui.screens.map
 
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
-import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 
 sealed interface MapState {
     data class Content(

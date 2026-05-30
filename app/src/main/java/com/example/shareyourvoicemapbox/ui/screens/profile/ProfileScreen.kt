@@ -330,7 +330,6 @@ fun ProfileScreen(
                         .padding(24.dp, 0.dp)
                         .animateItem(),
                     marker = marker,
-                    onMenuClick = {},
                     waveformProgress = 0f,
                     onWaveformProgressChange = {},
                     onPlayClick = { },

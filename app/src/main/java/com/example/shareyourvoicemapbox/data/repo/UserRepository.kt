@@ -3,7 +3,6 @@ package com.example.shareyourvoicemapbox.data.repo
 import com.example.shareyourvoicemapbox.data.exceptions.AppException
 import com.example.shareyourvoicemapbox.data.source.user.UserDataSource
 import com.example.shareyourvoicemapbox.domain.entities.UserEntity
-import com.mapbox.maps.extension.style.expressions.dsl.generated.id
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(

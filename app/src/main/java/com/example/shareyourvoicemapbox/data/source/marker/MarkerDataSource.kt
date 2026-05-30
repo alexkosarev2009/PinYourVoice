@@ -4,7 +4,6 @@ import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.data.dto.MarkerDTO
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
-import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete

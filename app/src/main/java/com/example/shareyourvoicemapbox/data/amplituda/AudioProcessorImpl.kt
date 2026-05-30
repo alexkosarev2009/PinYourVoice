@@ -1,10 +1,8 @@
 package com.example.shareyourvoicemapbox.data.amplituda
 
 import android.content.Context
-import android.util.Log
 import com.example.shareyourvoicemapbox.domain.amplituda.AudioProcessor
 import com.linc.amplituda.Amplituda
-import com.linc.amplituda.exceptions.io.AmplitudaIOException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
 import kotlin.coroutines.resume

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.domain.markers.GetMarkersByAuthorIdUseCase
-import com.example.shareyourvoicemapbox.domain.markers.GetMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.markers.GetPublicMarkersUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.GetCurrentExoPositionUseCase
 import com.example.shareyourvoicemapbox.domain.player.exo.PauseExoAudioUseCase

@@ -72,12 +72,10 @@ fun MarkerCard(
     onPlayClick: () -> Unit,
     onOpenMap: () -> Unit,
     amplitudes: List<Int>,
-    onMenuClick: () -> Unit,
     waveformProgress: Float,
     onWaveformProgressChange: (Float) -> Unit,
     name: String,
     createdAt: String,
-    audioUrl: String,
     isPLaying: Boolean = false,
     onReportClick: (Long) -> Unit,
     onNameClick: () -> Unit = {}
@@ -276,8 +274,6 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
             onWaveformProgressChange = {},
             name = "Саша Косарев",
             createdAt = "2026-04-25T19:48:26.812081Z",
-            audioUrl = "",
-            onMenuClick = {},
             id = 1L,
             onNameClick = {},
             onReportClick = {}
@@ -289,7 +285,6 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
 fun ShortMarkerCard(
     modifier: Modifier = Modifier,
     marker: MarkerEntity,
-    onMenuClick: () -> Unit,
     waveformProgress: Float,
     onWaveformProgressChange: (Float) -> Unit,
     onPlayClick: () -> Unit,
@@ -305,7 +300,7 @@ fun ShortMarkerCard(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Column() {
+        Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -402,7 +397,7 @@ fun ShortMarkerCard(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Column() {
+                    Column {
                         Text(
                             text = marker.title,
                             style = MaterialTheme.typography.titleLarge
@@ -516,7 +511,6 @@ fun ShortMarkerCardPreview() {
                 audioUrl = "",
                 icon = 1
             ),
-            onMenuClick = {},
             waveformProgress = 0.7f,
             onWaveformProgressChange = {},
             onPlayClick = {},
@@ -536,7 +530,7 @@ fun InvitationCard(
     onAcceptClick: (Long) -> Unit,
     onDeclineClick: (Long) -> Unit
 ) {
-    ElevatedCard() {
+    ElevatedCard {
         Column(
             modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.End
@@ -630,7 +624,7 @@ fun FriendCard(
     onNameClick: () -> Unit,
     onAddClick: () -> Unit,
 ) {
-    ElevatedCard() {
+    ElevatedCard {
         Column(
             modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.End
@@ -689,7 +683,7 @@ fun FriendCard(
 @Composable
 @Preview
 fun FriendCardPreview(modifier: Modifier = Modifier) {
-    AppTheme() {
+    AppTheme {
         FriendCard(
             friend = UserEntity(
                 id = 0,
@@ -720,36 +714,5 @@ fun InvitationCardPreview(modifier: Modifier = Modifier) {
             onNameClick = {},
             onDeclineClick = {}
         )
-    }
-}
-
-@Composable
-fun MinimalDropdownMenu(
-
-) {
-    var expanded by remember { mutableStateOf(false) }
-    Box(
-        modifier = Modifier
-    ) {
-        IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("Delete Marker", color = MaterialTheme.colorScheme.error) },
-                leadingIcon = { Icon(Icons.Default.Delete, null,
-                    tint = MaterialTheme.colorScheme.error) },
-
-                onClick = { /* Do something... */ }
-            )
-            DropdownMenuItem(
-                text = { Text("Report") },
-                leadingIcon = { Icon(Icons.Default.Flag, null) },
-                onClick = { /* Do something... */ },
-            )
-        }
     }
 }

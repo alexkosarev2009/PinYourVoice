@@ -1,6 +1,5 @@
 package com.example.shareyourvoicemapbox.data.source.user
 
-import android.util.Log
 import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.UserDTO
 import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage

@@ -306,9 +306,7 @@ fun FeedContent(
                         onWaveformProgressChange = onWaveformProgressChange,
                         name = marker.authorName,
                         createdAt = marker.createdAt,
-                        audioUrl = marker.audioUrl,
                         isPLaying = playerState.isPlaying && state.currentAudioUrl == marker.audioUrl,
-                        onMenuClick = {},
                         onNameClick = {
                             onNameClick(marker.authorUsername)
                         },
