@@ -51,11 +51,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.components.ShortMarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.Route
@@ -146,7 +148,7 @@ fun PersonScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Go back"
+                            contentDescription = stringResource(R.string.go_back)
                         )
                     }
                     Row {
@@ -157,7 +159,7 @@ fun PersonScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Flag,
-                                contentDescription = "Notifications",
+                                contentDescription = stringResource(R.string.notifications),
                             )
                         }
 
@@ -170,7 +172,7 @@ fun PersonScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu",
+                                contentDescription = stringResource(R.string.menu),
                             )
                         }
                     }
@@ -202,13 +204,13 @@ fun PersonScreen(
                     if (friendAdded) {
                         Icon(
                             imageVector = Icons.Default.Group,
-                            contentDescription = "Delete friend"
+                            contentDescription = stringResource(R.string.delete_friend),
                         )
                     }
                     else {
                         Icon(
                             imageVector = Icons.Default.PersonAdd,
-                            contentDescription = "Add friend"
+                            contentDescription = stringResource(R.string.add_friend)
                         )
                     }
                 }
@@ -224,7 +226,7 @@ fun PersonScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        "Markers",
+                        text = stringResource(R.string.markers),
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
                     )
@@ -237,7 +239,7 @@ fun PersonScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowUp,
-                                contentDescription = "Scroll up",
+                                contentDescription = stringResource(R.string.scroll_up),
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
@@ -277,7 +279,7 @@ fun PersonScreen(
             item {
                 if (state.markers == emptyList<MarkerEntity>()) {
                     Text(
-                        "No markers yet",
+                        text = stringResource(R.string.no_markers_yet),
                     )
                 }
             }
@@ -299,14 +301,14 @@ fun DeleteFriendDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Text(
-                text = "Delete friend?",
+                text = stringResource(R.string.delete_friend_q),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.SemiBold,
             )
         },
         text = {
             Text(
-                text = "Are you sure you want to remove this user from your friends list?",
+                text = stringResource(R.string.are_you_sure_you_want_to_remove_this_user_from_your_friends_list),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -316,7 +318,7 @@ fun DeleteFriendDialog(
                 onClick = onConfirm,
             ) {
                 Text(
-                    text = "Delete",
+                    text = stringResource(R.string.delete),
                     color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -327,7 +329,7 @@ fun DeleteFriendDialog(
                 onClick = onDismiss,
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.cancel),
                     fontWeight = FontWeight.Medium,
                 )
             }

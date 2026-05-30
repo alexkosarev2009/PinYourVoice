@@ -48,9 +48,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
 import com.example.shareyourvoicemapbox.domain.entities.InvitationEntity
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
@@ -126,14 +128,14 @@ fun MarkerCard(
                     modifier = Modifier
                 ) {
                     IconButton(onClick = { expanded = !expanded }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
                     }
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Report") },
+                            text = { Text(stringResource(R.string.report)) },
                             leadingIcon = { Icon(Icons.Default.Flag, null) },
                             onClick = {
                                 onReportClick(id)
@@ -188,7 +190,7 @@ fun MarkerCard(
                         Icons.Default.Pause else Icons.Default.PlayArrow
                     Icon(
                         imageVector = imageVector,
-                        contentDescription = "Play audio",
+                        contentDescription = stringResource(R.string.play_audio),
                         tint = MaterialTheme.colorScheme.background,
                         modifier = Modifier.size(32.dp),
                     )
@@ -246,7 +248,7 @@ fun MarkerCard(
                 ) {
                     Icon(
                         Icons.Default.Map,
-                        contentDescription = "Go to map",
+                        contentDescription = stringResource(R.string.go_to_map),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
@@ -336,7 +338,7 @@ fun ShortMarkerCard(
                     modifier = Modifier
                 ) {
                     IconButton(onClick = { expanded = !expanded }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
                     }
                     DropdownMenu(
                         expanded = expanded,
@@ -346,8 +348,8 @@ fun ShortMarkerCard(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "Delete Marker",
-                                        color = MaterialTheme.colorScheme.error
+                                        stringResource(R.string.delete_marker),
+                                        color = MaterialTheme.colorScheme.error,
                                     )
                                 },
                                 leadingIcon = {
@@ -360,11 +362,11 @@ fun ShortMarkerCard(
                                 onClick = {
                                     onDeleteClick(marker.id)
                                     expanded = false
-                                }
+                                },
                             )
                         }
                         DropdownMenuItem(
-                            text = { Text("Report") },
+                            text = { Text(stringResource(R.string.report)) },
                             leadingIcon = { Icon(Icons.Default.Flag, null) },
                             onClick = {
                                 onReportClick(marker.id)
@@ -380,7 +382,7 @@ fun ShortMarkerCard(
             ) {
                 AsyncImage(
                     model = marker.imageUrl,
-                    contentDescription = "image",
+                    contentDescription = stringResource(R.string.image),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .weight(1.5f)
@@ -422,7 +424,7 @@ fun ShortMarkerCard(
                     ) {
                         Icon(
                             Icons.Default.Map,
-                            contentDescription = "Go to map",
+                            contentDescription = stringResource(R.string.go_to_map),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
@@ -461,7 +463,7 @@ fun ShortMarkerCard(
                         Icons.Default.Pause else Icons.Default.PlayArrow
                     Icon(
                         imageVector = imageVector,
-                        contentDescription = "Play audio",
+                        contentDescription =  stringResource(R.string.play_audio),
                         tint = MaterialTheme.colorScheme.background,
                         modifier = Modifier.size(32.dp),
                     )
@@ -580,7 +582,7 @@ fun InvitationCard(
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(28.dp),
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Accept invitation"
+                        contentDescription = stringResource(R.string.accept_invitation),
                     )
                 }
                 Spacer(Modifier.width(16.dp))
@@ -597,7 +599,7 @@ fun InvitationCard(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(28.dp),
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Accept invitation"
+                        contentDescription = stringResource(R.string.decline_invitation),
                     )
                 }
 
@@ -672,7 +674,7 @@ fun FriendCard(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(28.dp),
                         imageVector = Icons.Default.PersonAdd,
-                        contentDescription = "Accept invitation"
+                        contentDescription = stringResource(R.string.add_friend),
                     )
                 }
             }

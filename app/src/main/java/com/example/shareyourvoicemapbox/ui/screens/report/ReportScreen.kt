@@ -33,14 +33,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.shareyourvoicemapbox.ui.theme.AppTheme
+import com.example.shareyourvoicemapbox.R
 
 @Composable
 fun ReportScreen(
@@ -76,12 +76,12 @@ fun ReportScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBackIosNew,
-                        contentDescription = "Go back"
+                        contentDescription = stringResource(R.string.go_back)
                     )
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "Report content",
+                    text = stringResource(R.string.report_content),
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                 )
@@ -98,7 +98,10 @@ fun ReportScreen(
         }
     }
     Box(
-        modifier = Modifier.fillMaxSize().navigationBarsPadding().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .padding(16.dp),
         contentAlignment = Alignment.BottomCenter,
     ) {
         Button(
@@ -117,10 +120,10 @@ fun ReportScreen(
                 if (!state.isLoading) {
                     Icon(
                         imageVector = Icons.Default.Flag,
-                        contentDescription = "Report",
+                        contentDescription = stringResource(R.string.report),
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Submit", fontSize = 20.sp)
+                    Text(text = stringResource(R.string.submit), fontSize = 20.sp)
                 } else {
                     CircularProgressIndicator(
                         trackColor = MaterialTheme.colorScheme.onPrimary,
@@ -136,10 +139,11 @@ fun ReportScreen(
 fun ReportContent(
     state: ReportState,
     onOptionSelect: (String) -> Unit,
-    options: List<String>
+    options: List<Int>
 ) {
     Column(Modifier.selectableGroup()) {
-        options.forEach { text ->
+        options.forEach { resource ->
+            val text = stringResource(resource)
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -163,27 +167,5 @@ fun ReportContent(
                 )
             }
         }
-    }
-}
-
-
-@Composable
-@Preview
-fun ReportScreenPreview(
-    modifier: Modifier = Modifier,
-) {
-    AppTheme() {
-        ReportContent(
-            onOptionSelect = {},
-            state = ReportState(),
-            options = listOf(
-                "Spam",
-                "Frauds and scams",
-                "Inappropriate content",
-                "Misinformation",
-                "Violence or graphic content",
-                "Hate and harassment"
-            )
-        )
     }
 }

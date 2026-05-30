@@ -38,12 +38,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.ui.navigation.Route
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
@@ -151,18 +153,22 @@ fun AuthContent(
                     onClick = onSignInClick
                 )
             ) {
-                Text("Sign in",
+                Text(
+                    stringResource(R.string.sign_in),
                     color = if (state.isSignInSelected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onBackground)
+                    else MaterialTheme.colorScheme.onBackground,
+                )
                 Spacer(Modifier.height(8.dp))
             }
             Tab(
                 selected = state.isSignUpSelected,
                 onClick = onSignUpClick
             ) {
-                Text("Sign up",
+                Text(
+                    stringResource(R.string.sign_up),
                     color = if (state.isSignUpSelected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onBackground)
+                    else MaterialTheme.colorScheme.onBackground,
+                )
                 Spacer(Modifier.height(8.dp))
             }
         }
@@ -189,11 +195,11 @@ fun AuthContent(
                             value = state.username,
                             onValueChange = onLoginChange,
                             label = {
-                                Text("Login")
+                                Text(stringResource(R.string.login))
                             },
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
-                            isError = state.error.isNotEmpty()
+                            isError = state.error.isNotEmpty(),
                         )
 
                         Spacer(Modifier.height(8.dp))
@@ -202,7 +208,7 @@ fun AuthContent(
                             value = state.password,
                             onValueChange = onPasswordChange,
                             label = {
-                                Text("Password")
+                                Text(stringResource(R.string.password))
                             },
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
@@ -210,7 +216,7 @@ fun AuthContent(
                                 keyboardType = KeyboardType.Password
                             ),
                             visualTransformation = PasswordVisualTransformation(),
-                            isError = state.error.isNotEmpty()
+                            isError = state.error.isNotEmpty(),
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
@@ -223,7 +229,7 @@ fun AuthContent(
                             onClick = onLoginClick,
                             enabled = state.isEnableLogin
                         ) {
-                            Text("Sign in")
+                            Text(stringResource(R.string.sign_in))
                         }
                     }
                 }
@@ -249,7 +255,7 @@ fun AuthContent(
                             value = state.email,
                             onValueChange = onEmailChange,
                             label = {
-                                Text("Email")
+                                Text(stringResource(R.string.email))
                             },
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
@@ -261,7 +267,7 @@ fun AuthContent(
                             value = state.registerPassword,
                             onValueChange = onRegisterPasswordChange,
                             label = {
-                                Text("Password")
+                                Text(stringResource(R.string.password))
                             },
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
@@ -281,7 +287,7 @@ fun AuthContent(
                             onClick = onRegisterClick,
                             enabled = state.isEnableRegister,
                         ) {
-                            Text("Sign up")
+                            Text(stringResource(R.string.sign_up))
                         }
                     }
                 }
@@ -307,12 +313,12 @@ fun AuthContent(
                             value = state.registerUsername,
                             onValueChange = onRegisterUsernameChange,
                             label = {
-                                Text("Username")
+                                Text(stringResource(R.string.username))
                             },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.AlternateEmail,
-                                    contentDescription = "username"
+                                    contentDescription = stringResource(R.string.username)
                                 )
                             },
                             shape = RoundedCornerShape(16.dp),
@@ -325,12 +331,12 @@ fun AuthContent(
                             value = state.registerName,
                             onValueChange = onRegisterNameChange,
                             label = {
-                                Text("Full name")
+                                Text(stringResource(R.string.full_name))
                             },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Person,
-                                    contentDescription = "full name"
+                                    contentDescription = stringResource(R.string.full_name)
                                 )
                             },
                             shape = RoundedCornerShape(16.dp),
@@ -360,7 +366,7 @@ fun AuthContent(
                                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 ),
                             ) {
-                                Text("Back")
+                                Text(stringResource(R.string.go_back))
                             }
                             Spacer(Modifier.width(8.dp))
                             Button(
@@ -370,7 +376,7 @@ fun AuthContent(
                                 onClick = onFinishRegisterClick,
                                 enabled = state.isEnableRegister,
                             ) {
-                                Text("Register")
+                                Text(stringResource(R.string.register))
                             }
                         }
                     }

@@ -108,6 +108,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -314,7 +315,7 @@ fun MapScreen(
                         Icon(
                             modifier = Modifier,
                             imageVector = ImageVector.vectorResource(R.drawable.no_connection_icon),
-                            contentDescription = "Connection status",
+                            contentDescription = stringResource(R.string.connection_status),
                             tint = Color.Gray,
                         )
                         Icon(
@@ -325,13 +326,13 @@ fun MapScreen(
                                 .background(MaterialTheme.colorScheme.background),
                             tint = MaterialTheme.colorScheme.error,
                             imageVector = Icons.Default.Cancel,
-                            contentDescription = "No connection",
+                            contentDescription = stringResource(R.string.no_connection),
                         )
                     }
                     Spacer(Modifier.height(8.dp))
 
                     Text(
-                        text = "No internet connection",
+                        text = stringResource(R.string.no_internet_connection),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -343,7 +344,7 @@ fun MapScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                     Spacer(Modifier.height(8.dp))
-                    Text(text = "Offline maps not supported")
+                    Text(text = stringResource(R.string.offline_maps_not_supported))
                 }
 
             } else {
@@ -387,7 +388,7 @@ fun MapScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.NearMe,
-                                        contentDescription = "My location",
+                                        contentDescription = stringResource(R.string.my_location),
                                         modifier = Modifier.size(28.dp),
                                     )
                                 }
@@ -436,16 +437,17 @@ fun MapScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.AddLocationAlt,
-                                        contentDescription = "Add marker",
+                                        contentDescription = stringResource(R.string.add_marker),
                                         modifier = Modifier.size(30.dp),
                                     )
                                 }
                             }
                         }
+                        val message = stringResource(R.string.couldn_t_load_markers)
                         LaunchedEffect(currentState.error) {
                             if (currentState.error != "") {
                                 snackbarHostState.showSnackbar(
-                                    message = "Couldn't load markers",
+                                    message = message,
                                     duration = SnackbarDuration.Short,
                                     withDismissAction = true,
                                 )
@@ -933,7 +935,7 @@ fun MapContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Back to recording",
+                            contentDescription = stringResource(R.string.back_to_recording),
                             modifier = Modifier.size(30.dp),
                         )
                     }
@@ -945,7 +947,7 @@ fun MapContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Confirm location",
+                            contentDescription = stringResource(R.string.confirm_location),
                             modifier = Modifier.size(30.dp),
                         )
                     }
@@ -974,7 +976,9 @@ fun MapContent(
         contentAlignment = Alignment.TopCenter,
     ) {
         SingleChoiceSegmentedButtonRow(
-            modifier = Modifier.statusBarsPadding().systemBarsPadding(),
+            modifier = Modifier
+                .statusBarsPadding()
+                .systemBarsPadding(),
         ) {
             SegmentedButton(
                 colors = SegmentedButtonDefaults.colors(
@@ -991,11 +995,11 @@ fun MapContent(
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Public,
-                        contentDescription = "Global",
+                        contentDescription = stringResource(R.string.global),
                     )
                 },
                 label = {
-                    Text("Global")
+                    Text(stringResource(R.string.global))
                 },
             )
             SegmentedButton(
@@ -1013,11 +1017,11 @@ fun MapContent(
                 icon = {
                     Icon(
                         imageVector = Icons.Default.People,
-                        contentDescription = "Friends",
+                        contentDescription = stringResource(R.string.friends),
                     )
                 },
                 label = {
-                    Text("Friends")
+                    Text(stringResource(R.string.friends))
                 },
             )
         }
@@ -1043,16 +1047,16 @@ fun MapContent(
         PermissionSettingsDialog(
             onConfirm = onConfirmPermissionSettingsDialog,
             onDismiss = onDismissPermissionSettingsDialog,
-            title = "Couldn't record audio",
-            text = "Please allow microphone access in App Settings.",
+            title = stringResource(R.string.couldn_t_record_audio),
+            text = stringResource(R.string.please_allow_microphone_access_in_app_settings),
         )
     }
     if (state.showFineLocationPermissionDialog) {
         PermissionSettingsDialog(
             onConfirm = onConfirmFineLocationDialog,
             onDismiss = onDismissFineLocationDialog,
-            title = "Couldn't fetch your current location",
-            text = "Please allow location access in App Settings.",
+            title = stringResource(R.string.couldn_t_fetch_your_current_location),
+            text = stringResource(R.string.please_allow_location_access_in_app_settings),
         )
     }
 }
@@ -1095,7 +1099,7 @@ fun AddMarkerDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete recording",
+                        contentDescription = stringResource(R.string.delete_recording),
                         modifier = Modifier.size(32.dp),
                     )
                 }
@@ -1133,7 +1137,7 @@ fun AddMarkerDialog(
                         Icon(
                             modifier = Modifier.size(28.dp),
                             imageVector = Icons.Default.KeyboardVoice,
-                            contentDescription = "Record",
+                            contentDescription = stringResource(R.string.record),
                             tint = MaterialTheme.colorScheme.onPrimary,
                         )
                         CircularProgressIndicator(
@@ -1159,7 +1163,7 @@ fun AddMarkerDialog(
                     ) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Save recording",
+                        contentDescription = stringResource(R.string.save_recording),
                         modifier = Modifier.size(32.dp),
                     )
                 }
@@ -1241,7 +1245,7 @@ fun ViewMarkerDialog(
                         onDismissRequest = { expanded = false },
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Report") },
+                            text = { Text(stringResource(R.string.report)) },
                             leadingIcon = { Icon(Icons.Default.Flag, null) },
                             onClick = {
                                 onReportClick(marker.id)
@@ -1257,7 +1261,7 @@ fun ViewMarkerDialog(
             ) {
                 AsyncImage(
                     model = marker.imageUrl,
-                    contentDescription = "image",
+                    contentDescription = stringResource(R.string.image),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .weight(1.5f)
@@ -1313,7 +1317,7 @@ fun ViewMarkerDialog(
                             imageVector =
                                 if (!isPLaying) Icons.Default.PlayArrow
                                 else Icons.Default.Pause,
-                            contentDescription = "Play audio",
+                            contentDescription = stringResource(R.string.play_audio),
                             tint = MaterialTheme.colorScheme.background,
                             modifier = Modifier.size(36.dp),
                         )
@@ -1374,12 +1378,12 @@ fun PermissionSettingsDialog(
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("To settings")
+                Text(stringResource(R.string.to_settings))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         },
     )

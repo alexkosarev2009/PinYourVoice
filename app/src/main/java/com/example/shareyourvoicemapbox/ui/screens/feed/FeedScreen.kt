@@ -44,12 +44,14 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
 import com.example.shareyourvoicemapbox.ui.components.MarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.Route
@@ -214,7 +216,7 @@ fun FeedContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    "Discover",
+                    text = stringResource(R.string.discover),
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                 )
@@ -223,7 +225,7 @@ fun FeedContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
+                        contentDescription = stringResource(R.string.search),
                         modifier = Modifier.size(32.dp),
                     )
                 }
@@ -239,7 +241,7 @@ fun FeedContent(
                     onClick = onViewPublicClick,
                 ) {
                     Text(
-                        text = "Global",
+                        text = stringResource(R.string.global),
                         color = if (state.isViewingPublic) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onBackground,
                     )
@@ -250,7 +252,7 @@ fun FeedContent(
                     onClick = onViewFriendsClick,
                 ) {
                     Text(
-                        text = "Friends",
+                        text = stringResource(R.string.friends),
                         color = if (!state.isViewingPublic) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onBackground,
                     )
@@ -317,7 +319,7 @@ fun FeedContent(
                 }
             }
             Spacer(Modifier.height(140.dp))
-            Text("No markers yet")
+            Text(stringResource(R.string.no_markers_yet))
         }
     }
 }

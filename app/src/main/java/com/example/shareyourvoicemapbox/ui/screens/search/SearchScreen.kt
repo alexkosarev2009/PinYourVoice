@@ -29,9 +29,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.domain.amplituda.ParseAmplitudesUseCase
 import com.example.shareyourvoicemapbox.ui.components.MarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
@@ -70,7 +72,7 @@ fun SearchScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(R.string.go_back)
                 )
             }
 
@@ -93,7 +95,7 @@ fun SearchScreen(
                         expanded = false,
                         onExpandedChange = {},
                         placeholder = {
-                            Text("Search markers")
+                            Text(stringResource(R.string.search_markers))
                         },
                         trailingIcon = {
                             IconButton(
@@ -106,9 +108,9 @@ fun SearchScreen(
                                     contentDescription = null
                                 )
                             }
-                        }
+                        },
                     )
-                }
+                },
             ) {}
         }
 
@@ -123,8 +125,8 @@ fun SearchScreen(
             ) {
 
                 Text(
-                    text = "Find anything",
-                    style = MaterialTheme.typography.titleMedium
+                    text = stringResource(R.string.find_anything),
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
 

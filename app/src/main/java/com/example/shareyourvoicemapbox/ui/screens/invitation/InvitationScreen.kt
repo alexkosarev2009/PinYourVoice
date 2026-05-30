@@ -24,11 +24,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.ui.components.InvitationCard
 import com.example.shareyourvoicemapbox.ui.navigation.SecondaryRoute
 
@@ -46,7 +48,9 @@ fun InvitationScreen(
     }
 
     LazyColumn(
-        modifier = Modifier.statusBarsPadding().padding(24.dp, 0.dp)
+        modifier = Modifier
+            .statusBarsPadding()
+            .padding(24.dp, 0.dp)
     ) {
         stickyHeader {
             Row(
@@ -64,12 +68,12 @@ fun InvitationScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBackIosNew,
-                        contentDescription = "Go back"
+                        contentDescription = stringResource(R.string.go_back)
                     )
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "Friend Invitations",
+                    text = stringResource(R.string.friend_invitations),
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                 )

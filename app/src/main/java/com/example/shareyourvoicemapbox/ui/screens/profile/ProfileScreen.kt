@@ -55,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,6 +64,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.domain.entities.MarkerEntity
 import com.example.shareyourvoicemapbox.ui.components.ShortMarkerCard
 import com.example.shareyourvoicemapbox.ui.navigation.Route
@@ -103,14 +105,14 @@ fun ProfileScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    text = "Delete marker?",
+                    text = stringResource(R.string.delete_marker_q),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold,
                 )
             },
             text = {
                 Text(
-                    text = "Are you sure you want to permanently delete this marker?",
+                    text = stringResource(R.string.are_you_sure_you_want_to_permanently_delete_this_marker),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -123,7 +125,7 @@ fun ProfileScreen(
                     },
                 ) {
                     Text(
-                        text = "Delete",
+                        text = stringResource(R.string.delete),
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold,
                     )
@@ -136,7 +138,7 @@ fun ProfileScreen(
                     },
                 ) {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.cancel),
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -152,14 +154,14 @@ fun ProfileScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    text = "Log out?",
+                    text = stringResource(R.string.log_out),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold,
                 )
             },
             text = {
                 Text(
-                    text = "Are you sure you want to log out?",
+                    text = stringResource(R.string.are_you_sure_you_want_to_log_out),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -177,7 +179,7 @@ fun ProfileScreen(
                     },
                 ) {
                     Text(
-                        text = "Log out",
+                        text = stringResource(R.string.log_out),
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold,
                     )
@@ -190,7 +192,7 @@ fun ProfileScreen(
                     },
                 ) {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.cancel),
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -229,7 +231,7 @@ fun ProfileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        "Profile",
+                        text = stringResource(R.string.profile),
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
                     )
@@ -241,7 +243,7 @@ fun ProfileScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Notifications,
-                                contentDescription = "Notifications",
+                                contentDescription = stringResource(R.string.notifications),
                             )
                         }
 
@@ -254,7 +256,7 @@ fun ProfileScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Logout,
-                                contentDescription = "Menu",
+                                contentDescription = stringResource(R.string.menu),
                             )
                         }
                     }
@@ -278,7 +280,7 @@ fun ProfileScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit",
+                        contentDescription = stringResource(R.string.edit),
                     )
                 }
             }
@@ -293,7 +295,7 @@ fun ProfileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        "Markers",
+                        stringResource(R.string.markers),
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
                     )
@@ -306,7 +308,7 @@ fun ProfileScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowUp,
-                                contentDescription = "Scroll up",
+                                contentDescription = stringResource(R.string.scroll_up),
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
@@ -350,7 +352,7 @@ fun ProfileScreen(
             item {
                 if (state.markers == emptyList<MarkerEntity>()) {
                     Text(
-                        "No markers yet",
+                        stringResource(R.string.no_markers_yet),
                     )
                 }
             }
@@ -388,7 +390,7 @@ fun ProfileContent(
 
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "default avatar",
+                    contentDescription = stringResource(R.string.default_avatar),
                     modifier = Modifier.size(68.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -398,7 +400,7 @@ fun ProfileContent(
                             .size(100.dp)
                             .clip(CircleShape),
                         model = state.avatarUrl,
-                        contentDescription = "user avatar",
+                        contentDescription = stringResource(R.string.user_avatar),
                         contentScale = ContentScale.Crop,
                     )
                 }
@@ -444,7 +446,7 @@ fun ProfileContent(
                     Icon(
                         modifier = Modifier.align(Alignment.TopEnd),
                         imageVector = Icons.Default.Place,
-                        contentDescription = "marker",
+                        contentDescription = stringResource(R.string.marker),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                     Column(
@@ -459,7 +461,7 @@ fun ProfileContent(
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                         Text(
-                            "Markers",
+                            stringResource(R.string.markers),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -488,7 +490,7 @@ fun ProfileContent(
                     Icon(
                         modifier = Modifier.align(Alignment.TopEnd),
                         imageVector = Icons.Default.PeopleAlt,
-                        contentDescription = "marker",
+                        contentDescription = stringResource(R.string.marker),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                     Column(
@@ -503,7 +505,7 @@ fun ProfileContent(
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            "Friends",
+                            stringResource(R.string.friends),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -517,7 +519,7 @@ fun ProfileContent(
                 .fillMaxWidth()
                 .padding(24.dp, 0.dp),
         ) {
-            Text("Bio", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.bio), fontWeight = FontWeight.Bold)
             Text(
                 state.bio, fontStyle = FontStyle.Italic,
                 fontSize = 16.sp,

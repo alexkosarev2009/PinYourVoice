@@ -3,6 +3,7 @@ package com.example.shareyourvoicemapbox.ui.screens.report
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shareyourvoicemapbox.R
 import com.example.shareyourvoicemapbox.data.dto.ReportMarkerDTO
 import com.example.shareyourvoicemapbox.domain.report.ReportMarkerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ReportViewModel @Inject constructor(
     private val reportMarkerUseCase: ReportMarkerUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+
 ) : ViewModel() {
     fun selectOption(text: String) {
         _state.update {
@@ -55,12 +57,12 @@ class ReportViewModel @Inject constructor(
     ))
     val state = _state.asStateFlow()
 
-    val options = listOf(
-        "Spam",
-        "Frauds and scams",
-        "Inappropriate content",
-        "Misinformation",
-        "Violence or graphic content",
-        "Hate and harassment"
-        )
+    val options: List<Int> = listOf(
+        R.string.spam,
+        R.string.frauds_and_scams,
+        R.string.inappropriate_content,
+        R.string.misinformation,
+        R.string.violence_or_graphic_content,
+        R.string.hate_and_harassment,
+    )
 }

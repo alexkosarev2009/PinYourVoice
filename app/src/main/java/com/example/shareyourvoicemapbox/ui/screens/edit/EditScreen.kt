@@ -81,6 +81,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -169,7 +170,7 @@ fun EditScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBackIosNew,
-                        contentDescription = "Go back",
+                        contentDescription = stringResource(R.string.go_back),
                     )
                 }
             }
@@ -244,7 +245,7 @@ fun EditScreen(
             },
             onPublicClick = {
                 viewModel.onPublicClick()
-            }
+            },
         )
     }
     LaunchedEffect(state.error) {
@@ -260,8 +261,10 @@ fun EditScreen(
     SnackbarHost(
         hostState = snackbarHostState,
     ) { data ->
-        Snackbar(data,
-            modifier = Modifier.statusBarsPadding())
+        Snackbar(
+            data,
+            modifier = Modifier.statusBarsPadding(),
+        )
     }
 
 }
@@ -289,7 +292,6 @@ fun EditContent(
     onDemonMarkerClick: () -> Unit,
     onPublicClick: () -> Unit,
     onFriendsOnlyClick: () -> Unit,
-
 
 
     imageScale: Animatable<Float, AnimationVector1D>,
@@ -348,14 +350,14 @@ fun EditContent(
                         if (state.imageUri == null) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Add picture",
+                                contentDescription = stringResource(R.string.add_picture),
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(32.dp),
                             )
                         } else {
                             AsyncImage(
                                 model = state.imageUri,
-                                contentDescription = "Preview photo",
+                                contentDescription = stringResource(R.string.preview_photo),
                                 contentScale = ContentScale.Crop,
                             )
                         }
@@ -377,7 +379,7 @@ fun EditContent(
                         modifier = Modifier.size(32.dp),
                         tint = MaterialTheme.colorScheme.onError,
                         imageVector = Icons.Default.DeleteForever,
-                        contentDescription = "Delete image",
+                        contentDescription = stringResource(R.string.delete_image),
                     )
                 }
 
@@ -405,7 +407,7 @@ fun EditContent(
                 onValueChange = onTitleChange,
                 placeholder = {
                     Text(
-                        "Add a title",
+                        stringResource(R.string.add_a_title),
                         fontSize = 16.sp,
                     )
                 },
@@ -467,7 +469,7 @@ fun EditContent(
                         Icons.Default.Pause else Icons.Default.PlayArrow
                     Icon(
                         imageVector = imageVector,
-                        contentDescription = "Play audio",
+                        contentDescription = stringResource(R.string.play_audio),
                         tint = MaterialTheme.colorScheme.background,
                         modifier = Modifier.size(32.dp),
                     )
@@ -497,31 +499,34 @@ fun EditContent(
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ),
-            elevation = CardDefaults.cardElevation(8.dp)
+            elevation = CardDefaults.cardElevation(8.dp),
         ) {
             Box(
-                Modifier.fillMaxWidth()
+                Modifier
+                    .fillMaxWidth()
                     .background(
                         Brush.horizontalGradient(
                             listOf(
                                 MaterialTheme.colorScheme.primaryContainer,
-                                MaterialTheme.colorScheme.secondaryContainer
-                            )
-                        )
-                    )
+                                MaterialTheme.colorScheme.secondaryContainer,
+                            ),
+                        ),
+                    ),
             ) {
                 Column {
                     Text(
-                        "Choose your style...",
+                        stringResource(R.string.choose_your_style),
                         modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp),
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        fontStyle = FontStyle.Italic
+                        fontStyle = FontStyle.Italic,
                     )
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         val (redElevation, redScale) =
                             markerAnimation(state.chosenMarker, 1)
@@ -532,27 +537,29 @@ fun EditContent(
                         val (demonElevation, demonScale) =
                             markerAnimation(state.chosenMarker, 3)
                         ElevatedCard(
-                            modifier = Modifier.size(80.dp)
+                            modifier = Modifier
+                                .size(80.dp)
                                 .clickable(
-                                    onClick = onRedMarkerClick
+                                    onClick = onRedMarkerClick,
                                 )
                                 .graphicsLayer {
                                     scaleY = redScale
                                     scaleX = redScale
-                                }.border(
+                                }
+                                .border(
                                     width = if (state.chosenMarker == 1) 2.dp else 0.dp,
                                     color = MaterialTheme.colorScheme.primary,
-                                    shape = RoundedCornerShape(12.dp)
+                                    shape = RoundedCornerShape(12.dp),
                                 ),
-                            elevation = CardDefaults.cardElevation(redElevation)
-                            ) {
+                            elevation = CardDefaults.cardElevation(redElevation),
+                        ) {
                             Box(
                                 Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Image(
                                     painter = painterResource(R.drawable.red_marker),
-                                    contentDescription = "",
+                                    contentDescription = null,
                                 )
                             }
                         }
@@ -563,45 +570,50 @@ fun EditContent(
                                 .graphicsLayer {
                                     scaleY = bearScale
                                     scaleX = bearScale
-                                }.border(
+                                }
+                                .border(
                                     width = if (state.chosenMarker == 2) 2.dp else 0.dp,
                                     color = MaterialTheme.colorScheme.primary,
-                                    shape = RoundedCornerShape(12.dp)
+                                    shape = RoundedCornerShape(12.dp),
                                 ),
-                            elevation = CardDefaults.cardElevation(bearElevation)
-                            ) {
+                            elevation = CardDefaults.cardElevation(bearElevation),
+                        ) {
                             Box(
                                 Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Image(
                                     painter = painterResource(R.drawable.bear_marker),
-                                    contentDescription = "",
+                                    contentDescription = null,
                                 )
                             }
                         }
                         ElevatedCard(
-                            modifier = Modifier.size(80.dp).clickable(
-                                onClick = onDemonMarkerClick
-                            ).graphicsLayer {
-                                scaleY = demonScale
-                                scaleX = demonScale
-                            }.border(
-                                width = if (state.chosenMarker == 3) 2.dp else 0.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = RoundedCornerShape(12.dp)
-                            ),
-                            elevation = CardDefaults.cardElevation(demonElevation)
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clickable(
+                                    onClick = onDemonMarkerClick,
+                                )
+                                .graphicsLayer {
+                                    scaleY = demonScale
+                                    scaleX = demonScale
+                                }
+                                .border(
+                                    width = if (state.chosenMarker == 3) 2.dp else 0.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(12.dp),
+                                ),
+                            elevation = CardDefaults.cardElevation(demonElevation),
 
 
-                        ) {
+                            ) {
                             Box(
                                 Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Image(
                                     painter = painterResource(R.drawable.demon_marker),
-                                    contentDescription = "",
+                                    contentDescription = null,
                                 )
                             }
                         }
@@ -612,45 +624,49 @@ fun EditContent(
 
         Spacer(Modifier.height(24.dp))
 
-        SecondaryTabRow (
-            selectedTabIndex = if (state.isPublicSelected) 0 else 1
+        SecondaryTabRow(
+            selectedTabIndex = if (state.isPublicSelected) 0 else 1,
         ) {
             Tab(
                 selected = state.isPublicSelected,
-                onClick = onPublicClick
+                onClick = onPublicClick,
             ) {
                 Row(
-                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 8.dp)
+                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 8.dp),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Public,
                         contentDescription = null,
                         tint = if (state.isPublicSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onBackground
+                        else MaterialTheme.colorScheme.onBackground,
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Public",
+                    Text(
+                        text = stringResource(R.string.public1),
                         color = if (state.isPublicSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onBackground)
+                        else MaterialTheme.colorScheme.onBackground,
+                    )
                 }
             }
             Tab(
                 selected = !state.isPublicSelected,
-                onClick = onFriendsOnlyClick
+                onClick = onFriendsOnlyClick,
             ) {
                 Row(
-                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp)
+                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp),
                 ) {
                     Icon(
                         imageVector = Icons.Default.PeopleAlt,
                         contentDescription = null,
                         tint = if (!state.isPublicSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onBackground
+                        else MaterialTheme.colorScheme.onBackground,
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Friends-only",
+                    Text(
+                        stringResource(R.string.friends_only),
                         color = if (!state.isPublicSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onBackground)
+                        else MaterialTheme.colorScheme.onBackground,
+                    )
                 }
             }
         }
@@ -673,10 +689,10 @@ fun EditContent(
                     if (!state.isLoading) {
                         Icon(
                             imageVector = Icons.Default.PinDrop,
-                            contentDescription = "Pin drop",
+                            contentDescription = null,
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text("Pin your voice", fontSize = 20.sp)
+                        Text(stringResource(R.string.pin_your_voice), fontSize = 20.sp)
                     } else {
                         CircularProgressIndicator(
                             trackColor = MaterialTheme.colorScheme.onPrimary,
@@ -700,7 +716,7 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
             topBar = {
                 Row(
                     Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     IconButton(
                         onClick = {
@@ -708,12 +724,12 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Go back",
+                            contentDescription = stringResource(R.string.go_back),
                         )
                     }
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "Create marker",
+                        text = stringResource(R.string.create_marker),
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp,
                     )
@@ -762,17 +778,17 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
 @Composable
 fun markerAnimation(
     chosen: Int,
-    current: Int
+    current: Int,
 ): Pair<Dp, Float> {
 
     val elevation by animateDpAsState(
         targetValue = if (chosen == current) 8.dp else 2.dp,
-        label = ""
+        label = "",
     )
 
     val scale by animateFloatAsState(
         targetValue = if (chosen == current) 1.1f else 1f,
-        label = ""
+        label = "",
     )
 
     return elevation to scale
