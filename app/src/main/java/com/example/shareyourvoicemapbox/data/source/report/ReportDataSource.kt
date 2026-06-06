@@ -2,7 +2,7 @@ package com.example.shareyourvoicemapbox.data.source.report
 
 import com.example.shareyourvoicemapbox.data.constants.Constants
 import com.example.shareyourvoicemapbox.data.dto.ReportMarkerDTO
-import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
+import com.example.shareyourvoicemapbox.data.source.auth.storage.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -22,7 +22,7 @@ class ReportDataSource @Inject constructor(
     suspend fun reportMarker(dto: ReportMarkerDTO): Result<Boolean> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.post("${Constants.HOST}/api/report/marker") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
                 contentType(ContentType.Application.Json)
                 setBody(dto)
             }

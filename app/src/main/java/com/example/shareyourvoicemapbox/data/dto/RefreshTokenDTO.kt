@@ -3,7 +3,6 @@ package com.example.shareyourvoicemapbox.data.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AuthResponseDTO(
-    val accessToken: String,
+data class RefreshTokenDTO(
     val refreshToken: String,
 )

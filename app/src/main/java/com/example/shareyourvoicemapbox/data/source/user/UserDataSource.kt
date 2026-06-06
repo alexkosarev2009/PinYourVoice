@@ -2,7 +2,7 @@ package com.example.shareyourvoicemapbox.data.source.user
 
 import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.UserDTO
-import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
+import com.example.shareyourvoicemapbox.data.source.auth.storage.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -21,7 +21,7 @@ class UserDataSource @Inject constructor(
     suspend fun getUsers(): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.get("${HOST}/api/users") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (result.status != HttpStatusCode.OK) {
                 error("Status: ${result.status}")
@@ -32,7 +32,7 @@ class UserDataSource @Inject constructor(
     suspend fun getUserById(id: Long): Result<UserDTO> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.get("${HOST}/api/users/$id") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (result.status != HttpStatusCode.OK) {
                 error("Status: ${result.status}")
@@ -43,7 +43,7 @@ class UserDataSource @Inject constructor(
     suspend fun getUserByUsername(username: String): Result<UserDTO> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.get("${HOST}/api/users/by-username") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
                 parameter("username", username)
             }
             if (result.status != HttpStatusCode.OK) {
@@ -55,7 +55,7 @@ class UserDataSource @Inject constructor(
     suspend fun getMe(): Result<UserDTO> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.get("${HOST}/api/users/me") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (result.status != HttpStatusCode.OK) {
                 error("Status: ${result.status}")
@@ -67,7 +67,7 @@ class UserDataSource @Inject constructor(
     suspend fun getMyFriends(): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.get("${HOST}/api/friends") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (result.status != HttpStatusCode.OK) {
                 error("Status: ${result.status}")
@@ -78,7 +78,7 @@ class UserDataSource @Inject constructor(
     suspend fun getFriendsByUserId(userId: Long): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.get("${HOST}/api/friends/$userId") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (result.status != HttpStatusCode.OK) {
                 error("Status: ${result.status}")

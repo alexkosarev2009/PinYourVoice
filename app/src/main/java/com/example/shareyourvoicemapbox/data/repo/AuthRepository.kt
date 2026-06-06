@@ -2,7 +2,7 @@ package com.example.shareyourvoicemapbox.data.repo
 
 import com.example.shareyourvoicemapbox.data.dto.UserLoginDTO
 import com.example.shareyourvoicemapbox.data.dto.UserRegisterDTO
-import com.example.shareyourvoicemapbox.data.source.auth.basic.AuthNetworkDataSource
+import com.example.shareyourvoicemapbox.data.source.auth.network.AuthNetworkDataSource
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(

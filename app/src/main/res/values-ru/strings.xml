@@ -63,7 +63,7 @@
     <string name="delete">Удалить</string>
     <string name="delete_marker_q">Удалить маркер?</string>
     <string name="are_you_sure_you_want_to_permanently_delete_this_marker">Вы уверены, что хотите навсегда удалить маркер?</string>
-    <string name="log_out">Выйти?</string>
+    <string name="log_out">Выйти</string>
     <string name="are_you_sure_you_want_to_log_out">Вы уверены, что хотите выйти?</string>
     <string name="profile">Профиль</string>
     <string name="edit">Редактировать</string>

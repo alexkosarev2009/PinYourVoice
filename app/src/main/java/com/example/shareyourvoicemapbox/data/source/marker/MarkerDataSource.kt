@@ -1,9 +1,11 @@
 package com.example.shareyourvoicemapbox.data.source.marker
 
+import android.util.Log
 import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.data.dto.MarkerDTO
-import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
+import com.example.shareyourvoicemapbox.data.dto.RefreshTokenDTO
+import com.example.shareyourvoicemapbox.data.source.auth.storage.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -28,7 +30,7 @@ class MarkerDataSource @Inject constructor(
     suspend fun getMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/markers") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.OK) {
                 error("Error: ${response.status}")
@@ -39,7 +41,8 @@ class MarkerDataSource @Inject constructor(
     suspend fun getAvailableMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/markers/available") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                Log.d("TOKEN", tokenStorage.getAccessToken() ?: "null")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.OK) {
                 error("Error: ${response.status}")
@@ -50,7 +53,7 @@ class MarkerDataSource @Inject constructor(
     suspend fun getPublicMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/markers/public") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.OK) {
                 error("Error: ${response.status}")
@@ -61,7 +64,7 @@ class MarkerDataSource @Inject constructor(
     suspend fun getMarkersByAuthorId(authorId: Long): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.get("${HOST}/api/markers/by-author-id") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
                 parameter("authorId", authorId)
             }
             if (result.status != HttpStatusCode.OK) {
@@ -74,7 +77,7 @@ class MarkerDataSource @Inject constructor(
     suspend fun postMarker(dto: CreateMarkerDTO): Result<MarkerDTO> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.post("${HOST}/api/markers") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
                 contentType(ContentType.Application.Json)
                 setBody(dto)
             }
@@ -88,7 +91,7 @@ class MarkerDataSource @Inject constructor(
     suspend fun deleteMarker(id: Long): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
             val result = client.delete("$HOST/api/markers/$id") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (result.status != HttpStatusCode.NoContent) {
                 error("Error: ${result.status}")
@@ -99,7 +102,7 @@ class MarkerDataSource @Inject constructor(
     suspend fun getMarkerById(id: Long): Result<MarkerDTO> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/markers/$id") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
                 contentType(ContentType.Application.Json)
             }
             if (response.status != HttpStatusCode.OK) {
@@ -114,7 +117,7 @@ class MarkerDataSource @Inject constructor(
     ): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/markers/search") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
                 parameter("query", query)
             }
             if (response.status != HttpStatusCode.OK) {

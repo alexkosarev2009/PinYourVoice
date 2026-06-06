@@ -2,7 +2,7 @@ package com.example.shareyourvoicemapbox.data.source.invitation
 
 import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.InvitationDTO
-import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
+import com.example.shareyourvoicemapbox.data.source.auth.storage.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -23,7 +23,7 @@ class InvitationDataSource @Inject constructor(
     suspend fun getMyInvitations(): Result<List<InvitationDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/friends/invitations") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.OK) {
                 error("Error: ${response.status}")
@@ -34,7 +34,7 @@ class InvitationDataSource @Inject constructor(
     suspend fun declineInvitation(id: Long): Result<Boolean> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.delete("${HOST}/api/friends/invitations/$id/decline") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.NoContent) {
                 error("Error: ${response.status}")
@@ -45,7 +45,7 @@ class InvitationDataSource @Inject constructor(
     suspend fun acceptInvitation(id: Long): Result<Boolean> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.patch("${HOST}/api/friends/invitations/$id/accept") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.OK) {
                 error("Error: ${response.status}")
@@ -56,7 +56,7 @@ class InvitationDataSource @Inject constructor(
     suspend fun invite(receiverId: Long): Result<Boolean> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.post("${HOST}/api/friends/invite/$receiverId") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.Created) {
                 error("Error: ${response.status}")
@@ -67,7 +67,7 @@ class InvitationDataSource @Inject constructor(
     suspend fun deleteFriend(receiverId: Long): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.delete("${HOST}/api/friends/delete/$receiverId") {
-                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.get()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.NoContent) {
                 error("Error: ${response.status}")

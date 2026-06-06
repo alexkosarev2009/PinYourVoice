@@ -2,7 +2,7 @@ package com.example.shareyourvoicemapbox.data.source.presign
 
 import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.PresignResponseDTO
-import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
+import com.example.shareyourvoicemapbox.data.source.auth.storage.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -20,7 +20,6 @@ import java.io.File
 
 class PresignDataSource @Inject constructor(
     private val client: HttpClient,
-    private val tokenStorage: TokenStorage
 ) {
     suspend fun getPresign(
         fileName: String,

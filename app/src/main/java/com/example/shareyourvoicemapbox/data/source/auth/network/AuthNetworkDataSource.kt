@@ -1,10 +1,12 @@
-package com.example.shareyourvoicemapbox.data.source.auth.basic
+package com.example.shareyourvoicemapbox.data.source.auth.network
 
 import com.example.shareyourvoicemapbox.data.constants.Constants
 import com.example.shareyourvoicemapbox.data.dto.AuthResponseDTO
+import com.example.shareyourvoicemapbox.data.dto.RefreshTokenDTO
 import com.example.shareyourvoicemapbox.data.dto.UserLoginDTO
 import com.example.shareyourvoicemapbox.data.dto.UserRegisterDTO
-import com.example.shareyourvoicemapbox.data.source.auth.bearer.TokenStorage
+import com.example.shareyourvoicemapbox.data.source.auth.storage.TokenStorage
+import com.example.shareyourvoicemapbox.domain.auth.SessionManager
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 class AuthNetworkDataSource @Inject constructor(
     private val client: HttpClient,
-    private val tokenStorage: TokenStorage
+    private val tokenStorage: TokenStorage,
+    private val sessionManager: SessionManager,
 ) {
     suspend fun login(dto: UserLoginDTO): Result<Boolean> = withContext(Dispatchers.IO) {
         runCatching {
@@ -30,7 +33,9 @@ class AuthNetworkDataSource @Inject constructor(
                 tokenStorage.clear()
                 error("Auth error: ${result.status}")
             }
-            tokenStorage.save(result.body<AuthResponseDTO>().token)
+            val body = result.body<AuthResponseDTO>()
+            tokenStorage.save(body.accessToken, body.refreshToken)
+            sessionManager.logIn()
             true
         }
     }
@@ -48,5 +53,6 @@ class AuthNetworkDataSource @Inject constructor(
     }
     fun logOut() {
         tokenStorage.clear()
+        sessionManager.logout()
     }
 }

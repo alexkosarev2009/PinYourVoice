@@ -1,4 +1,4 @@
-package com.example.shareyourvoicemapbox.data.source.auth.bearer
+package com.example.shareyourvoicemapbox.data.source.auth.storage
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -12,7 +12,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object StorageModule {
-
     @Provides
     @Singleton
     fun provideSharedPreferences(

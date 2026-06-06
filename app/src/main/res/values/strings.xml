@@ -62,7 +62,7 @@
     <string name="delete">Delete</string>
     <string name="delete_marker_q">Delete marker?</string>
     <string name="are_you_sure_you_want_to_permanently_delete_this_marker">Are you sure you want to permanently delete this marker?</string>
-    <string name="log_out">Log out?</string>
+    <string name="log_out">Log out</string>
     <string name="are_you_sure_you_want_to_log_out">Are you sure you want to log out?</string>
     <string name="profile">Profile</string>
     <string name="edit">Edit</string>
