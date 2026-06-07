@@ -220,8 +220,8 @@ fun AuthContent(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = state.error,
-                            color = MaterialTheme.colorScheme.error
+                            text = if (state.error.isNotEmpty()) stringResource(R.string.auth_error) else "",
+                            color = MaterialTheme.colorScheme.error,
                         )
                         Spacer(Modifier.height(8.dp))
                         Button(
@@ -348,7 +348,7 @@ fun AuthContent(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = state.error,
+                            text = if (state.error.isNotEmpty()) stringResource(R.string.register_error) else "",
                             color = MaterialTheme.colorScheme.error,
                         )
                         Spacer(Modifier.height(8.dp))

@@ -81,4 +81,8 @@
     <string name="misinformation">Дезинформация</string>
     <string name="violence_or_graphic_content">Жестокий контент</string>
     <string name="hate_and_harassment">Розжиг ненависти</string>
+    <string name="map">Карта</string>
+    <string name="feed_nav">Лента</string>
+    <string name="auth_error">Ошибка авторизации</string>
+    <string name="register_error">Ошибка регистрации</string>
 </resources>

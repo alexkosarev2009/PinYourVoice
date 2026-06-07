@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -273,12 +274,12 @@ fun AppNav(
                                         Route.MAP -> if (currentRoute == "map?markerId={markerId}") route.icon else route.iconOutlined
                                         else -> if (route.route == currentRoute) route.icon else route.iconOutlined
                                     },
-                                    contentDescription = route.contentDescription,
+                                    contentDescription = stringResource(route.contentDescription),
                                     modifier = Modifier.size(28.dp),
                                 )
                             },
                             label = {
-                                Text(route.contentDescription)
+                                Text(stringResource(route.contentDescription))
                             },
                         )
                     }
