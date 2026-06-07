@@ -80,8 +80,4 @@
     <string name="misinformation">Misinformation</string>
     <string name="violence_or_graphic_content">Violence or graphic content</string>
     <string name="hate_and_harassment">Hate and harassment</string>
-    <string name="map">Map</string>
-    <string name="feed_nav">Feed</string>
-    <string name="auth_error">Auth error</string>
-    <string name="register_error">Register error</string>
 </resources>
