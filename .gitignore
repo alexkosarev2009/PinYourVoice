@@ -14,3 +14,5 @@
 .cxx
 local.properties
 /app/src/main/res/values/mapbox-access-token.xml
+/.idea/
+/.kotlin/
