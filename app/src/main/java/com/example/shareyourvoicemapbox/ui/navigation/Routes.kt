@@ -8,25 +8,29 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.core.R
+import com.example.shareyourvoicemapbox.R
 
 enum class Route(
     val route: String,
     val icon: ImageVector,
     val iconOutlined: ImageVector,
-    val contentDescription: String = ""
+    val contentDescription: Int,
 ) {
-    FEED("feed",
+    FEED(
+        "feed",
         Icons.AutoMirrored.Filled.Comment,
         Icons.AutoMirrored.Outlined.Comment,
-        "Feed"),
-    MAP("map",
+        R.string.feed,
+    ),
+    MAP(
+        "map",
         Icons.Filled.Explore,
-        Icons.Outlined.Explore, "Map"),
+        Icons.Outlined.Explore, R.string.map,
+    ),
     PROFILE("profile",
         Icons.Filled.Person,
         Icons.Outlined.Person,
-        "Profile")
+        R.string.profile)
 }
 
 enum class SecondaryRoute(
