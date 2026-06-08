@@ -10,6 +10,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import io.ktor.util.cio.readChannel
@@ -20,6 +21,7 @@ import java.io.File
 
 class PresignDataSource @Inject constructor(
     private val client: HttpClient,
+    private val tokenStorage: TokenStorage
 ) {
     suspend fun getPresign(
         fileName: String,
@@ -27,6 +29,7 @@ class PresignDataSource @Inject constructor(
     ): Result<PresignResponseDTO> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/s3/presign") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
                 parameter("fileName", fileName)
                 parameter("contentType", contentType)
             }
