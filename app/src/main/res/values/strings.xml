@@ -84,4 +84,6 @@
     <string name="feed_nav">Feed</string>
     <string name="auth_error">Auth error</string>
     <string name="register_error">Register error</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="change_avatar">Change avatar</string>
 </resources>

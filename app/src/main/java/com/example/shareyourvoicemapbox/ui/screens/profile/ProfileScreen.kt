@@ -273,7 +273,9 @@ fun ProfileScreen(
                             )
                         }
                     },
-                    onNameIconClick = {},
+                    onNameIconClick = {
+                        navHostController.navigate(SecondaryRoute.EDIT_PROFILE.route)
+                    },
                     onFriendsClick = {
                         navHostController.navigate("${SecondaryRoute.FRIENDS.route}?userId=${state.userId}")
                     },

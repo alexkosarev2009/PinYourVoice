@@ -39,6 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shareyourvoicemapbox.ui.screens.auth.AuthScreen
 import com.example.shareyourvoicemapbox.ui.screens.edit.EditScreen
+import com.example.shareyourvoicemapbox.ui.screens.editProfile.EditProfileScreen
 import com.example.shareyourvoicemapbox.ui.screens.feed.FeedScreen
 import com.example.shareyourvoicemapbox.ui.screens.friends.FriendsScreen
 import com.example.shareyourvoicemapbox.ui.screens.invitation.InvitationScreen
@@ -86,6 +87,9 @@ fun AppNavHost(
         }
         composable(SecondaryRoute.SEARCH.route) {
             SearchScreen(modifier, navHostController)
+        }
+        composable(SecondaryRoute.EDIT_PROFILE.route) {
+            EditProfileScreen(modifier, navHostController)
         }
         composable("${SecondaryRoute.FRIENDS.route}?userId={userId}",
             arguments = listOf(

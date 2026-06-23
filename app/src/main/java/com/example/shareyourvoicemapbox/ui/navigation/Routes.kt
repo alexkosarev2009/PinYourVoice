@@ -42,6 +42,6 @@ enum class SecondaryRoute(
     INVITATIONS("invitations"),
     REPORT("report"),
     SEARCH("search"),
-
-    FRIENDS("friends")
+    FRIENDS("friends"),
+    EDIT_PROFILE("edit_profile")
 }

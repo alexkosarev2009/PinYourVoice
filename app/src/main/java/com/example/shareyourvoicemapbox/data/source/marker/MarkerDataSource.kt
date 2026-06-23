@@ -1,10 +1,8 @@
 package com.example.shareyourvoicemapbox.data.source.marker
 
-import android.util.Log
 import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
 import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.data.dto.MarkerDTO
-import com.example.shareyourvoicemapbox.data.dto.RefreshTokenDTO
 import com.example.shareyourvoicemapbox.data.source.auth.storage.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -41,7 +39,6 @@ class MarkerDataSource @Inject constructor(
     suspend fun getAvailableMarkers(): Result<List<MarkerDTO>> = withContext(Dispatchers.IO) {
         runCatching {
             val response = client.get("${HOST}/api/markers/available") {
-                Log.d("TOKEN", tokenStorage.getAccessToken() ?: "null")
                 header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
             }
             if (response.status != HttpStatusCode.OK) {
