@@ -12,6 +12,7 @@ import com.example.shareyourvoicemapbox.data.dto.CreateMarkerDTO
 import com.example.shareyourvoicemapbox.domain.UploadFileUseCase
 import com.example.shareyourvoicemapbox.domain.amplituda.ProcessAudioUseCase
 import com.example.shareyourvoicemapbox.domain.markers.CreateMarkerUseCase
+import com.example.shareyourvoicemapbox.domain.network.NetworkMonitor
 import com.example.shareyourvoicemapbox.domain.player.GetCurrentPositionUseCase
 import com.example.shareyourvoicemapbox.domain.player.PauseAudioUseCase
 import com.example.shareyourvoicemapbox.domain.player.PlayAudioUseCase
@@ -20,8 +21,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -40,6 +43,7 @@ class EditViewModel @Inject constructor(
     private val processAudioUseCase: ProcessAudioUseCase,
     private val getCurrentPositionUseCase: GetCurrentPositionUseCase,
     private val uploadFileUseCase: UploadFileUseCase,
+    private val networkMonitor: NetworkMonitor,
     private val createMarkerUseCase: CreateMarkerUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -54,6 +58,11 @@ class EditViewModel @Inject constructor(
         )
     )
     val state: StateFlow<EditState> = _state.asStateFlow()
+
+    val isConnected = networkMonitor.observe()
+        .stateIn(viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            networkMonitor.isCurrentlyConnected())
 
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()

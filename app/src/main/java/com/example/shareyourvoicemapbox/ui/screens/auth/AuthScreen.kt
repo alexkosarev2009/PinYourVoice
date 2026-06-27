@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
@@ -134,10 +135,11 @@ fun AuthContent(
             .padding(32.dp, 0.dp)
             .background(
                 MaterialTheme.colorScheme.background
-            ),
+            )
+            .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Spacer(Modifier.height(240.dp))
         SecondaryTabRow(
             selectedTabIndex = if (state.isSignInSelected) 0 else 1,
             modifier = Modifier.fillMaxWidth(),

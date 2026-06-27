@@ -1,5 +1,7 @@
 package com.example.shareyourvoicemapbox.data.repo
 
+import com.example.shareyourvoicemapbox.data.dto.UpdateUserDTO
+import com.example.shareyourvoicemapbox.data.dto.UserDTO
 import com.example.shareyourvoicemapbox.data.exceptions.AppException
 import com.example.shareyourvoicemapbox.data.source.user.UserDataSource
 import com.example.shareyourvoicemapbox.domain.entities.UserEntity
@@ -80,6 +82,10 @@ class UserRepository @Inject constructor(
                 avatarUrl = userDTO.avatarUrl ?: "default/avatar.jpg",
             )
         }
+    }
+
+    suspend fun updateMe(userDTO: UpdateUserDTO): Result<Boolean> {
+        return userInfoDataSource.updateMe(userDTO)
     }
 
 }

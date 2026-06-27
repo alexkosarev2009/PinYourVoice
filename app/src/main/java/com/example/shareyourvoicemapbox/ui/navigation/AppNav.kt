@@ -91,6 +91,7 @@ fun AppNavHost(
         composable(SecondaryRoute.EDIT_PROFILE.route) {
             EditProfileScreen(modifier, navHostController)
         }
+        composable("crop") {}
         composable("${SecondaryRoute.FRIENDS.route}?userId={userId}",
             arguments = listOf(
                 navArgument("userId") {

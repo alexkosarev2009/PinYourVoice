@@ -114,6 +114,9 @@ fun EditScreen(
     val playerState by viewModel.playerState.collectAsState()
     val context = LocalContext.current
 
+    val isConnected by viewModel.isConnected.collectAsState()
+
+
     val waveformProgress by remember {
         derivedStateOf {
             (playerState.currentPosition / playerState.maxDuration.toFloat())
@@ -135,7 +138,7 @@ fun EditScreen(
             viewModel.getFileFromUri(context, uri)
         }
     }
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val density = LocalDensity.current
     val maxDragPx = with(density) { 250.dp.toPx() }
@@ -156,6 +159,15 @@ fun EditScreen(
         if (state.audioPath == "") return@LaunchedEffect
         viewModel.processAudio()
         viewModel.getAudioDurationMs(state.audioPath)
+    }
+    LaunchedEffect(isConnected) {
+        if (!isConnected) {
+            snackBarHostState.showSnackbar(
+                message = "No internet",
+                duration = SnackbarDuration.Short,
+                withDismissAction = true,
+            )
+        }
     }
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
@@ -250,7 +262,7 @@ fun EditScreen(
     }
     LaunchedEffect(state.error) {
         if (state.error != "") {
-            snackbarHostState.showSnackbar(
+            snackBarHostState.showSnackbar(
                 message = state.error,
                 duration = SnackbarDuration.Short,
                 withDismissAction = true,
@@ -259,7 +271,7 @@ fun EditScreen(
         }
     }
     SnackbarHost(
-        hostState = snackbarHostState,
+        hostState = snackBarHostState,
     ) { data ->
         Snackbar(
             data,

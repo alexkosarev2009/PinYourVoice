@@ -38,7 +38,6 @@ class SearchViewModel @Inject constructor(
             )
         }
     }
-
     private val _state = MutableStateFlow(SearchState())
     val state = _state.asStateFlow()
 }

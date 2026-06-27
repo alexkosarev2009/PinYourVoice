@@ -10,4 +10,5 @@ data class FeedState(
     val isRefreshing: Boolean = false,
     val currentPlayingId: Int = -1,
     val currentAudioUrl: String = "",
+    val isCurrentAudioLoading: Boolean = false,
 )

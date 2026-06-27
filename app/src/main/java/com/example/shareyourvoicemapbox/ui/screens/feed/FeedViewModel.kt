@@ -125,13 +125,16 @@ class FeedViewModel @Inject constructor(
         if (_uiState.value.currentAudioUrl != url) {
             pauseAudio()
             viewModelScope.launch {
+                _uiState.update {
+                    it.copy(isCurrentAudioLoading = true)
+                }
                 val duration = playExoAudioUseCase(url)
                 _playerState.update {
                     it.copy(isPlaying = true, maxDuration = duration)
                 }
                 Log.d("MAX DURATION", _playerState.value.maxDuration.toString())
                 _uiState.update {
-                    it.copy(currentAudioUrl = url, currentPlayingId = id)
+                    it.copy(currentAudioUrl = url, currentPlayingId = id, isCurrentAudioLoading = false)
                 }
             }
         }

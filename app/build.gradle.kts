@@ -44,6 +44,9 @@ android {
 }
 
 dependencies {
+    // CROP KIT
+    implementation("com.github.Tanish-Ranjan:crop-kit:1.0.0")
+
     // EXO PLAYER
     implementation("androidx.media3:media3-exoplayer:1.4.1")
 

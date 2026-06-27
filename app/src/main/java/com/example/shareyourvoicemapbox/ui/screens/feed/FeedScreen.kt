@@ -2,6 +2,13 @@
 
 package com.example.shareyourvoicemapbox.ui.screens.feed
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +19,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -20,6 +29,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -64,7 +74,7 @@ import kotlin.math.absoluteValue
 fun FeedScreen(
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = hiltViewModel<FeedViewModel>(),
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
     val state by viewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
@@ -89,7 +99,8 @@ fun FeedScreen(
                 }
                 state.markers.getOrNull(page)?.let {
                     scope.launch {
-                        viewModel.playAudio(it.audioUrl, page)
+//                        viewModel.playAudio(it.audioUrl, page)
+                        viewModel.pauseAudio()
                     }
                 }
             }
@@ -99,8 +110,7 @@ fun FeedScreen(
         viewModel.pauseAudio()
         if (state.isViewingPublic) {
             viewModel.getData()
-        }
-        else {
+        } else {
             viewModel.getFriendsMarker()
         }
     }
@@ -134,23 +144,20 @@ fun FeedScreen(
         onRefresh = {
             if (state.isViewingPublic) {
                 viewModel.getData()
-            }
-            else {
+            } else {
                 viewModel.getFriendsMarker()
             }
         },
         onPlayClick = { url, id ->
             if (playerState.isPlaying && url == state.currentAudioUrl) {
                 viewModel.pauseAudio()
-            }
-            else {
+            } else {
                 if (url != state.currentAudioUrl) {
                     scope.launch {
                         viewModel.getAudioDurationMs(url)
                         viewModel.playAudio(url, id)
                     }
-                }
-                else {
+                } else {
                     viewModel.playAudio(url, id)
                 }
             }
@@ -167,7 +174,7 @@ fun FeedScreen(
         },
         onReportClick = { id ->
             navHostController.navigate("${SecondaryRoute.REPORT.route}/$id")
-        }
+        },
     )
 }
 
@@ -187,7 +194,7 @@ fun FeedContent(
     onWaveformProgressChange: (Float) -> Unit,
     progress: Float,
     onNameClick: (String) -> Unit,
-    onReportClick: (Long) -> Unit
+    onReportClick: (Long) -> Unit,
 ) {
     PullToRefreshBox(
         state = refreshState,
@@ -199,13 +206,13 @@ fun FeedContent(
                 isRefreshing = state.isRefreshing,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter),
             )
-        }
+        },
     ) {
         Column(
             modifier = Modifier.statusBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
                 modifier = Modifier
@@ -260,10 +267,11 @@ fun FeedContent(
                 }
             }
             VerticalPager(
+                modifier = Modifier.weight(1f),
                 state = pagerState,
                 contentPadding = PaddingValues(0.dp, 16.dp, 0.dp, 0.dp),
                 beyondViewportPageCount = 1,
-                pageSize = PageSize.Fixed(500.dp),
+                pageSize = PageSize.Fill,
             ) { page ->
                 val marker = state.markers[page]
                 Box(
@@ -299,6 +307,7 @@ fun FeedContent(
                         username = marker.authorUsername,
                         avatarUrl = marker.authorAvatarUrl,
                         imageUrl = marker.imageUrl ?: "",
+                        isLoading = state.isCurrentAudioLoading,
                         onPlayClick = { onPlayClick(marker.audioUrl, page) },
                         onOpenMap = {
                             onOpenMap(marker.id)
@@ -316,6 +325,33 @@ fun FeedContent(
                             onReportClick(marker.id)
                         },
                     )
+                }
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = pagerState.currentPage == 0,
+                    enter = fadeIn(tween(500)),
+                    exit = fadeOut(tween(500)),
+                ) {
+                    val infiniteTransition = rememberInfiniteTransition()
+
+                    val offsetY by infiniteTransition.animateFloat(
+                        initialValue = -60f,
+                        targetValue = -44f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1000),
+                            repeatMode = RepeatMode.Reverse,
+                        ),
+                    )
+                    Column() {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(60.dp)
+                                .align(Alignment.CenterHorizontally)
+                                .offset(y = offsetY.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(140.dp))

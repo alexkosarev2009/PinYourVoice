@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
@@ -80,7 +81,8 @@ fun MarkerCard(
     createdAt: String,
     isPLaying: Boolean = false,
     onReportClick: (Long) -> Unit,
-    onNameClick: () -> Unit = {}
+    onNameClick: () -> Unit = {},
+    isLoading: Boolean = false,
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
@@ -186,14 +188,22 @@ fun MarkerCard(
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    val imageVector = if (isPLaying)
-                        Icons.Default.Pause else Icons.Default.PlayArrow
-                    Icon(
-                        imageVector = imageVector,
-                        contentDescription = stringResource(R.string.play_audio),
-                        tint = MaterialTheme.colorScheme.background,
-                        modifier = Modifier.size(32.dp),
-                    )
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(32.dp),
+                            trackColor = MaterialTheme.colorScheme.onPrimary,
+                        )
+                    }
+                    else {
+                        val imageVector = if (isPLaying)
+                            Icons.Default.Pause else Icons.Default.PlayArrow
+                        Icon(
+                            imageVector = imageVector,
+                            contentDescription = stringResource(R.string.play_audio),
+                            tint = MaterialTheme.colorScheme.background,
+                            modifier = Modifier.size(32.dp),
+                        )
+                    }
                 }
                 Spacer(Modifier.width(16.dp))
                 AudioWaveform(
@@ -264,9 +274,9 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
         darkTheme = false
     ) {
         MarkerCard(
-            title = "Moscow City",
+            title = "Burger House",
             location = "Moscow, Russia",
-            username = "k1riesshka",
+            username = "burger_house",
             avatarUrl = "https://i.pinimg.com/236x/68/31/12/68311248ba2f6e0ba94ff6da62eac9f6.jpg",
             imageUrl = "",
             onPlayClick = {},
@@ -274,7 +284,7 @@ fun MarkerCardPreview(modifier: Modifier = Modifier) {
             amplitudes = listOf(1, 2, 6, 15, 4, 7, 12, 24),
             waveformProgress = 0.7f,
             onWaveformProgressChange = {},
-            name = "Саша Косарев",
+            name = "Burger House Russia",
             createdAt = "2026-04-25T19:48:26.812081Z",
             id = 1L,
             onNameClick = {},

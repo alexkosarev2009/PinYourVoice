@@ -1,6 +1,8 @@
 package com.example.shareyourvoicemapbox.data.source.user
 
+import android.util.Log
 import com.example.shareyourvoicemapbox.data.constants.Constants.HOST
+import com.example.shareyourvoicemapbox.data.dto.UpdateUserDTO
 import com.example.shareyourvoicemapbox.data.dto.UserDTO
 import com.example.shareyourvoicemapbox.data.source.auth.storage.TokenStorage
 import io.ktor.client.HttpClient
@@ -8,8 +10,13 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
+import io.ktor.client.request.patch
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -84,6 +91,23 @@ class UserDataSource @Inject constructor(
                 error("Status: ${result.status}")
             }
             result.body()
+        }
+    }
+
+    suspend fun updateMe(userDTO: UpdateUserDTO): Result<Boolean> = withContext(Dispatchers.IO) {
+        Log.d("UPDATE ME", "data source reached")
+
+        runCatching {
+            val result = client.patch("${HOST}/api/users/update") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenStorage.getAccessToken()}")
+                contentType(ContentType.Application.Json)
+                setBody(userDTO)
+            }
+            Log.d("UPDATE ME", "${result.status}")
+            if (result.status != HttpStatusCode.OK) {
+                error("Error: ${result.status}")
+            }
+            true
         }
     }
 }

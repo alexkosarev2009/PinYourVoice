@@ -85,4 +85,7 @@
     <string name="feed_nav">Лента</string>
     <string name="auth_error">Ошибка авторизации</string>
     <string name="register_error">Ошибка регистрации</string>
+    <string name="edit_profile">Редактировать профиль</string>
+    <string name="change_avatar">Сменить аватар</string>
+    <string name="no_markers_found">Маркеры не найдены</string>
 </resources>
