@@ -88,4 +88,8 @@
     <string name="edit_profile">Редактировать профиль</string>
     <string name="change_avatar">Сменить аватар</string>
     <string name="no_markers_found">Маркеры не найдены</string>
+    <string name="swipe_to_see_more_markers">Листайте, чтобы увидеть ещё маркеры</string>
+    <string name="save_changes">Сохранить</string>
+    <string name="take_picture">Снять фото</string>
+    <string name="select_from_gallery">Выбрать из галереи</string>
 </resources>
