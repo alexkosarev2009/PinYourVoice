@@ -92,4 +92,5 @@
     <string name="save_changes">Сохранить</string>
     <string name="take_picture">Снять фото</string>
     <string name="select_from_gallery">Выбрать из галереи</string>
+    <string name="name">Имя</string>
 </resources>

@@ -255,7 +255,7 @@ fun EditProfileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        "Name",
+                        stringResource(R.string.name),
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(Modifier.width(8.dp))
@@ -300,7 +300,7 @@ fun EditProfileScreen(
 
                     ) {
                     Text(
-                        "Bio",
+                        stringResource(R.string.bio),
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(Modifier.width(8.dp))

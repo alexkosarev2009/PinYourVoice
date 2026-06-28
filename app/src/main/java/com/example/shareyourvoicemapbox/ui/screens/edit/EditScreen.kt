@@ -2,6 +2,9 @@
 
 package com.example.shareyourvoicemapbox.ui.screens.edit
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,15 +39,19 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PeopleAlt
+import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -66,8 +73,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -93,10 +102,12 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.shareyourvoicemapbox.R
+import com.example.shareyourvoicemapbox.ui.screens.editProfile.createImageUri
 import com.example.shareyourvoicemapbox.ui.theme.AppTheme
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
@@ -116,6 +127,25 @@ fun EditScreen(
 
     val isConnected by viewModel.isConnected.collectAsState()
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) {
+
+    }
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture(),
+    ) { success ->
+        if (success) {
+            imageUri?.let { nonNullUri ->
+                viewModel.onImagePicked(nonNullUri)
+                viewModel.getFileFromUri(context, nonNullUri)
+            }
+
+        }
+    }
 
     val waveformProgress by remember {
         derivedStateOf {
@@ -147,6 +177,9 @@ fun EditScreen(
     val scope = rememberCoroutineScope()
     val imageScale = remember { Animatable(1f) }
     val shouldEnlarge = offsetX.value >= maxDragPx * 0.9f
+
+    var expanded by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(shouldEnlarge) {
         imageScale.animateTo(
@@ -199,11 +232,7 @@ fun EditScreen(
             },
             onImagePickClick = {
                 if (state.imageUri == null) {
-                    imagePicker.launch(
-                        PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.ImageOnly,
-                        ),
-                    )
+                    expanded = true
                 }
             },
             onTitleChange = { title ->
@@ -251,13 +280,37 @@ fun EditScreen(
             onDemonMarkerClick = {
                 viewModel.chooseMarker(3)
             },
-            imageScale = imageScale,
-            onFriendsOnlyClick = {
-                viewModel.onFriendsOnlyClick()
-            },
             onPublicClick = {
                 viewModel.onPublicClick()
             },
+            onFriendsOnlyClick = {
+                viewModel.onFriendsOnlyClick()
+            },
+            expanded = expanded,
+            imageScale = imageScale,
+            onTakePictureClick = {
+                val hasGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                if (hasGranted == PackageManager.PERMISSION_GRANTED) {
+                    val uri = createImageUri(context)
+                    imageUri = uri
+                    takePictureLauncher.launch(uri)
+                }
+                else {
+                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+                expanded = false
+            },
+            onSelectFromGalleryClick = {
+                imagePicker.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly,
+                    ),
+                )
+                expanded = false
+            },
+            onDismissMenu = {
+                expanded = false
+            }
         )
     }
     LaunchedEffect(state.error) {
@@ -304,9 +357,13 @@ fun EditContent(
     onDemonMarkerClick: () -> Unit,
     onPublicClick: () -> Unit,
     onFriendsOnlyClick: () -> Unit,
+    expanded: Boolean,
 
 
     imageScale: Animatable<Float, AnimationVector1D>,
+    onDismissMenu: () -> Unit,
+    onTakePictureClick: () -> Unit,
+    onSelectFromGalleryClick: () -> Unit,
 ) {
     Column(
         modifier
@@ -373,6 +430,21 @@ fun EditContent(
                                 contentScale = ContentScale.Crop,
                             )
                         }
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = onDismissMenu
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.take_picture)) },
+                            leadingIcon = { Icon(Icons.Default.CameraAlt, null) },
+                            onClick = onTakePictureClick
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.select_from_gallery)) },
+                            leadingIcon = { Icon(Icons.Default.Photo, null) },
+                            onClick = onSelectFromGalleryClick,
+                        )
                     }
                 }
                 Box(
@@ -782,6 +854,10 @@ fun EditScreenPreview(modifier: Modifier = Modifier) {
                 imageScale = remember { Animatable(1f) },
                 onPublicClick = {},
                 onFriendsOnlyClick = {},
+                expanded = true,
+                onDismissMenu = {},
+                onSelectFromGalleryClick = {},
+                onTakePictureClick = {}
             )
         }
     }

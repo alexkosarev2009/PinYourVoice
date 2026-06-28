@@ -91,4 +91,5 @@
     <string name="save_changes">Save changes</string>
     <string name="take_picture">Take picture</string>
     <string name="select_from_gallery">Select from gallery</string>
+    <string name="name">Name</string>
 </resources>
