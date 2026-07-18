@@ -32,7 +32,7 @@ Additionally, Pin Your Voice supports both light and dark Material 3 themes.
 
 ## Clustering
 
-If many markers stack in a same place on the map, they form a **cluster**. This approach improves both performance and map readability.
+If many markers stack in the same place on the map, they form a **cluster**. This approach improves both performance and map readability.
 
 <img width="1920" height="1080" alt="PinYourVoice (5)" src="https://github.com/user-attachments/assets/d067b117-1265-4b85-8dd0-41d53538ac33" />
 
