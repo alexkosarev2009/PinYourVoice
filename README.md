@@ -58,7 +58,7 @@ PinYourVoice is built using modern Android development technologies and a Spring
 * JWT Authentication
 * Amazon AWS S3 API + Yandex Object Storage
 # Achievements
-* 🥇 1st Place — IT-Школа Самсунг выбирает сильнейших 2026(School Chooses the Strongest 2026), Номинация "Социальное приложение"(Social Applications category)
+* 🥇 1st Place — IT-Школа Самсунг выбирает сильнейших 2026(Samsung IT-School Chooses the Strongest 2026), Номинация "Социальное приложение"(Social Applications category)
 # Additional demo
 <img width="33%" height="1733" alt="feed" src="https://github.com/user-attachments/assets/9575be88-23f1-4e82-b825-f32c7bff1d82" />
 <img width="33%" height="1733" alt="clustering" src="https://github.com/user-attachments/assets/9af94cb8-79fd-467a-aa14-442195adbef0" />
