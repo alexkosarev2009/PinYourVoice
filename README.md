@@ -1,5 +1,10 @@
 <img width="1920" height="1080" alt="PinYourVoice (2)" src="https://github.com/user-attachments/assets/792a02fb-1df7-424a-9259-1225fd00b988" />
-
+<p align="center">
+  <img src="https://img.shields.io/badge/Kotlin-CFC9FF?style=for-the-badge&logo=kotlin&logoColor=black" alt="Kotlin" />
+  <img src="https://img.shields.io/badge/Android-D7F0D0?style=for-the-badge&logo=android&logoColor=black" alt="Android" />
+  <img src="https://img.shields.io/badge/Jetpack%20Compose-D6F2FF?style=for-the-badge&logo=jetpackcompose&logoColor=black" alt="Jetpack Compose" />
+  <img src="https://img.shields.io/badge/Ktor-E9D7FF?style=for-the-badge&logo=ktor&logoColor=black" alt="Ktor" />
+</p>
 # Pin Your Voice
 > A social network where every place has a voice.
 
