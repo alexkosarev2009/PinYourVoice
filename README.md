@@ -86,4 +86,7 @@ Feel free to open an issue or submit a pull request.
 * 📱 Download: [RuStore](https://www.rustore.ru/catalog/app/com.example.shareyourvoicemapbox)
 * 🌐 Backend Repository: [PYVBackend](https://github.com/alexkosarev2009/PYVBackend)
 * 🎥 Video demonstration(🇷🇺): [Google Drive](https://drive.google.com/file/d/1XAEO0zwmbqcUmydSJNtd81Rtv6hKqLa3/view?usp=drive_link)
-  
+
+# Developer
+
+[Kosarev Aleksandr](https://t.me/lnv1ncible)
